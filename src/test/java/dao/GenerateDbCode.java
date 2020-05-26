@@ -1,13 +1,12 @@
 package dao;
 
-import fun.johntaylor.kunkka.entity.todo.Todo;
 import fun.johntaylor.kunkka.entity.todo.TodoList;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
-public class GenerateMapper {
+public class GenerateDbCode {
 
     private static String camelNameToUnderString(String name) {
         return name.replaceAll("([a-z0-9])([A-Z])", "$1_$2").toLowerCase();
@@ -31,6 +30,7 @@ public class GenerateMapper {
 
         String fn;
         String col;
+        StringBuilder sqlCode = new StringBuilder();
         int i = 0;
         for (Field field : clz.getDeclaredFields()) {
             if (Modifier.isStatic(field.getModifiers())) {
@@ -41,6 +41,22 @@ public class GenerateMapper {
             }
             fn = field.getName();
             col = camelNameToUnderString(fn);
+            String typeName = field.getType().getSimpleName();
+            if (typeName.equals("Integer") || typeName.equals("Long") || typeName.equals("Short")) {
+                String defaultStr = "default";
+                String autoStr = "";
+                if (keyColSet.contains(field.getName())) {
+                    defaultStr = "not";
+                    autoStr = "auto_increment ";
+                }
+                sqlCode.append(String.format("\t`%s` bigint(20) %s null %scomment '',\n", col, defaultStr, autoStr));
+            } else if (typeName.equals("String") || typeName.equals("Character")) {
+                sqlCode.append(String.format("\t`%s` varchar(50) default null comment '',\n", col));
+            } else if (typeName.equals("Float") || typeName.equals("Double")) {
+                sqlCode.append(String.format("\t`%s` decimal(20,2) default '0.00' comment '',\n", col));
+            } else if (typeName.equals("Boolean")) {
+                sqlCode.append(String.format("\t`%s` tinyint(2) default '0' comment '',\n", col));
+            }
 
             if (i != 0) {
                 select.append(", ");
@@ -138,7 +154,7 @@ public class GenerateMapper {
 
         sql.append(String.format("<update id=\"update\" parameterType=\"%s\">\n", clz.getName()));
         sql.append(String.format("\tupdate %s\n", tableName));
-        if(update.length()>0) {
+        if (update.length() > 0) {
             sql.append("\t<set>\n");
             sql.append(update);
             sql.append("\t</set>\n");
@@ -151,12 +167,12 @@ public class GenerateMapper {
 
         sql.append("<update id=\"updateIdempotent\" parameterType=\"Map\">\n");
         sql.append(String.format("\tupdate %s\n", tableName));
-        if(updateIdempotentKey.length()>0) {
+        if (updateIdempotentKey.length() > 0) {
             sql.append("\t<set>\n");
             sql.append(updateIdempotentKey);
             sql.append("\t</set>\n");
         }
-        if(updateIdempotentWhere.length()> 0) {
+        if (updateIdempotentWhere.length() > 0) {
             sql.append("\t<where>\n");
             sql.append(String.format("\t\twhere %s\n", keyPairsNew.toString()));
             sql.append(updateIdempotentWhere);
@@ -166,10 +182,32 @@ public class GenerateMapper {
         System.out.println(sql.toString());
         sql.delete(0, sql.length());
         System.out.println();
+
+        sql.append(String.format("drop table if exists `%s`;\n", tableName));
+        sql.append(String.format("create table `%s` (\n", tableName));
+        sql.append(sqlCode);
+        if (keys.length == 1) {
+            sql.append(String.format("\tprimary key(`%s`)\n", keys[0]));
+        } else {
+            StringBuilder keyStr = new StringBuilder();
+            i = 0;
+            for (String key : keys) {
+                if (i != 0) {
+                    keyStr.append(",");
+                }
+                keyStr.append(String.format("`%s`", key));
+                i++;
+            }
+            sql.append(String.format("\tprimary key(%s)\n", keyStr));
+        }
+        sql.append(")engine=InnoDB auto_increment=1;");
+        System.out.println(sql.toString());
+        sql.delete(0, sql.length());
+        System.out.println();
         System.out.println("===========================================================");
     }
 
     public static void main(String[] args) {
-        printSql(Todo.class, "id");
+        printSql(TodoList.class, "id");
     }
 }
