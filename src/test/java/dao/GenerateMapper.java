@@ -1,5 +1,6 @@
 package dao;
 
+import fun.johntaylor.kunkka.entity.todo.Todo;
 import fun.johntaylor.kunkka.entity.todo.TodoList;
 
 import java.lang.reflect.Field;
@@ -69,7 +70,7 @@ public class GenerateMapper {
 
         System.out.println("===========================================================");
         StringBuilder sql = new StringBuilder();
-        sql.append(String.format("String COLUMNS = \"%s\"", select));
+        sql.append(String.format("String COLUMNS = \"%s\";", select));
         System.out.println(sql.toString());
         sql.delete(0, sql.length());
         System.out.println();
@@ -86,7 +87,7 @@ public class GenerateMapper {
             keyPairsNew.append(String.format("%s=#{old.%s}", keyMap.get(k), k));
             i++;
         }
-        sql.append(String.format("@Select(\"select COLUMNS from %s where %s\")", tableName, keyPairs.toString()));
+        sql.append(String.format("@Select(\"select \" + COLUMNS + \" from %s where %s\")", tableName, keyPairs.toString()));
         System.out.println(sql.toString());
         sql.delete(0, sql.length());
         String selectWhere = keyPairs.toString();
@@ -104,11 +105,11 @@ public class GenerateMapper {
         sql.delete(0, sql.length());
         System.out.println();
 
-        sql.append(String.format("@Insert into %s(%s) values(%s)", tableName, insertCol, insertFn));
+        sql.append(String.format("@Insert(\"insert into %s(%s) values(%s)\")", tableName, insertCol, insertFn));
         System.out.println(sql.toString());
         sql.delete(0, sql.length());
         if (keys.length == 1) {
-            sql.append(String.format("@SelectKey(statement = \"SELECT LAST_INSERT_ID()\", keyProperty = \"%s\", before = false, resultType = Long.class", keys[0]));
+            sql.append(String.format("@SelectKey(statement = \"SELECT LAST_INSERT_ID()\", keyProperty = \"%s\", before = false, resultType = Long.class)", keys[0]));
             System.out.println(sql.toString());
             sql.delete(0, sql.length());
         }
@@ -117,7 +118,7 @@ public class GenerateMapper {
         sql.delete(0, sql.length());
         System.out.println();
 
-        sql.append(String.format("int update(%s %s)", clz.getSimpleName(), objName));
+        sql.append(String.format("int update(%s %s);", clz.getSimpleName(), objName));
         System.out.println(sql.toString());
         sql.delete(0, sql.length());
         System.out.println();
@@ -140,7 +141,7 @@ public class GenerateMapper {
         if(update.length()>0) {
             sql.append("\t<set>\n");
             sql.append(update);
-            sql.append("\t<set>\n");
+            sql.append("\t</set>\n");
         }
         sql.append(String.format("\twhere %s\n", selectWhere));
         sql.append("</update>");
@@ -169,6 +170,6 @@ public class GenerateMapper {
     }
 
     public static void main(String[] args) {
-        printSql(TodoList.class, "id");
+        printSql(Todo.class, "id");
     }
 }

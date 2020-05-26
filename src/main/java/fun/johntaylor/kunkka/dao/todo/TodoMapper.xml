@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="fun.johntaylor.kunkka.dao.todo.TodoListMapper">
-    <update id="update" parameterType="fun.johntaylor.kunkka.entity.todo.TodoList">
-        update t_todo_list
+<mapper namespace="fun.johntaylor.kunkka.dao.todo.TodoMapper">
+    <update id="update" parameterType="fun.johntaylor.kunkka.entity.todo.Todo">
+        update t_todo
         <set>
+            <if test="task!=null">task = task,</if>
             <if test="value!=null">value = value,</if>
-            <if test="finishValue!=null">finish_value = finishValue,</if>
-            <if test="totalTime!=null">total_time = totalTime,</if>
+            <if test="estimateTime!=null">estimate_time = estimateTime,</if>
+            <if test="realityTime!=null">reality_time = realityTime,</if>
+            <if test="listId!=null">list_id = listId,</if>
             <if test="createTime!=null">create_time = createTime,</if>
             <if test="updateTime!=null">update_time = updateTime,</if>
             <if test="status!=null">status = status,</if>
@@ -15,20 +17,24 @@
     </update>
 
     <update id="updateIdempotent" parameterType="Map">
-        update t_todo_list
+        update t_todo
         <set>
+            <if test="new.task!=null">task = #{new.task},</if>
             <if test="new.value!=null">value = #{new.value},</if>
-            <if test="new.finishValue!=null">finish_value = #{new.finishValue},</if>
-            <if test="new.totalTime!=null">total_time = #{new.totalTime},</if>
+            <if test="new.estimateTime!=null">estimate_time = #{new.estimateTime},</if>
+            <if test="new.realityTime!=null">reality_time = #{new.realityTime},</if>
+            <if test="new.listId!=null">list_id = #{new.listId},</if>
             <if test="new.createTime!=null">create_time = #{new.createTime},</if>
             <if test="new.updateTime!=null">update_time = #{new.updateTime},</if>
             <if test="new.status!=null">status = #{new.status},</if>
         </set>
         <where>
             where id=#{old.id}
+            <if test="new.task!=null and old.task!=null">and task = #{old.task}</if>
             <if test="new.value!=null and old.value!=null">and value = #{old.value}</if>
-            <if test="new.finishValue!=null and old.finishValue!=null">and finish_value = #{old.finishValue}</if>
-            <if test="new.totalTime!=null and old.totalTime!=null">and total_time = #{old.totalTime}</if>
+            <if test="new.estimateTime!=null and old.estimateTime!=null">and estimate_time = #{old.estimateTime}</if>
+            <if test="new.realityTime!=null and old.realityTime!=null">and reality_time = #{old.realityTime}</if>
+            <if test="new.listId!=null and old.listId!=null">and list_id = #{old.listId}</if>
             <if test="new.createTime!=null and old.createTime!=null">and create_time = #{old.createTime}</if>
             <if test="new.updateTime!=null and old.updateTime!=null">and update_time = #{old.updateTime}</if>
             <if test="new.status!=null and old.status!=null">and status = #{old.status}</if>
