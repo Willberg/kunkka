@@ -1,11 +1,13 @@
-package fun.johntaylor.kunkka.dao.todo;
+package fun.johntaylor.kunkka.mapper.todo;
 
 import fun.johntaylor.kunkka.entity.todo.Todo;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.SelectKey;
 
 import java.util.Map;
 
-@Mapper
 public interface TodoMapper {
     String COLUMNS = "id, task, value, estimate_time as estimateTime, reality_time as realityTime, list_id as listId, create_time as createTime, update_time as updateTime, status";
 

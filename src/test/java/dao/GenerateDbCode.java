@@ -1,5 +1,6 @@
 package dao;
 
+import fun.johntaylor.kunkka.entity.todo.Todo;
 import fun.johntaylor.kunkka.entity.todo.TodoList;
 
 import java.lang.reflect.Field;
@@ -76,7 +77,7 @@ public class GenerateDbCode {
                 keyMap.put(field.getName(), camelNameToUnderString(field.getName()));
                 typeMap.put(field.getName(), field.getType().getSimpleName());
             } else {
-                update.append(String.format("\t\t<if test=\"%s!=null\">%s = %s,</if>\n", field.getName(), camelNameToUnderString(field.getName()), field.getName()));
+                update.append(String.format("\t\t<if test=\"%s!=null\">%s = #{%s},</if>\n", field.getName(), camelNameToUnderString(field.getName()), field.getName()));
                 updateIdempotentKey.append(String.format("\t\t<if test=\"new.%s!=null\">%s = #{new.%s},</if>\n", field.getName(), camelNameToUnderString(field.getName()), field.getName()));
                 updateIdempotentWhere.append(String.format("\t\t<if test=\"new.%s!=null and old.%s!=null\">and %s = #{old.%s}</if>\n", field.getName(), field.getName(), camelNameToUnderString(field.getName()), field.getName()));
             }

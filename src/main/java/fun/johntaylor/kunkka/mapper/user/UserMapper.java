@@ -1,4 +1,4 @@
-package fun.johntaylor.kunkka.dao.user;
+package fun.johntaylor.kunkka.mapper.user;
 
 import org.apache.ibatis.annotations.Mapper;
 

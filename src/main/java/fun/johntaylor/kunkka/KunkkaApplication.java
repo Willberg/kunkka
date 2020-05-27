@@ -5,11 +5,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan("fun.johntaylor.kunkka.dao")
+@MapperScan("fun.johntaylor.kunkka.mapper")
 public class KunkkaApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(KunkkaApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(KunkkaApplication.class, args);
+    }
 
 }
