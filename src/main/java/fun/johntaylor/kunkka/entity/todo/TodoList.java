@@ -21,6 +21,16 @@ public class TodoList {
      */
     private Integer totalTime;
 
+    /**
+     * 最多用时， 不能超过此用时时间
+     */
+    private Integer maxTime;
+
+    /**
+     * 最低优先级，高于此优先级的任务不可过滤
+     */
+    private Integer minPriority;
+
     private Long createTime;
 
     private Long updateTime;
@@ -29,4 +39,8 @@ public class TodoList {
      * 1-- 待处理， 99- 作废， 100- 完成
      */
     private Integer status;
+
+    public static final Integer S_PENDING = 1;
+    public static final Integer S_DEL = 99;
+    public static final Integer S_FINISHED = 100;
 }

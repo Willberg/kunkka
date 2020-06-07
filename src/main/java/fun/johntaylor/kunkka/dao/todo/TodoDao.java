@@ -8,6 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
 
 @Repository
 public class TodoDao {
@@ -19,13 +23,22 @@ public class TodoDao {
     private TodoMapper todoMapper;
 
     @Transactional
-    public void addData() {
+    public void addData(List<Todo> todos) {
         TodoList todoList = new TodoList();
-        todoList.setCreateTime(System.currentTimeMillis());
-        todoList.setValue(100);
-        todoListMapper.insert(todoList);
+        Todo todo = todos.get(0);
+        if (Objects.isNull(todo.getListId())) {
+            todoList.setValue(todo.getValue());
+            todoList.setCreateTime(System.currentTimeMillis());
+            todo.setUpdateTime(System.currentTimeMillis());
+            todo.setStatus(TodoList.S_PENDING);
+            todoListMapper.insert(todoList);
+        } else {
+            todoList = todoListMapper.select(todo.getListId());
+//            todoList.setValue();
+        }
 
-        Todo todo = new Todo();
+
+//        Todo todo = new Todo();
         todo.setCreateTime(System.currentTimeMillis());
         todo.setListId(todoList.getId());
         todoMapper.insert(todo);

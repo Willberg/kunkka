@@ -1,0 +1,6 @@
+sys:
+  0001: system error
+  0002: db error
+  0003: timeout error
+  0004: customize error
+  0005: parameter error

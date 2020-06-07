@@ -32,5 +32,7 @@ public class Todo {
 
     private Long updateTime;
 
+    private Integer priority;
+
     private Integer status;
 }

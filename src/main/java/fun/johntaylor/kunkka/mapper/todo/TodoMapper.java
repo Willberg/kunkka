@@ -9,12 +9,12 @@ import org.apache.ibatis.annotations.SelectKey;
 import java.util.Map;
 
 public interface TodoMapper {
-    String COLUMNS = "id, task, value, estimate_time as estimateTime, reality_time as realityTime, list_id as listId, create_time as createTime, update_time as updateTime, status";
+    String COLUMNS = "id, task, value, estimate_time as estimateTime, reality_time as realityTime, list_id as listId, create_time as createTime, update_time as updateTime, priority, status";
 
     @Select("select " + COLUMNS + " from t_todo where id=#{id}")
     Todo select(Long id);
 
-    @Insert("insert into t_todo(id, task, value, estimate_time, reality_time, list_id, create_time, update_time, status) values(#{id}, #{task}, #{value}, #{estimateTime}, #{realityTime}, #{listId}, #{createTime}, #{updateTime}, #{status})")
+    @Insert("insert into t_todo(id, task, value, estimate_time, reality_time, list_id, create_time, update_time, priority, status) values(#{id}, #{task}, #{value}, #{estimateTime}, #{realityTime}, #{listId}, #{createTime}, #{updateTime}, #{priority}, #{status})")
     @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "id", before = false, resultType = Long.class)
     int insert(Todo todo);
 

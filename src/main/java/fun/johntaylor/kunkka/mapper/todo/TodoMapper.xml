@@ -11,6 +11,7 @@
             <if test="listId!=null">list_id = #{listId},</if>
             <if test="createTime!=null">create_time = #{createTime},</if>
             <if test="updateTime!=null">update_time = #{updateTime},</if>
+            <if test="priority!=null">priority = #{priority},</if>
             <if test="status!=null">status = #{status},</if>
         </set>
         where id=#{id}
@@ -26,6 +27,7 @@
             <if test="new.listId!=null">list_id = #{new.listId},</if>
             <if test="new.createTime!=null">create_time = #{new.createTime},</if>
             <if test="new.updateTime!=null">update_time = #{new.updateTime},</if>
+            <if test="new.priority!=null">priority = #{new.priority},</if>
             <if test="new.status!=null">status = #{new.status},</if>
         </set>
         <where>
@@ -37,6 +39,7 @@
             <if test="new.listId!=null and old.listId!=null">and list_id = #{old.listId}</if>
             <if test="new.createTime!=null and old.createTime!=null">and create_time = #{old.createTime}</if>
             <if test="new.updateTime!=null and old.updateTime!=null">and update_time = #{old.updateTime}</if>
+            <if test="new.priority!=null and old.priority!=null">and priority = #{old.priority}</if>
             <if test="new.status!=null and old.status!=null">and status = #{old.status}</if>
         </where>
     </update>
