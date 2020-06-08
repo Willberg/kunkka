@@ -3,6 +3,7 @@ package fun.johntaylor.kunkka.controller.todo;
 import com.google.gson.reflect.TypeToken;
 import fun.johntaylor.kunkka.entity.todo.Todo;
 import fun.johntaylor.kunkka.service.todo.TodoService;
+import fun.johntaylor.kunkka.utils.error.ErrorCode;
 import fun.johntaylor.kunkka.utils.json.JsonUtil;
 import fun.johntaylor.kunkka.utils.result.Result;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
@@ -35,23 +37,25 @@ public class TodoController {
         todo.setListId(listId);
         todo.setPriority(priority);
 //        todoService.add();
-        return Mono.just("hello");
+        return Mono.error(new RuntimeException("test error"));
     }
 
     @RequestMapping(value = "/patch/add", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Mono<String> addPatch(@RequestParam("todoStr") String todoStr) {
+    public Mono<String> addPatch(
+            @RequestParam(value = "minPriority", defaultValue = "1") Integer minPriority,
+            @RequestParam("todoStr") String todoStr) {
         log.info("patch add todo and todo list");
-        try {
-            List<Todo> todos = JsonUtil.fromJson(todoStr, new TypeToken<List<Todo>>() {
-            }.getType());
-            todoService.addPatch(todos);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-
-        }
-
-        return Mono.just("hello");
+        return Mono
+                .defer(() -> Mono.just(JsonUtil.fromJson(todoStr, new TypeToken<List<Todo>>() {
+                }.getType())))
+                .publishOn(Schedulers.newElastic("patch-pool"))
+                .map(v -> {
+                    todoService.addPatch(minPriority, (List<Todo>) v);
+                    return Result.success().toString();
+                })
+                .doOnError(e -> log.error(e.getMessage()))
+                .onErrorReturn(Result.fail(ErrorCode.SYS_PARAMETER_ERROR).toString());
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

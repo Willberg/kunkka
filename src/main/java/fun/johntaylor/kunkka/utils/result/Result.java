@@ -27,15 +27,23 @@ public final class Result<T> {
         this.data = data;
     }
 
-    public static <T> String success(T data) {
-        return JsonUtil.toJson(new Result<T>(S_SUCCESS, null, null, data));
+    public static <T> Result<T> success() {
+        return new Result<>(S_SUCCESS, null, null, null);
     }
 
-    public static <T> String fail(String code) {
-        return JsonUtil.toJson(new Result<T>(S_FAIL, code, MessageUtil.getMessage(code), null));
+    public static <T> Result<T> success(T data) {
+        return new Result<>(S_SUCCESS, null, null, data);
     }
 
-    public static <T> String failWithMessage(String message) {
-        return JsonUtil.toJson(new Result<T>(S_FAIL, ErrorCode.SYS_CUSTOMIZE_ERROR, message, null));
+    public static <T> Result<T> fail(String code) {
+        return new Result<>(S_FAIL, code, MessageUtil.getMessage(code), null);
+    }
+
+    public static <T> Result<T> failWithMessage(String message) {
+        return new Result<>(S_FAIL, ErrorCode.SYS_CUSTOMIZE_ERROR, message, null);
+    }
+
+    public String toString() {
+        return JsonUtil.toJson(this);
     }
 }

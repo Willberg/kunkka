@@ -26,7 +26,7 @@ public interface TodoListMapper {
     int delete(Long id);
 
     @Insert("insert into t_todo_list(id, value, finish_value, total_time, max_time, min_priority, create_time, update_time, status) values(#{id}, #{value}, #{finishValue}, #{totalTime}, #{maxTime}, #{minPriority}, #{createTime}, #{updateTime}, #{status}) " +
-            "on duplicate key update update_time = #{updateTime}")
+            "on duplicate key update update_time = #{updateTime}, status = #{status}")
     @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "id", before = false, resultType = Long.class)
     int insertWithUpdate(TodoList todoList);
 }
