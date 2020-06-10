@@ -18,16 +18,24 @@ public class TodoService {
 //        todoDao.addData(todo);
     }
 
-    // 根据背包问题方案解决
-    public void addPatch(Integer minPriority, List<Todo> todos) {
-        if (todos.size() > 0) {
-            TodoList todoList = new TodoList();
-            todoList.setId(todos.get(0).getListId());
-            todoList.setMinPriority(minPriority);
-            todoList.setCreateTime(System.currentTimeMillis());
-            todoList.setUpdateTime(System.currentTimeMillis());
-            todoDao.addData(todoList, todos);
+    public void addPatch(Integer maxTime, Integer minPriority, List<Todo> todos) {
+        if (todos.size() == 0) {
+            return;
         }
+
+        // 初始化TodoList
+        TodoList todoList = new TodoList();
+        todoList.setId(todos.get(0).getListId());
+        todoList.setMinPriority(minPriority);
+        todoList.setMaxTime(maxTime);
+        int totalTime = 0;
+        for (Todo t : todos) {
+            totalTime += t.getEstimateTime();
+        }
+        todoList.setTotalTime(totalTime);
+        todoList.setCreateTime(System.currentTimeMillis());
+        todoList.setUpdateTime(System.currentTimeMillis());
+        todoDao.addData(todoList, todos);
     }
 
     public void update(Long id) {

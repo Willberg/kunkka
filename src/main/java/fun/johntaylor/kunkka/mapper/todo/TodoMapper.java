@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectKey;
 
+import java.util.List;
 import java.util.Map;
 
 public interface TodoMapper {
@@ -24,4 +25,12 @@ public interface TodoMapper {
 
     @Delete("delete from Todo where id=#{id}")
     int delete(Long id);
+
+    @Select("select " + COLUMNS + " from t_todo where list_id=#{listId} for update")
+    List<Todo> selectByListId(Long listId);
+
+    @Insert("insert into t_todo(id, task, value, estimate_time, reality_time, list_id, create_time, update_time, priority, status) values(#{id}, #{task}, #{value}, #{estimateTime}, #{realityTime}, #{listId}, #{createTime}, #{updateTime}, #{priority}, #{status}) " +
+            "on duplicate key update update_time = #{updateTime}, status = #{status}")
+    @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "id", before = false, resultType = Long.class)
+    int insertWithUpdateStatus(Todo todo);
 }

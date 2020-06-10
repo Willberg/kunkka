@@ -36,11 +36,11 @@ public class TodoList {
     private Long updateTime;
 
     /**
-     * 1-- 待处理， 99- 作废， 100- 完成
+     * 1-- 待处理， 50- 作废， 100- 完成
      */
     private Integer status;
 
     public static final Integer S_PENDING = 1;
-    public static final Integer S_DEL = 99;
+    public static final Integer S_DEL = 50;
     public static final Integer S_FINISHED = 100;
 }

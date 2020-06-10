@@ -32,7 +32,17 @@ public class Todo {
 
     private Long updateTime;
 
+    /**
+     * 权限 1-10， 数值越小，权限越高
+     */
     private Integer priority;
 
+    /**
+     * 1-- 待处理， 50- 作废， 100- 完成
+     */
     private Integer status;
+
+    public static final Integer S_PENDING = 1;
+    public static final Integer S_DEL = 50;
+    public static final Integer S_FINISHED = 100;
 }

@@ -9,11 +9,15 @@ import fun.johntaylor.kunkka.utils.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -22,8 +26,7 @@ public class TodoController {
     @Autowired
     private TodoService todoService;
 
-    @RequestMapping(value = "/add", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
+    @GetMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<String> add(@RequestParam("task") String task,
                             @RequestParam("value") Integer value,
                             @RequestParam("estimateTime") Integer estimateTime,
@@ -40,29 +43,30 @@ public class TodoController {
         return Mono.error(new RuntimeException("test error"));
     }
 
-    @RequestMapping(value = "/patch/add", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
+    @PostMapping(value = "/patch/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<String> addPatch(
-            @RequestParam(value = "minPriority", defaultValue = "1") Integer minPriority,
-            @RequestParam("todoStr") String todoStr) {
-        log.info("patch add todo and todo list");
+            Integer maxTime,
+            Integer minPriority,
+            String todoStr) {
         return Mono
                 .defer(() -> Mono.just(JsonUtil.fromJson(todoStr, new TypeToken<List<Todo>>() {
                 }.getType())))
                 .publishOn(Schedulers.newElastic("patch-pool"))
                 .map(v -> {
-                    todoService.addPatch(minPriority, (List<Todo>) v);
+                    System.out.println("todo:" + ((List<Todo>) v).size());
+                    int validMaxTime = Optional.ofNullable(maxTime).orElse(480);
+                    int validMinPriority = Optional.ofNullable(minPriority).orElse(1);
+                    todoService.addPatch(validMaxTime, validMinPriority, (List<Todo>) v);
                     return Result.success().toString();
                 })
                 .doOnError(e -> log.error(e.getMessage()))
                 .onErrorReturn(Result.fail(ErrorCode.SYS_PARAMETER_ERROR).toString());
     }
 
-    @RequestMapping(value = "/update", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public Mono<String> update(@RequestParam(value = "id") Long id) {
+    @PostMapping(value = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<String> update(Long id) {
         log.info("d");
-        todoService.update(id);
+//        todoService.update(id);
         return Mono.just("hello");
     }
 }

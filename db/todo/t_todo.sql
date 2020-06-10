@@ -10,5 +10,6 @@ create table `t_todo` (
 	`update_time` bigint(20) default null comment '更新时间',
 	`priority` int(10) default null comment '优先级，数字越小优先级越高，1--最高',
 	`status` tinyint(4) default null comment '0--无效， 50--进行中， 100--完成',
-	primary key(`id`)
+	primary key(`id`),
+	key(`list_id`)
 )engine=InnoDB auto_increment=1;
