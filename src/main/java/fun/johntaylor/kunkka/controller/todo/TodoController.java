@@ -1,6 +1,7 @@
 package fun.johntaylor.kunkka.controller.todo;
 
 import com.google.gson.reflect.TypeToken;
+import fun.johntaylor.kunkka.component.ThreadPoolComponent;
 import fun.johntaylor.kunkka.entity.todo.Todo;
 import fun.johntaylor.kunkka.service.todo.TodoService;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 import java.util.Optional;
@@ -51,7 +51,7 @@ public class TodoController {
         return Mono
                 .defer(() -> Mono.just(JsonUtil.fromJson(todoStr, new TypeToken<List<Todo>>() {
                 }.getType())))
-                .publishOn(Schedulers.newElastic("patch-pool"))
+                .publishOn(ThreadPoolComponent.daoThreadPool())
                 .map(v -> {
                     System.out.println("todo:" + ((List<Todo>) v).size());
                     int validMaxTime = Optional.ofNullable(maxTime).orElse(480);
