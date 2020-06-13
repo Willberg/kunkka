@@ -1,16 +1,19 @@
 package fun.johntaylor.kunkka.component;
 
+import org.springframework.stereotype.Component;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
+@Component
 public class ThreadPoolComponent {
-    private static Scheduler daoPool = Schedulers.newParallel("thread-db-pool", 10);
+	private Scheduler daoPool;
 
-    private ThreadPoolComponent() {
+	private ThreadPoolComponent() {
+		daoPool = Schedulers.newParallel("thread-db-pool", 10);
+	}
 
-    }
 
-    public static Scheduler daoThreadPool() {
-        return daoPool;
-    }
+	public Scheduler daoInstance() {
+		return daoPool;
+	}
 }

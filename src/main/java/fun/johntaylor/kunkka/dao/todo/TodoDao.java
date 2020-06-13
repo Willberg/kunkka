@@ -4,79 +4,85 @@ import fun.johntaylor.kunkka.entity.todo.Todo;
 import fun.johntaylor.kunkka.entity.todo.TodoList;
 import fun.johntaylor.kunkka.mapper.todo.TodoListMapper;
 import fun.johntaylor.kunkka.mapper.todo.TodoMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 
 @Repository
+@Slf4j
 public class TodoDao {
 
-    @Autowired
-    private TodoListMapper todoListMapper;
+	@Autowired
+	private TodoListMapper todoListMapper;
 
-    @Autowired
-    private TodoMapper todoMapper;
+	@Autowired
+	private TodoMapper todoMapper;
 
-    // 价值评判由权限×价值决定
-    private static int[] calMaxValueByDp(int capacity, List<Todo> todoList) {
-        int[] dp = new int[capacity + 1];
-        for (int i = 0; i < todoList.size(); i++) {
-            for (int j = capacity; j >= 0; j--) {
-                if (j > todoList.get(i).getEstimateTime()) {
-                    dp[i] = Math.max(dp[i], dp[j - todoList.get(i).getEstimateTime()] + todoList.get(i).getValue() * todoList.get(i).getPriority());
+	// 价值评判由优先级(越小权优先级高)×价值决定
+	private static int[] calMaxValueByDp(int capacity, List<Todo> todoList) {
+		int[] dp = new int[capacity + 1];
+		for (int i = 0; i < todoList.size(); i++) {
+			for (int j = capacity; j >= 0; j--) {
+				if (j > todoList.get(i).getEstimateTime()) {
+					int preValue = dp[j - todoList.get(i).getEstimateTime()] + todoList.get(i).getValue() * (TodoList.MAX_PRIORITY - todoList.get(i).getPriority());
+					dp[j] = Math.max(dp[j], preValue);
+					if (dp[j] == preValue) {
+						todoList.get(i).setStatus(Todo.S_PENDING);
+					} else {
+						todoList.get(i).setStatus(Todo.S_DEL);
+					}
+				}
+			}
+		}
+		return dp;
+	}
 
-                }
-            }
-        }
-        return dp;
-    }
+	@Transactional(rollbackFor = Exception.class)
+	public void addData(TodoList todoList, List<Todo> todos) {
+		// 根据背包问题方案解决, f[v] = max{f[v], f[v-w[i]] +v[i]}
+		int capacity = todoList.getMaxTime();
+		if (Objects.nonNull(todoList.getId())) {
+			capacity = capacity - todoListMapper.select(todoList.getId()).getTotalTime();
+		}
+		int[] dp = calMaxValueByDp(capacity, todos);
+		log.debug("total value: " + dp[capacity]);
 
-    // 找到最佳方案，设置状态
-    private static void findWhat(int i, int j, int[] dp, List<Todo> todos, TodoList todoList) {
-        if (i >= 1) {
-            if (j - todos.get(i).getEstimateTime() >= 0 && dp[j] == dp[j - todos.get(i).getEstimateTime()] + todos.get(i).getValue() * todos.get(i).getPriority()) {
-                todos.get(i).setStatus(Todo.S_PENDING);
-                // 存在未完成任务
-                todoList.setStatus(TodoList.S_PENDING);
-                findWhat(i - 1, j - todos.get(i).getEstimateTime(), dp, todos, todoList);
-            } else {
-                todos.get(i).setStatus(Todo.S_DEL);
-                findWhat(i - 1, j, dp, todos, todoList);
-            }
-        }
-    }
+		todos.forEach(t -> {
+			t.setCreateTime(System.currentTimeMillis());
+			t.setUpdateTime(System.currentTimeMillis());
+			if (Todo.S_PENDING.equals(t.getStatus())) {
+				// 存在未完成任务
+				int oldValue = Optional.ofNullable(todoList.getValue()).orElse(0);
+				todoList.setValue(oldValue + t.getValue());
+				todoList.setStatus(TodoList.S_PENDING);
+			}
+		});
 
-    @Transactional
-    public void addData(TodoList todoList, List<Todo> todos) {
-        // 根据背包问题方案解决, f[v] = max{f[v], f[v-w[i]] +v[i]}
-        int capacity = todoList.getMaxTime();
-        if (Objects.nonNull(todoList.getId())) {
-            capacity = capacity - todoListMapper.select(todoList.getId()).getTotalTime();
-        }
-        int[] dp = calMaxValueByDp(capacity, todos);
 
-        // 找到最佳方案
-        findWhat(todos.size() - 1, capacity, dp, todos, todoList);
+		todoListMapper.insertWithUpdate(todoList);
+		todos.forEach(t -> {
+			t.setListId(todoList.getId());
+			todoMapper.insert(t);
+		});
+	}
 
-        todoListMapper.insertWithUpdate(todoList);
-        todos.forEach(t -> todoMapper.insert(t));
-    }
+	@Transactional(rollbackFor = Exception.class)
+	public void updateData(Long id) {
+		Todo todo = todoMapper.select(id);
+		todo.setValue(id.intValue());
+		todo.setUpdateTime(System.currentTimeMillis());
+		todoMapper.update(todo);
 
-    @Transactional
-    public void updateData(Long id) {
-        Todo todo = todoMapper.select(id);
-        todo.setValue(id.intValue());
-        todo.setUpdateTime(System.currentTimeMillis());
-        todoMapper.update(todo);
-
-        TodoList todoList = new TodoList();
-        todoList.setId(todo.getListId());
-        todoList.setUpdateTime(System.currentTimeMillis());
-        todoList.setValue(50);
-        todoListMapper.update(todoList);
-    }
+		TodoList todoList = new TodoList();
+		todoList.setId(todo.getListId());
+		todoList.setUpdateTime(System.currentTimeMillis());
+		todoList.setValue(50);
+		todoListMapper.update(todoList);
+	}
 }

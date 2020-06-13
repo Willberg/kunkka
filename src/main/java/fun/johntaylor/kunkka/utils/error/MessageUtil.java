@@ -18,7 +18,7 @@ public final class MessageUtil {
 
     static {
         Yaml yml = new Yaml();
-        String path = Object.class.getResource("/error/").getPath() + "messages.yml";
+        String path = Thread.currentThread().getContextClassLoader().getResource("error") + "/messages.yml";
         InputStream reader = null;
         try {
             reader = new FileInputStream(new File(path));

@@ -40,6 +40,9 @@ public class TodoList {
      */
     private Integer status;
 
+
+    public static final Integer MAX_PRIORITY = 10;
+
     public static final Integer S_PENDING = 1;
     public static final Integer S_DEL = 50;
     public static final Integer S_FINISHED = 100;

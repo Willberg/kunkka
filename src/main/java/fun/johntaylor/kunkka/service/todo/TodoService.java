@@ -35,6 +35,7 @@ public class TodoService {
         todoList.setTotalTime(totalTime);
         todoList.setCreateTime(System.currentTimeMillis());
         todoList.setUpdateTime(System.currentTimeMillis());
+        todoList.setStatus(TodoList.S_FINISHED);
         todoDao.addData(todoList, todos);
     }
 

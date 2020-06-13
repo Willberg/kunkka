@@ -5,9 +5,11 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectKey;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+@Component
 public interface TodoListMapper {
     String COLUMNS = "id, value, finish_value as finishValue, total_time as totalTime, max_time as maxTime, min_priority as minPriority, create_time as createTime, update_time as updateTime, status";
 
