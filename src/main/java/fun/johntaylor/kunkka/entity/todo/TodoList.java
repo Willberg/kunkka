@@ -2,6 +2,9 @@ package fun.johntaylor.kunkka.entity.todo;
 
 import lombok.Data;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+
 @Data
 public class TodoList {
     private Long id;
@@ -29,6 +32,8 @@ public class TodoList {
     /**
      * 最低优先级，高于此优先级的任务不可过滤
      */
+    @Min(value = 1,message = "不能小于1")
+    @Max(value = 10, message = "不能超过10")
     private Integer minPriority;
 
     private Long createTime;

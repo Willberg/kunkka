@@ -11,35 +11,48 @@ import java.util.List;
 @Service
 public class TodoService {
 
-    @Autowired
-    private TodoDao todoDao;
+	@Autowired
+	private TodoDao todoDao;
 
-    public void add(Todo todo) {
+	public void add(Todo todo) {
 //        todoDao.addData(todo);
-    }
+	}
 
-    public void addPatch(Integer maxTime, Integer minPriority, List<Todo> todos) {
-        if (todos.size() == 0) {
-            return;
-        }
+	public void addPatch(Integer maxTime, Integer minPriority, List<Todo> todos) {
+		if (todos.size() == 0) {
+			return;
+		}
 
-        // 初始化TodoList
-        TodoList todoList = new TodoList();
-        todoList.setId(todos.get(0).getListId());
-        todoList.setMinPriority(minPriority);
-        todoList.setMaxTime(maxTime);
-        int totalTime = 0;
-        for (Todo t : todos) {
-            totalTime += t.getEstimateTime();
-        }
-        todoList.setTotalTime(totalTime);
-        todoList.setCreateTime(System.currentTimeMillis());
-        todoList.setUpdateTime(System.currentTimeMillis());
-        todoList.setStatus(TodoList.S_FINISHED);
-        todoDao.addData(todoList, todos);
-    }
+		// 初始化TodoList
+		TodoList todoList = new TodoList();
+		todoList.setId(todos.get(0).getListId());
+		todoList.setMinPriority(minPriority);
+		todoList.setMaxTime(maxTime);
+		int totalTime = 0;
+		for (Todo t : todos) {
+			totalTime += t.getEstimateTime();
+		}
+		todoList.setTotalTime(totalTime);
+		todoList.setCreateTime(System.currentTimeMillis());
+		todoList.setUpdateTime(System.currentTimeMillis());
+		todoList.setStatus(TodoList.S_FINISHED);
 
-    public void update(Long id) {
-        todoDao.updateData(id);
-    }
+		// 按优先级给todos排序
+		todos.sort((o1, o2) -> {
+			if (o1.getPriority() < o2.getPriority()) {
+				return 1;
+			} else {
+				return -1;
+			}
+		});
+		todoDao.addData(todoList, todos);
+	}
+
+	public void update(Long id) {
+		todoDao.updateData(id);
+	}
+
+	public void test(){
+		todoDao.updateData(1000L);
+	}
 }

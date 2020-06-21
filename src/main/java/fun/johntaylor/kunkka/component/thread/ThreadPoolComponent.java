@@ -1,4 +1,4 @@
-package fun.johntaylor.kunkka.component;
+package fun.johntaylor.kunkka.component.thread;
 
 import org.springframework.stereotype.Component;
 import reactor.core.scheduler.Scheduler;

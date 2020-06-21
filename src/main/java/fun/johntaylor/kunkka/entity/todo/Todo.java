@@ -2,6 +2,9 @@ package fun.johntaylor.kunkka.entity.todo;
 
 import lombok.Data;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+
 @Data
 public class Todo {
     private Long id;
@@ -14,6 +17,8 @@ public class Todo {
     /**
      * 价值 1-100
      */
+    @Min(value = 1,message = "不能小于1")
+    @Max(value = 100, message = "不能超过10")
     private Integer value;
 
     /**
@@ -33,8 +38,10 @@ public class Todo {
     private Long updateTime;
 
     /**
-     * 权限 1-10， 数值越小，权限越高
+     * 优先级 1-10， 数值越小，优先级越高
      */
+    @Min(value = 1,message = "不能小于1")
+    @Max(value = 10, message = "不能超过10")
     private Integer priority;
 
     /**

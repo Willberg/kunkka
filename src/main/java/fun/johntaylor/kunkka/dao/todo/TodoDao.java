@@ -53,17 +53,28 @@ public class TodoDao {
 		int[] dp = calMaxValueByDp(capacity, todos);
 		log.debug("total value: " + dp[capacity]);
 
-		todos.forEach(t -> {
+		int totalTime = 0;
+		for (Todo t : todos) {
+			// 优先级较高不可过滤
+			if (Todo.S_DEL.equals(t.getStatus()) && todoList.getMinPriority() >= t.getPriority()) {
+				t.setStatus(Todo.S_PENDING);
+			}
 			t.setCreateTime(System.currentTimeMillis());
 			t.setUpdateTime(System.currentTimeMillis());
+
+			// 不能超过总时长
+			totalTime += t.getEstimateTime();
+			if (totalTime > todoList.getMaxTime()) {
+				t.setStatus(Todo.S_DEL);
+			}
+
 			if (Todo.S_PENDING.equals(t.getStatus())) {
 				// 存在未完成任务
 				int oldValue = Optional.ofNullable(todoList.getValue()).orElse(0);
 				todoList.setValue(oldValue + t.getValue());
 				todoList.setStatus(TodoList.S_PENDING);
 			}
-		});
-
+		}
 
 		todoListMapper.insertWithUpdate(todoList);
 		todos.forEach(t -> {

@@ -12,6 +12,9 @@ public class user {
 
     private String phoneNumber;
 
+
+    private String email;
+
     private String alias;
 
     private Long createTime;

@@ -1,18 +1,20 @@
 package fun.johntaylor.kunkka.controller.todo;
 
-import fun.johntaylor.kunkka.component.ThreadPoolComponent;
+import fun.johntaylor.kunkka.component.thread.ThreadPoolComponent;
+import fun.johntaylor.kunkka.controller.todo.param.Test;
+import fun.johntaylor.kunkka.controller.todo.param.TodoEntity;
 import fun.johntaylor.kunkka.entity.todo.Todo;
 import fun.johntaylor.kunkka.service.todo.TodoService;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
 import fun.johntaylor.kunkka.utils.result.Result;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
+import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.Optional;
 
 
@@ -42,19 +44,11 @@ public class TodoController {
 		return Mono.error(new RuntimeException("test error"));
 	}
 
-	@Data
-	private static class TodoEntity {
-		private Integer maxTime;
-		private Integer minPriority;
-		private List<Todo> todos;
-	}
-
 	@PostMapping(value = "/patch/add", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<String> addPatch(@RequestBody Mono<TodoEntity> entityMono) {
-		return entityMono
+	public Mono<String> addPatch(@Valid @RequestBody TodoEntity entity) {
+		return Mono.just(entity)
 				.publishOn(threadPoolComponent.daoInstance())
 				.map(v -> {
-					System.out.println("todo:" + v.getTodos().size());
 					int maxTime = Optional.ofNullable(v.getMaxTime()).orElse(480);
 					int minPriority = Optional.ofNullable(v.getMinPriority()).orElse(1);
 					todoService.addPatch(maxTime, minPriority, v.getTodos());
@@ -64,21 +58,20 @@ public class TodoController {
 				.onErrorReturn(Result.fail(ErrorCode.SYS_PARAMETER_ERROR).toString());
 	}
 
-	@Data
-	private static class Test {
-		private Long id;
-	}
-
 	@PostMapping(value = "/test", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<String> test(@RequestBody Mono<Test> test) {
+	public Mono<String> test(@Valid @RequestBody Test test) {
 		log.info("d");
 //        todoService.update(id);
-
-		return test
+		if(test.getId().equals(1)) {
+			throw new NumberFormatException("test");
+		}
+		return Mono.just(test)
 				.publishOn(threadPoolComponent.daoInstance())
 				.map(v -> {
 					System.out.println(String.format("thread name: %s, pool: %s, id: %s", Thread.currentThread().getName(), Thread.currentThread().getThreadGroup(), Thread.currentThread().getId()));
 					System.out.println(v.getId());
+					System.out.println(Optional.ofNullable(v.getTest2List()).orElse(new ArrayList<>()).size());
+//					todoService.test();
 					return v;
 				})
 				.thenReturn(Result.success().toString());
@@ -116,6 +109,21 @@ public class TodoController {
 
 	@GetMapping(value = "/test4", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<String> test4(@RequestBody Mono<Test> test) {
+		log.info("d");
+//        todoService.update(id);
+
+		return test
+				.publishOn(threadPoolComponent.daoInstance())
+				.map(v -> {
+					System.out.println(String.format("thread name: %s, pool: %s, id: %s", Thread.currentThread().getName(), Thread.currentThread().getThreadGroup(), Thread.currentThread().getId()));
+					System.out.println(v.getId());
+					return v;
+				})
+				.thenReturn(Result.success().toString());
+	}
+
+	@PostMapping(value = "/test5", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Mono<String> test5(@RequestBody Mono<Test> test) {
 		log.info("d");
 //        todoService.update(id);
 
