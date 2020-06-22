@@ -10,6 +10,11 @@ public class TodoList {
     private Long id;
 
     /**
+     * 用户ID
+     */
+    private Long uid;
+
+    /**
      * 总价值
      */
     private Integer value;

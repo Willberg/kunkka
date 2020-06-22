@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan("fun.johntaylor.kunkka.mapper")
+@MapperScan("fun.johntaylor.kunkka.repository.mybatis")
 public class KunkkaApplication {
 
     public static void main(String[] args) {

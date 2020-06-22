@@ -1,9 +1,9 @@
 package fun.johntaylor.kunkka.controller.todo;
 
-import fun.johntaylor.kunkka.component.thread.ThreadPoolComponent;
-import fun.johntaylor.kunkka.controller.todo.param.Test;
-import fun.johntaylor.kunkka.controller.todo.param.TodoEntity;
+import fun.johntaylor.kunkka.component.thread.pool.DbThreadPool;
 import fun.johntaylor.kunkka.entity.todo.Todo;
+import fun.johntaylor.kunkka.entity.todo.request.AddPatchRequest;
+import fun.johntaylor.kunkka.entity.todo.request.Test;
 import fun.johntaylor.kunkka.service.todo.TodoService;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
 import fun.johntaylor.kunkka.utils.result.Result;
@@ -25,7 +25,7 @@ public class TodoController {
 	private TodoService todoService;
 
 	@Autowired
-	private ThreadPoolComponent threadPoolComponent;
+	private DbThreadPool dbThreadPool;
 
 	@GetMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<String> add(@RequestParam("task") String task,
@@ -45,9 +45,9 @@ public class TodoController {
 	}
 
 	@PostMapping(value = "/patch/add", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<String> addPatch(@Valid @RequestBody TodoEntity entity) {
+	public Mono<String> addPatch(@Valid @RequestBody AddPatchRequest entity) {
 		return Mono.just(entity)
-				.publishOn(threadPoolComponent.daoInstance())
+				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					int maxTime = Optional.ofNullable(v.getMaxTime()).orElse(480);
 					int minPriority = Optional.ofNullable(v.getMinPriority()).orElse(1);
@@ -62,11 +62,11 @@ public class TodoController {
 	public Mono<String> test(@Valid @RequestBody Test test) {
 		log.info("d");
 //        todoService.update(id);
-		if(test.getId().equals(1)) {
+		if (test.getId().equals(1)) {
 			throw new NumberFormatException("test");
 		}
 		return Mono.just(test)
-				.publishOn(threadPoolComponent.daoInstance())
+				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					System.out.println(String.format("thread name: %s, pool: %s, id: %s", Thread.currentThread().getName(), Thread.currentThread().getThreadGroup(), Thread.currentThread().getId()));
 					System.out.println(v.getId());
@@ -83,7 +83,7 @@ public class TodoController {
 //        todoService.update(id);
 
 		return Mono.just(test)
-				.publishOn(threadPoolComponent.daoInstance())
+				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					System.out.println(String.format("thread name: %s, pool: %s, id: %s", Thread.currentThread().getName(), Thread.currentThread().getThreadGroup(), Thread.currentThread().getId()));
 					System.out.println(v.getId());
@@ -98,7 +98,7 @@ public class TodoController {
 //        todoService.update(id);
 
 		return Mono.just(test)
-				.publishOn(threadPoolComponent.daoInstance())
+				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					System.out.println(String.format("thread name: %s, pool: %s, id: %s", Thread.currentThread().getName(), Thread.currentThread().getThreadGroup(), Thread.currentThread().getId()));
 					System.out.println(v.getId());
@@ -113,7 +113,7 @@ public class TodoController {
 //        todoService.update(id);
 
 		return test
-				.publishOn(threadPoolComponent.daoInstance())
+				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					System.out.println(String.format("thread name: %s, pool: %s, id: %s", Thread.currentThread().getName(), Thread.currentThread().getThreadGroup(), Thread.currentThread().getId()));
 					System.out.println(v.getId());
@@ -128,7 +128,7 @@ public class TodoController {
 //        todoService.update(id);
 
 		return test
-				.publishOn(threadPoolComponent.daoInstance())
+				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					System.out.println(String.format("thread name: %s, pool: %s, id: %s", Thread.currentThread().getName(), Thread.currentThread().getThreadGroup(), Thread.currentThread().getId()));
 					System.out.println(v.getId());

@@ -1,4 +1,4 @@
-package fun.johntaylor.kunkka.controller.todo.param;
+package fun.johntaylor.kunkka.entity.todo.request;
 
 import lombok.Data;
 

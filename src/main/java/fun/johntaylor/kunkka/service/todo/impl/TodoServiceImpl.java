@@ -1,31 +1,74 @@
-package fun.johntaylor.kunkka.dao.todo;
+package fun.johntaylor.kunkka.service.todo.impl;
 
 import fun.johntaylor.kunkka.entity.todo.Todo;
 import fun.johntaylor.kunkka.entity.todo.TodoList;
-import fun.johntaylor.kunkka.mapper.todo.TodoListMapper;
-import fun.johntaylor.kunkka.mapper.todo.TodoMapper;
+import fun.johntaylor.kunkka.repository.mybatis.todo.TodoListMapper;
+import fun.johntaylor.kunkka.repository.mybatis.todo.TodoMapper;
+import fun.johntaylor.kunkka.service.todo.TodoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-
-@Repository
+@Service
 @Slf4j
-public class TodoDao {
-
+public class TodoServiceImpl implements TodoService {
 	@Autowired
 	private TodoListMapper todoListMapper;
 
 	@Autowired
 	private TodoMapper todoMapper;
 
+
+	public void add(Todo todo) {
+//        todoDao.addData(todo);
+	}
+
+	@Override
+	public void addPatch(Integer maxTime, Integer minPriority, List<Todo> todos) {
+		if (todos.size() == 0) {
+			return;
+		}
+
+		// 初始化TodoList
+		TodoList todoList = new TodoList();
+		todoList.setId(todos.get(0).getListId());
+		todoList.setMinPriority(minPriority);
+		todoList.setMaxTime(maxTime);
+		int totalTime = 0;
+		for (Todo t : todos) {
+			totalTime += t.getEstimateTime();
+		}
+		todoList.setTotalTime(totalTime);
+		todoList.setCreateTime(System.currentTimeMillis());
+		todoList.setUpdateTime(System.currentTimeMillis());
+		todoList.setStatus(TodoList.S_FINISHED);
+
+		// 按优先级给todos排序
+		todos.sort((o1, o2) -> {
+			if (o1.getPriority() < o2.getPriority()) {
+				return 1;
+			} else {
+				return -1;
+			}
+		});
+		addData(todoList, todos);
+	}
+
+	public void update(Long id) {
+		updateData(id);
+	}
+
+	public void test() {
+		updateData(1000L);
+	}
+
 	// 价值评判由优先级(越小权优先级高)×价值决定
-	private static int[] calMaxValueByDp(int capacity, List<Todo> todoList) {
+	private int[] calMaxValueByDp(int capacity, List<Todo> todoList) {
 		int[] dp = new int[capacity + 1];
 		for (int i = 0; i < todoList.size(); i++) {
 			for (int j = capacity; j >= 0; j--) {

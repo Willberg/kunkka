@@ -1,15 +1,16 @@
-package fun.johntaylor.kunkka.controller.todo.param;
+package fun.johntaylor.kunkka.entity.todo.request;
 
 import fun.johntaylor.kunkka.entity.todo.Todo;
 import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
-public class TodoEntity {
+public class AddPatchRequest {
 	@Min(value = 1, message = "最长时间不能少于1")
 	private Integer maxTime;
 
@@ -18,5 +19,6 @@ public class TodoEntity {
 	private Integer minPriority;
 
 	@NotNull
+	@Valid
 	private List<Todo> todos;
 }

@@ -1,6 +1,6 @@
 sys:
-  0001: system error
-  0002: db error
-  0003: timeout error
-  0004: customize error
-  0005: parameter error
+  0001: 系统错误
+  0002: 数据库错误
+  0003: 超时错误
+  0004: 自定义错误
+  0005: 参数错误
