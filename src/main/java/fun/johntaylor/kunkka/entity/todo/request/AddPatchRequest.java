@@ -9,6 +9,11 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+/**
+ * @Author John
+ * @Description
+ * @Date 2020/6/22 8:07 PM
+ **/
 @Data
 public class AddPatchRequest {
 	@Min(value = 1, message = "最长时间不能少于1")

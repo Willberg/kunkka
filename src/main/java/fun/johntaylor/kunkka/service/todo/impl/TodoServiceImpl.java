@@ -36,6 +36,7 @@ public class TodoServiceImpl implements TodoService {
 
 		// 初始化TodoList
 		TodoList todoList = new TodoList();
+		todoList.setUid(1L);
 		todoList.setId(todos.get(0).getListId());
 		todoList.setMinPriority(minPriority);
 		todoList.setMaxTime(maxTime);
@@ -67,7 +68,12 @@ public class TodoServiceImpl implements TodoService {
 		updateData(1000L);
 	}
 
-	// 价值评判由优先级(越小权优先级高)×价值决定
+	/**
+	 * @decription 价值评判由优先级(越小权优先级高)×价值决定
+	 * @param capacity
+	 * @param todoList
+	 * @return
+	 */
 	private int[] calMaxValueByDp(int capacity, List<Todo> todoList) {
 		int[] dp = new int[capacity + 1];
 		for (int i = 0; i < todoList.size(); i++) {

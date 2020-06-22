@@ -6,7 +6,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
 
 @Data
-public class user {
+public class User {
     private Long id;
 
     private String userName;
