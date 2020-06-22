@@ -60,12 +60,13 @@ public class TodoServiceImpl implements TodoService {
 		addData(todoList, todos);
 	}
 
-	public void update(Long id) {
+	@Override
+	public void test(Long id) {
 		updateData(id);
 	}
 
-	public void test() {
-		updateData(1000L);
+	public void update(Long id) {
+		updateData(id);
 	}
 
 	/**

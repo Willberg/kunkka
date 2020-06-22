@@ -22,12 +22,3 @@ spring:
       # 数据库连接超时时间,默认30秒，即30000
       connection-timeout: 30000
       connection-test-query: SELECT 1
-
-#mybatis的相关配置
-mybatis:
-  #mapper配置文件
-  mapper-locations: classpath:repository/mybatis/**/*.xml
-  type-aliases-package: fun.johntaylor.kunkka.entity
-  #开启驼峰命名
-  configuration:
-    map-underscore-to-camel-case: true

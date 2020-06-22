@@ -75,7 +75,7 @@ public class TodoController {
 					System.out.println(String.format("thread name: %s, pool: %s, id: %s", Thread.currentThread().getName(), Thread.currentThread().getThreadGroup(), Thread.currentThread().getId()));
 					System.out.println(v.getId());
 					System.out.println(Optional.ofNullable(v.getTest2List()).orElse(new ArrayList<>()).size());
-//					todoService.test();
+					todoService.test(test.getTest().longValue());
 					return v;
 				})
 				.thenReturn(Result.success().toString());

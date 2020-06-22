@@ -19,4 +19,6 @@ public interface TodoService {
 	 * @return
 	 **/
 	void addPatch(Integer maxTime, Integer minPriority, List<Todo> todos);
+
+	void test(Long id);
 }

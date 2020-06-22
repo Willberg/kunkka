@@ -10,6 +10,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @Author John
+ * @Description
+ * @Date 2020/6/22 9:32 PM
+ **/
 @Repository
 public interface TodoMapper {
 	String COLUMNS = "id, task, value, estimate_time as estimateTime, reality_time as realityTime, list_id as listId, create_time as createTime, update_time as updateTime, priority, status";

@@ -23,8 +23,9 @@ import java.util.Optional;
 public class GlobalException {
 
 	@ExceptionHandler(Throwable.class)
-	public void testExceptions(Throwable t) {
+	public Mono<String> testExceptions(Throwable t) {
 		log.error("exception: {}", t);
+		return Mono.just(Result.failWithMessage(ErrorCode.SYS_ERROR).toString());
 	}
 
 	/**
