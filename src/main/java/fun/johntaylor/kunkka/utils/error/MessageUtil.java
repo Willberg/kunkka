@@ -12,6 +12,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * @Author John
+ * @Description 错误消息处理
+ * @Date 2020/6/22 10:00 PM
+ **/
 @Slf4j
 public final class MessageUtil {
     private static Map<String, Object> errorMessages = new HashMap<>();

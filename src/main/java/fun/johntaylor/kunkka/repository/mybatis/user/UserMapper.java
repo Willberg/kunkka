@@ -11,12 +11,12 @@ import java.util.Map;
 
 @Repository
 public interface UserMapper {
-	String COLUMNS = "id, user_name as userName, password, phone_number as phoneNumber, email, alias, create_time as createTime, update_time as updateTime, type, status";
+	String COLUMNS = "id, user_name as userName, password, phone_number as phoneNumber, email, create_time as createTime, update_time as updateTime, type, status";
 
 	@Select("select " + COLUMNS + " from t_user where id=#{id}")
 	User select(Long id);
 
-	@Insert("insert into t_user(id, user_name, password, phone_number, email, alias, create_time, update_time, type, status) values(#{id}, #{userName}, #{password}, #{phoneNumber}, #{email}, #{alias}, #{createTime}, #{updateTime}, #{type}, #{status})")
+	@Insert("insert into t_user(id, user_name, password, phone_number, email, create_time, update_time, type, status) values(#{id}, #{userName}, #{password}, #{phoneNumber}, #{email}, #{createTime}, #{updateTime}, #{type}, #{status})")
 	@SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "id", before = false, resultType = Long.class)
 	int insert(User user);
 

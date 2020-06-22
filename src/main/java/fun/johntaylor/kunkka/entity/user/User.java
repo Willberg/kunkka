@@ -5,27 +5,30 @@ import lombok.Data;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
 
+/**
+ * @Author John
+ * @Description 用户表
+ * @Date 2020/6/22 10:16 PM
+ **/
 @Data
 public class User {
-    private Long id;
+	private Long id;
 
-    private String userName;
+	private String userName;
 
-    private String password;
+	private String password;
 
-    @Pattern(regexp = "^[0-9]{11}$", message = "手机号不对")
-    private String phoneNumber;
+	@Pattern(regexp = "^[0-9]{11}$", message = "手机号不对")
+	private String phoneNumber;
 
-    @Email(message = "邮箱格式错误")
-    private String email;
+	@Email(message = "邮箱格式错误")
+	private String email;
 
-    private String alias;
+	private Long createTime;
 
-    private Long createTime;
+	private Long updateTime;
 
-    private Long updateTime;
+	private Integer type;
 
-    private Integer type;
-
-    private Integer status;
+	private Integer status;
 }

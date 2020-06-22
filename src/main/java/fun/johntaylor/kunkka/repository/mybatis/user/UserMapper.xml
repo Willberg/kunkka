@@ -8,7 +8,6 @@
 			<if test="password!=null">password = #{password},</if>
 			<if test="phoneNumber!=null">phone_number = #{phoneNumber},</if>
 			<if test="email!=null">email = #{email},</if>
-			<if test="alias!=null">alias = #{alias},</if>
 			<if test="createTime!=null">create_time = #{createTime},</if>
 			<if test="updateTime!=null">update_time = #{updateTime},</if>
 			<if test="type!=null">type = #{type},</if>
@@ -24,7 +23,6 @@
 			<if test="new.password!=null">password = #{new.password},</if>
 			<if test="new.phoneNumber!=null">phone_number = #{new.phoneNumber},</if>
 			<if test="new.email!=null">email = #{new.email},</if>
-			<if test="new.alias!=null">alias = #{new.alias},</if>
 			<if test="new.createTime!=null">create_time = #{new.createTime},</if>
 			<if test="new.updateTime!=null">update_time = #{new.updateTime},</if>
 			<if test="new.type!=null">type = #{new.type},</if>
@@ -36,7 +34,6 @@
 			<if test="new.password!=null and old.password!=null">and password = #{old.password}</if>
 			<if test="new.phoneNumber!=null and old.phoneNumber!=null">and phone_number = #{old.phoneNumber}</if>
 			<if test="new.email!=null and old.email!=null">and email = #{old.email}</if>
-			<if test="new.alias!=null and old.alias!=null">and alias = #{old.alias}</if>
 			<if test="new.createTime!=null and old.createTime!=null">and create_time = #{old.createTime}</if>
 			<if test="new.updateTime!=null and old.updateTime!=null">and update_time = #{old.updateTime}</if>
 			<if test="new.type!=null and old.type!=null">and type = #{old.type}</if>

@@ -3,7 +3,6 @@ package fun.johntaylor.kunkka.controller.todo;
 import fun.johntaylor.kunkka.component.thread.pool.DbThreadPool;
 import fun.johntaylor.kunkka.entity.todo.Todo;
 import fun.johntaylor.kunkka.entity.todo.request.AddPatchRequest;
-import fun.johntaylor.kunkka.entity.todo.request.Test;
 import fun.johntaylor.kunkka.service.todo.TodoService;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
 import fun.johntaylor.kunkka.utils.result.Result;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.Optional;
 
 /**
@@ -31,7 +29,7 @@ public class TodoController {
 	@Autowired
 	private DbThreadPool dbThreadPool;
 
-	@GetMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/api/todo/add", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<String> add(@RequestParam("task") String task,
 			@RequestParam("value") Integer value,
 			@RequestParam("estimateTime") Integer estimateTime,
@@ -48,7 +46,7 @@ public class TodoController {
 		return Mono.error(new RuntimeException("test error"));
 	}
 
-	@PostMapping(value = "/patch/add", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/api/todo/patch/add", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Mono<String> addPatch(@Valid @RequestBody AddPatchRequest entity) {
 		return Mono.just(entity)
 				.publishOn(dbThreadPool.daoInstance())
@@ -60,84 +58,5 @@ public class TodoController {
 				})
 				.doOnError(e -> log.error(e.getMessage()))
 				.onErrorReturn(Result.fail(ErrorCode.SYS_PARAMETER_ERROR).toString());
-	}
-
-	@PostMapping(value = "/test", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<String> test(@Valid @RequestBody Test test) {
-		log.info("d");
-//        todoService.update(id);
-		if (test.getId().equals(1)) {
-			throw new NumberFormatException("test");
-		}
-		return Mono.just(test)
-				.publishOn(dbThreadPool.daoInstance())
-				.map(v -> {
-					System.out.println(String.format("thread name: %s, pool: %s, id: %s", Thread.currentThread().getName(), Thread.currentThread().getThreadGroup(), Thread.currentThread().getId()));
-					System.out.println(v.getId());
-					System.out.println(Optional.ofNullable(v.getTest2List()).orElse(new ArrayList<>()).size());
-					todoService.test(test.getTest().longValue());
-					return v;
-				})
-				.thenReturn(Result.success().toString());
-	}
-
-	@PostMapping(value = "/test2", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<String> test2(Test test) {
-		log.info("d");
-//        todoService.update(id);
-
-		return Mono.just(test)
-				.publishOn(dbThreadPool.daoInstance())
-				.map(v -> {
-					System.out.println(String.format("thread name: %s, pool: %s, id: %s", Thread.currentThread().getName(), Thread.currentThread().getThreadGroup(), Thread.currentThread().getId()));
-					System.out.println(v.getId());
-					return v;
-				})
-				.thenReturn(Result.success().toString());
-	}
-
-	@GetMapping(value = "/test3", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<String> test3(Test test) {
-		log.info("d");
-//        todoService.update(id);
-
-		return Mono.just(test)
-				.publishOn(dbThreadPool.daoInstance())
-				.map(v -> {
-					System.out.println(String.format("thread name: %s, pool: %s, id: %s", Thread.currentThread().getName(), Thread.currentThread().getThreadGroup(), Thread.currentThread().getId()));
-					System.out.println(v.getId());
-					return v;
-				})
-				.thenReturn(Result.success().toString());
-	}
-
-	@GetMapping(value = "/test4", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<String> test4(@RequestBody Mono<Test> test) {
-		log.info("d");
-//        todoService.update(id);
-
-		return test
-				.publishOn(dbThreadPool.daoInstance())
-				.map(v -> {
-					System.out.println(String.format("thread name: %s, pool: %s, id: %s", Thread.currentThread().getName(), Thread.currentThread().getThreadGroup(), Thread.currentThread().getId()));
-					System.out.println(v.getId());
-					return v;
-				})
-				.thenReturn(Result.success().toString());
-	}
-
-	@PostMapping(value = "/test5", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<String> test5(@RequestBody Mono<Test> test) {
-		log.info("d");
-//        todoService.update(id);
-
-		return test
-				.publishOn(dbThreadPool.daoInstance())
-				.map(v -> {
-					System.out.println(String.format("thread name: %s, pool: %s, id: %s", Thread.currentThread().getName(), Thread.currentThread().getThreadGroup(), Thread.currentThread().getId()));
-					System.out.println(v.getId());
-					return v;
-				})
-				.thenReturn(Result.success().toString());
 	}
 }
