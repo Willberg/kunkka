@@ -10,7 +10,7 @@
 			<if test="email!=null">email = #{email},</if>
 			<if test="createTime!=null">create_time = #{createTime},</if>
 			<if test="updateTime!=null">update_time = #{updateTime},</if>
-			<if test="type!=null">type = #{type},</if>
+			<if test="roleId!=null">role_id = #{roleId},</if>
 			<if test="status!=null">status = #{status},</if>
 		</set>
 		where id=#{id}
@@ -25,7 +25,7 @@
 			<if test="new.email!=null">email = #{new.email},</if>
 			<if test="new.createTime!=null">create_time = #{new.createTime},</if>
 			<if test="new.updateTime!=null">update_time = #{new.updateTime},</if>
-			<if test="new.type!=null">type = #{new.type},</if>
+			<if test="new.roleId!=null">role_id = #{new.roleId},</if>
 			<if test="new.status!=null">status = #{new.status},</if>
 		</set>
 		<where>
@@ -36,7 +36,7 @@
 			<if test="new.email!=null and old.email!=null">and email = #{old.email}</if>
 			<if test="new.createTime!=null and old.createTime!=null">and create_time = #{old.createTime}</if>
 			<if test="new.updateTime!=null and old.updateTime!=null">and update_time = #{old.updateTime}</if>
-			<if test="new.type!=null and old.type!=null">and type = #{old.type}</if>
+			<if test="new.roleId!=null and old.roleId!=null">and role_id = #{old.roleId}</if>
 			<if test="new.status!=null and old.status!=null">and status = #{old.status}</if>
 		</where>
 	</update>

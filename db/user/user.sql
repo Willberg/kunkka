@@ -7,7 +7,7 @@ create table `t_user` (
 	`email` varchar(50) default null comment '邮箱',
 	`create_time` bigint(20) default null comment '创建时间',
 	`update_time` bigint(20) default null comment '更新时间',
-	`type` bigint(20) default null comment '用户类别， 1xxx--用户，2xxx-管理员',
+	`role_id` bigint(20) default null comment '用户角色， 1--用户，2-管理员',
 	`status` bigint(20) default null comment '0--无效， 1--有效',
 	primary key(`id`),
 	unique key(`user_name`),

@@ -4,6 +4,11 @@ import fun.johntaylor.kunkka.utils.error.ErrorCode;
 import fun.johntaylor.kunkka.utils.error.MessageUtil;
 import fun.johntaylor.kunkka.utils.json.JsonUtil;
 
+/**
+ * @Author John
+ * @Description 返回消息
+ * @Date 2020/6/24 3:18 PM
+ **/
 public final class Result<T> {
 	private Boolean status;
 
@@ -13,8 +18,8 @@ public final class Result<T> {
 
 	private T data;
 
-	public static final Boolean S_SUCCESS = true;
-	public static final Boolean S_FAIL = false;
+	private static final Boolean S_SUCCESS = true;
+	private static final Boolean S_FAIL = false;
 
 	private Result() {
 

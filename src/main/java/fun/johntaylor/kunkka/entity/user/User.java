@@ -28,7 +28,13 @@ public class User {
 
 	private Long updateTime;
 
-	private Integer type;
+	private Integer roleId;
 
 	private Integer status;
+
+	public static final Integer R_USER = 1;
+	public static final Integer R_ADMIN = 2;
+
+	public static final Integer S_DEL = 0;
+	public static final Integer S_NORMAL = 1;
 }
