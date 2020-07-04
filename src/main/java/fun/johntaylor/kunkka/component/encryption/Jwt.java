@@ -1,11 +1,19 @@
 package fun.johntaylor.kunkka.component.encryption;
 
+import fun.johntaylor.kunkka.constant.cache.CacheDomain;
+import fun.johntaylor.kunkka.entity.encrypt.user.EncryptUser;
+import fun.johntaylor.kunkka.entity.user.User;
+import fun.johntaylor.kunkka.utils.cache.SimpleCacheUtil;
+import fun.johntaylor.kunkka.utils.result.Result;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.Objects;
@@ -18,6 +26,8 @@ import java.util.Objects;
 @Component
 @Slf4j
 public class Jwt {
+	public static final String TOKEN_HEADER = "Authorization";
+	public static final String TOKEN_PREFIX = "Bearer ";
 
 	@Value("${jwt.subject}")
 	private String subject;
@@ -64,17 +74,41 @@ public class Jwt {
 	}
 
 	/**
-	 * 获取用户ID
+	 * 获取用户
 	 * @param token
 	 * @return
 	 */
-	public Long getUserId(String token) {
+	public User getUser(String token) {
+		if (Objects.isNull(token)) {
+			return null;
+		}
+
 		Claims claims = getClaims(token);
 		if (Objects.isNull(claims)) {
 			return null;
 		}
-		return Long.parseLong(claims.get(secret).toString());
+		Long uid = Long.parseLong(claims.get(authId).toString());
+		return SimpleCacheUtil.get(CacheDomain.USER_CACHE, uid, User.class);
 	}
+
+	/**
+	 * 获取用户
+	 * @param request
+	 * @return
+	 */
+	public User getUser(ServerHttpRequest request) {
+		String jwtToken = getJwtToken(request);
+		return getUser(jwtToken);
+	}
+
+	public String getJwtToken(ServerHttpRequest request) {
+		String token = request.getHeaders().getFirst(Jwt.TOKEN_HEADER);
+		if (StringUtils.isEmpty(token) || !token.startsWith(Jwt.TOKEN_PREFIX)) {
+			return null;
+		}
+		return token.substring(Jwt.TOKEN_PREFIX.length());
+	}
+
 
 	/**
 	 * 是否过期
@@ -82,10 +116,21 @@ public class Jwt {
 	 * @return
 	 */
 	public boolean isExpiration(String token) {
+		if (Objects.isNull(token)) {
+			return true;
+		}
+
 		Claims claims = getClaims(token);
 		if (Objects.isNull(claims)) {
 			return true;
 		}
 		return claims.getExpiration().before(new Date());
+	}
+
+	public void setTokenHeader(ServerHttpResponse response, Result<EncryptUser> result) {
+		if (result.isSuccess()) {
+			EncryptUser u = result.getData();
+			response.getHeaders().add(TOKEN_HEADER, createToken(u.getId()));
+		}
 	}
 }

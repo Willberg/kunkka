@@ -32,7 +32,7 @@ public final class SimpleCacheUtil {
 		if (key instanceof Number || key instanceof String) {
 			return generateKeyByDomainKey(domain, String.valueOf(key));
 		} else {
-			log.error(String.format("domain:%s key generate error, key:%s", domain, key.toString()));
+			log.error(String.format("domain:%s key generate error, key:%s", domain, String.valueOf(key)));
 			return null;
 		}
 	}

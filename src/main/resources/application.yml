@@ -27,9 +27,8 @@ jwt:
   subject: kunkka
   expiration: 1296000000
   secret: dJF&*JOFJO#Jdiojocijiosj23e2d9i0fjsdj
-  auth.id: kunkka
+  auth.id: kunkkaId
   authentication.whitelist.urls: '^.*/api/user/login.*$|^.*/api/public/.*$|^.*/api/user/register.*$'
-  authorization.urls: '^.*/api/user/login.*$|^.*/api/user/register.*$'
 
 salt:
   password: IDJIFJio329&*&*ejenfi323hdhhdh

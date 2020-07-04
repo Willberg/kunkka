@@ -1,5 +1,6 @@
 package fun.johntaylor.kunkka.service.user;
 
+import fun.johntaylor.kunkka.entity.encrypt.user.EncryptUser;
 import fun.johntaylor.kunkka.entity.user.User;
 import fun.johntaylor.kunkka.utils.result.Result;
 
@@ -14,14 +15,14 @@ public interface UserService {
 	 * @param user
 	 * @return
 	 */
-	Result register(User user);
+	Result<EncryptUser> register(User user);
 
 	/**
 	 * 登录
 	 * @param user
 	 * @return
 	 */
-	Result login(User user);
+	Result<EncryptUser> login(User user);
 
 	/**
 	 * 退出

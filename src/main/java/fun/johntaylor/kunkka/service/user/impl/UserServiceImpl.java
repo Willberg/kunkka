@@ -2,16 +2,16 @@ package fun.johntaylor.kunkka.service.user.impl;
 
 import fun.johntaylor.kunkka.component.encryption.Encrypt;
 import fun.johntaylor.kunkka.constant.cache.CacheDomain;
+import fun.johntaylor.kunkka.entity.encrypt.user.EncryptUser;
 import fun.johntaylor.kunkka.entity.user.User;
 import fun.johntaylor.kunkka.repository.mybatis.user.UserMapper;
 import fun.johntaylor.kunkka.service.user.UserService;
 import fun.johntaylor.kunkka.utils.cache.SimpleCacheUtil;
-import fun.johntaylor.kunkka.utils.encryption.EncryptionUtil;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
+import fun.johntaylor.kunkka.utils.general.CopyUtil;
 import fun.johntaylor.kunkka.utils.result.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.Objects;
 
@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
 	private Encrypt encrypt;
 
 	@Override
-	public Result register(User user) {
+	public Result<EncryptUser> register(User user) {
 		User oldUser = userMapper.selectByUser(user);
 		if (Objects.nonNull(oldUser)) {
 			return Result.fail(ErrorCode.USER_EXISTS);
@@ -44,13 +44,14 @@ public class UserServiceImpl implements UserService {
 		user.setUpdateTime(System.currentTimeMillis());
 		user.setRoleId(User.R_USER);
 		user.setStatus(User.S_NORMAL);
-		int row = userMapper.insert(user);
+		userMapper.insert(user);
 		SimpleCacheUtil.set(CacheDomain.USER_CACHE, user.getId(), user);
-		return Result.success(row);
+		EncryptUser u = CopyUtil.copyWithSet(user, new EncryptUser());
+		return Result.success(u);
 	}
 
 	@Override
-	public Result login(User user) {
+	public Result<EncryptUser> login(User user) {
 		User dbUser = userMapper.selectByUser(user);
 		if (Objects.isNull(dbUser)) {
 			return Result.failWithMessage("账号或密码错误");
@@ -61,7 +62,8 @@ public class UserServiceImpl implements UserService {
 			return Result.failWithMessage("账号或密码错误");
 		}
 		SimpleCacheUtil.set(CacheDomain.USER_CACHE, dbUser.getId(), dbUser);
-		return Result.success(dbUser.getId());
+		EncryptUser u = CopyUtil.copyWithSet(user, new EncryptUser());
+		return Result.success(u);
 	}
 
 	@Override

@@ -52,6 +52,22 @@ public final class Result<T> {
 		return new Result<>(S_FAIL, code, MessageUtil.getMessage(code), data);
 	}
 
+	public boolean isSuccess() {
+		return this.status;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public T getData() {
+		return this.data;
+	}
+
 	@Override
 	public String toString() {
 		return JsonUtil.toJson(this);
