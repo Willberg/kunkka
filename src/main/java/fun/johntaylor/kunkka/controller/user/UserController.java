@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
+import java.util.Objects;
 
 /**
  * @Author John
@@ -44,6 +46,9 @@ public class UserController {
 		return Mono.just(reqUser)
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
+					if (Objects.isNull(reqUser.getUserName()) && Objects.isNull(reqUser.getPhoneNumber()) && Objects.isNull(reqUser.getEmail())) {
+						return Result.fail(ErrorCode.SYS_PARAMETER_ERROR).toString();
+					}
 					Result result = userService.register(v);
 					return result.toString();
 				});
@@ -61,7 +66,7 @@ public class UserController {
 		return Mono.just(reqUser)
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
-					Result result = userService.register(v);
+					Result result = userService.login(v);
 					return result.toString();
 				});
 	}
