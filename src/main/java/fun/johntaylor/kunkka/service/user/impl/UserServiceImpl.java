@@ -52,17 +52,17 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Result<EncryptUser> login(User user) {
-		User dbUser = userMapper.selectByUser(user);
-		if (Objects.isNull(dbUser)) {
+		User sUser = userMapper.selectByUser(user);
+		if (Objects.isNull(sUser)) {
 			return Result.failWithMessage("账号或密码错误");
 		}
 
 		String password = encrypt.md5WithSalt(user.getPassword());
-		if (!dbUser.getPassword().equals(password)) {
+		if (!sUser.getPassword().equals(password)) {
 			return Result.failWithMessage("账号或密码错误");
 		}
-		SimpleCacheUtil.set(CacheDomain.USER_CACHE, dbUser.getId(), dbUser);
-		EncryptUser u = CopyUtil.copyWithSet(user, new EncryptUser());
+		SimpleCacheUtil.set(CacheDomain.USER_CACHE, sUser.getId(), sUser);
+		EncryptUser u = CopyUtil.copyWithSet(sUser, new EncryptUser());
 		return Result.success(u);
 	}
 

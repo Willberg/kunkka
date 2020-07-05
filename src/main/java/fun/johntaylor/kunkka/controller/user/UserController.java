@@ -39,7 +39,7 @@ public class UserController {
 
 	/**
 	 * @Author John
-	 * @Description
+	 * @Description 注册
 	 * @Date 2020/6/22 9:47 PM
 	 * @Param
 	 * @return
@@ -61,7 +61,7 @@ public class UserController {
 
 	/**
 	 * @Author John
-	 * @Description
+	 * @Description 登录
 	 * @Date 2020/6/22 9:47 PM
 	 * @Param
 	 * @return

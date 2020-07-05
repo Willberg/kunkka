@@ -68,7 +68,6 @@ public class Jwt {
 		try {
 			return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
 		} catch (Exception e) {
-			log.error("checkJwt error", e);
 			return null;
 		}
 	}
@@ -87,8 +86,13 @@ public class Jwt {
 		if (Objects.isNull(claims)) {
 			return null;
 		}
-		Long uid = Long.parseLong(claims.get(authId).toString());
-		return SimpleCacheUtil.get(CacheDomain.USER_CACHE, uid, User.class);
+
+		try {
+			Long uid = Long.parseLong(String.valueOf(claims.get(authId)));
+			return SimpleCacheUtil.get(CacheDomain.USER_CACHE, uid, User.class);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	/**
@@ -97,18 +101,16 @@ public class Jwt {
 	 * @return
 	 */
 	public User getUser(ServerHttpRequest request) {
-		String jwtToken = getJwtToken(request);
-		return getUser(jwtToken);
+		return getUser(getJwtToken(request));
 	}
 
 	public String getJwtToken(ServerHttpRequest request) {
-		String token = request.getHeaders().getFirst(Jwt.TOKEN_HEADER);
+		String token = request.getHeaders().getFirst(TOKEN_HEADER);
 		if (StringUtils.isEmpty(token) || !token.startsWith(Jwt.TOKEN_PREFIX)) {
 			return null;
 		}
 		return token.substring(Jwt.TOKEN_PREFIX.length());
 	}
-
 
 	/**
 	 * 是否过期

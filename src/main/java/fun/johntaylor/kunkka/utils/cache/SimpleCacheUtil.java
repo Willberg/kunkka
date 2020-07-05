@@ -37,7 +37,6 @@ public final class SimpleCacheUtil {
 		}
 	}
 
-
 	public static <T> void set(String domain, Object key, T value) {
 		String realKey = Optional.ofNullable(generateKeyByDomainKey(domain, key)).orElse("");
 		if ("".equals(key)) {

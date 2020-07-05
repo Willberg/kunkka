@@ -1,6 +1,7 @@
 package fun.johntaylor.kunkka.component.filter;
 
 import fun.johntaylor.kunkka.component.encryption.Jwt;
+import fun.johntaylor.kunkka.entity.user.User;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
 import fun.johntaylor.kunkka.utils.result.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,8 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
+
+import java.util.Objects;
 
 /**
  * @Author John
@@ -45,6 +48,12 @@ public class JwtAuthenticationWebFilter implements WebFilter {
 
 		String jwtToken = jwt.getJwtToken(request);
 		if (jwt.isExpiration(jwtToken)) {
+			return setErrorResponse(response);
+		}
+
+		// 权限校验
+		User user = jwt.getUser(jwtToken);
+		if (Objects.isNull(user)) {
 			return setErrorResponse(response);
 		}
 

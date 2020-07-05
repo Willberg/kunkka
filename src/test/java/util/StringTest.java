@@ -7,6 +7,7 @@ import fun.johntaylor.kunkka.utils.cache.SimpleCacheUtil;
 import fun.johntaylor.kunkka.utils.general.CopyUtil;
 import org.junit.jupiter.api.Test;
 
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 public class StringTest {
@@ -42,9 +43,17 @@ public class StringTest {
 		System.out.println(fresh.getStatus());
 	}
 
-	public static void main(String[] args) {
+	@Test
+	public void testCache() {
 		SimpleCacheUtil.set(CacheDomain.USER_CACHE, null, new User());
 		User u = SimpleCacheUtil.get(CacheDomain.USER_CACHE, null, User.class);
 		System.out.println(u.getId());
+	}
+
+	@Test
+	public void testLong() {
+		System.out.println(Long.parseLong("-1"));
+		String s = null;
+		System.out.println(Long.parseLong(Optional.ofNullable(s).orElse("")));
 	}
 }

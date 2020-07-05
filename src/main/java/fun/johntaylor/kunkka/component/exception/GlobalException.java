@@ -25,9 +25,14 @@ import java.util.Optional;
 public class GlobalException {
 
 	@ExceptionHandler(Throwable.class)
-	public Mono<String> generalExceptions(Throwable t) {
+	public Mono<ResponseEntity<String>> generalExceptions(Throwable t) {
 		log.error("exception: {}", t);
-		return Mono.just(Result.failWithMessage(ErrorCode.SYS_ERROR).toString());
+		return Mono
+				.just(ResponseEntity
+						.ok()
+						.header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+						.body(Result.fail(ErrorCode.SYS_ERROR).toString())
+				);
 	}
 
 	/**
