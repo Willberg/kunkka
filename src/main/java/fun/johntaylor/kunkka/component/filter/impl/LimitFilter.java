@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.RateLimiter;
 import fun.johntaylor.kunkka.component.filter.BaseFilter;
 import fun.johntaylor.kunkka.utils.cache.impl.LimitCache;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -25,9 +26,10 @@ import java.util.concurrent.atomic.AtomicLong;
 public class LimitFilter extends BaseFilter implements WebFilter {
 
 	@Value("${limit.max}")
-	private Long limitMax = 5L;
+	private Long limitMax;
 
-	private RateLimiter rateLimiter = RateLimiter.create(limitMax);
+	@Autowired
+	private RateLimiter rateLimiter;
 
 	@Override
 	public Mono<Void> filter(ServerWebExchange serverWebExchange, WebFilterChain webFilterChain) {
