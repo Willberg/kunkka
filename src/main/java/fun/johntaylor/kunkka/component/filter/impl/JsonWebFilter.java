@@ -1,6 +1,8 @@
-package fun.johntaylor.kunkka.component.filter;
+package fun.johntaylor.kunkka.component.filter.impl;
 
 import org.springframework.core.annotation.Order;
+import org.springframework.http.MediaType;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -9,16 +11,17 @@ import reactor.core.publisher.Mono;
 
 /**
  * @Author John
- * @Description 跨域请求伪造过滤器
- * @Date 2020/7/3 9:33 AM
+ * @Description 基本过滤器
+ * @Date 2020/7/3 9:03 AM
  **/
 @Component
-@Order(50)
-public class CsrfWebFilter implements WebFilter {
-
+@Order(100)
+public class JsonWebFilter implements WebFilter {
 
 	@Override
 	public Mono<Void> filter(ServerWebExchange serverWebExchange, WebFilterChain webFilterChain) {
+		ServerHttpResponse response = serverWebExchange.getResponse();
+		response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 		return webFilterChain.filter(serverWebExchange);
 	}
 }

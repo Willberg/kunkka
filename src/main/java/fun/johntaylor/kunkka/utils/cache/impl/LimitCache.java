@@ -19,7 +19,7 @@ public final class LimitCache extends BaseCache {
 		CACHE.put(CacheDomain.LIMIT_CACHE, limitCache);
 	}
 
-	public static <T> void set(String function, Object key, T value) {
+	public static <T> void set(Object key, T value) {
 		set(CacheDomain.LIMIT_CACHE, key, value);
 	}
 

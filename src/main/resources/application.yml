@@ -33,4 +33,6 @@ jwt:
 salt:
   password: IDJIFJio329&*&*ejenfi323hdhhdh
 
+limit.max: 5
+
 
