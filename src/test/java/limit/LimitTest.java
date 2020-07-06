@@ -29,15 +29,10 @@ public class LimitTest {
 		//向线程池提交100次任务
 		IntStream.range(0, 100).forEach(i -> {
 			service.execute(() -> {
-				synchronized (this) {
-					long s = System.currentTimeMillis();
-					boolean isLimit = filter.isSlideLimit();
+				boolean isLimit = filter.isTokenBucketLimit();
 //					boolean isLimit = isLeakBucketLimit();
-					if (isLimit) {
-						System.out.println("超过服务");
-					}
-					// 测试同步块每次运行时间ms
-					System.out.println("every: " + (System.currentTimeMillis() - s));
+				if (isLimit) {
+					System.out.println("超过服务");
 				}
 				try {
 					Thread.sleep(1000);

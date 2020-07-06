@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class LimitFilter extends BaseFilter implements WebFilter {
 
 	@Value("${limit.max}")
-	private Long limitMax;
+	private Long limitMax = 5L;
 
 	private RateLimiter rateLimiter = RateLimiter.create(limitMax);
 
@@ -94,7 +94,6 @@ public class LimitFilter extends BaseFilter implements WebFilter {
 	 * @return
 	 **/
 	public boolean isTokenBucketLimit() {
-		rateLimiter.acquire();
-		return false;
+		return !rateLimiter.tryAcquire();
 	}
 }
