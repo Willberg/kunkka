@@ -1,12 +1,11 @@
 package fun.johntaylor.kunkka.service.user.impl;
 
 import fun.johntaylor.kunkka.component.encryption.Encrypt;
-import fun.johntaylor.kunkka.constant.cache.CacheDomain;
 import fun.johntaylor.kunkka.entity.encrypt.user.EncryptUser;
 import fun.johntaylor.kunkka.entity.user.User;
 import fun.johntaylor.kunkka.repository.mybatis.user.UserMapper;
 import fun.johntaylor.kunkka.service.user.UserService;
-import fun.johntaylor.kunkka.utils.cache.SimpleCacheUtil;
+import fun.johntaylor.kunkka.utils.cache.impl.UserCache;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
 import fun.johntaylor.kunkka.utils.general.CopyUtil;
 import fun.johntaylor.kunkka.utils.result.Result;
@@ -45,7 +44,7 @@ public class UserServiceImpl implements UserService {
 		user.setRoleId(User.R_USER);
 		user.setStatus(User.S_NORMAL);
 		userMapper.insert(user);
-		SimpleCacheUtil.set(CacheDomain.USER_CACHE, user.getId(), user);
+		UserCache.set(user.getId(), user);
 		EncryptUser u = CopyUtil.copyWithSet(user, new EncryptUser());
 		return Result.success(u);
 	}
@@ -61,7 +60,7 @@ public class UserServiceImpl implements UserService {
 		if (!sUser.getPassword().equals(password)) {
 			return Result.failWithMessage("账号或密码错误");
 		}
-		SimpleCacheUtil.set(CacheDomain.USER_CACHE, sUser.getId(), sUser);
+		UserCache.set(sUser.getId(), sUser);
 		EncryptUser u = CopyUtil.copyWithSet(sUser, new EncryptUser());
 		return Result.success(u);
 	}

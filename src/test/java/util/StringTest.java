@@ -3,7 +3,8 @@ package util;
 import fun.johntaylor.kunkka.constant.cache.CacheDomain;
 import fun.johntaylor.kunkka.entity.encrypt.user.EncryptUser;
 import fun.johntaylor.kunkka.entity.user.User;
-import fun.johntaylor.kunkka.utils.cache.SimpleCacheUtil;
+import fun.johntaylor.kunkka.utils.cache.BaseCache;
+import fun.johntaylor.kunkka.utils.cache.impl.UserCache;
 import fun.johntaylor.kunkka.utils.general.CopyUtil;
 import org.junit.jupiter.api.Test;
 
@@ -45,8 +46,12 @@ public class StringTest {
 
 	@Test
 	public void testCache() {
-		SimpleCacheUtil.set(CacheDomain.USER_CACHE, null, new User());
-		User u = SimpleCacheUtil.get(CacheDomain.USER_CACHE, null, User.class);
+		UserCache.set(null, new User());
+		User u = UserCache.get(null, User.class);
+		System.out.println(u.getId());
+
+		UserCache.set(null, null);
+		u = UserCache.get(null, User.class);
 		System.out.println(u.getId());
 	}
 

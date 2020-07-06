@@ -1,9 +1,8 @@
 package fun.johntaylor.kunkka.component.encryption;
 
-import fun.johntaylor.kunkka.constant.cache.CacheDomain;
 import fun.johntaylor.kunkka.entity.encrypt.user.EncryptUser;
 import fun.johntaylor.kunkka.entity.user.User;
-import fun.johntaylor.kunkka.utils.cache.SimpleCacheUtil;
+import fun.johntaylor.kunkka.utils.cache.impl.UserCache;
 import fun.johntaylor.kunkka.utils.result.Result;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -89,7 +88,7 @@ public class Jwt {
 
 		try {
 			Long uid = Long.parseLong(String.valueOf(claims.get(authId)));
-			return SimpleCacheUtil.get(CacheDomain.USER_CACHE, uid, User.class);
+			return UserCache.get(uid, User.class);
 		} catch (Exception e) {
 			return null;
 		}
