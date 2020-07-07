@@ -1,6 +1,8 @@
 server:
   port: 40001
 spring:
+  # 选择日志输出级别
+  profiles.active: dev
   #数据库连接配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
