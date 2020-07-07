@@ -12,6 +12,7 @@ public final class ErrorCode {
 	public static String SYS_CUSTOMIZE_ERROR = "sys.0004";
 	public static String SYS_PARAMETER_ERROR = "sys.0005";
 	public static String SYS_LIMIT_ERROR = "sys.0006";
+	public static String SYS_FORBIDDEN_ERROR = "sys.0007";
 
 	public static String USER_EXISTS = "user.0001";
 	public static String USER_AUTHENTICATION_ERROR = "user.0002";

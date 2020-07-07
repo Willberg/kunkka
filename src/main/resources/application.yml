@@ -35,4 +35,7 @@ salt:
 
 limit.max: 5
 
+csrf.whitelist.urls: '^http://localhost.*$|^https://localhost.*$'
+# 测试
+#csrf.whitelist.urls: '^$'
 

@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
  * @Date 2020/7/3 9:03 AM
  **/
 @Component
-@Order(100)
+@Order(50)
 public class JsonWebFilter implements WebFilter {
 
 	@Override
