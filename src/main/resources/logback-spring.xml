@@ -190,7 +190,7 @@
 		</rollingPolicy>
 		<!-- 此日志文件只记录ERROR级别的 -->
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
-			<level>TRACE</level>
+			<level>INFO</level>
 			<onMatch>ACCEPT</onMatch>
 			<onMismatch>DENY</onMismatch>
 		</filter>
