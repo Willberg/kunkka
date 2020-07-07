@@ -53,12 +53,12 @@ public class UserServiceImpl implements UserService {
 	public Result<EncryptUser> login(User user) {
 		User sUser = userMapper.selectByUser(user);
 		if (Objects.isNull(sUser)) {
-			return Result.failWithMessage("账号或密码错误");
+			return Result.fail(ErrorCode.USER_AUTHENTICATION_ERROR);
 		}
 
 		String password = encrypt.md5WithSalt(user.getPassword());
 		if (!sUser.getPassword().equals(password)) {
-			return Result.failWithMessage("账号或密码错误");
+			return Result.fail(ErrorCode.USER_AUTHENTICATION_ERROR);
 		}
 		UserCache.set(sUser.getId(), sUser);
 		EncryptUser u = CopyUtil.copyWithSet(sUser, new EncryptUser());

@@ -56,7 +56,7 @@ public class GlobalException {
 				})
 				.map(data -> ResponseEntity.ok()
 						.header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-						.body(Result.failWithMessageData(ErrorCode.SYS_PARAMETER_ERROR, data).toString()));
+						.body(Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, data).toString()));
 	}
 
 }

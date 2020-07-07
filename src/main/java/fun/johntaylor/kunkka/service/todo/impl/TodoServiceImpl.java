@@ -5,6 +5,7 @@ import fun.johntaylor.kunkka.entity.todo.TodoList;
 import fun.johntaylor.kunkka.repository.mybatis.todo.TodoListMapper;
 import fun.johntaylor.kunkka.repository.mybatis.todo.TodoMapper;
 import fun.johntaylor.kunkka.service.todo.TodoService;
+import fun.johntaylor.kunkka.utils.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,20 +30,17 @@ public class TodoServiceImpl implements TodoService {
 	private TodoMapper todoMapper;
 
 
-	public void add(Todo todo) {
-//        todoDao.addData(todo);
+	@Override
+	public Result<TodoList> addTodo(Todo todo) {
+		return null;
 	}
 
 	@Override
-	public void addPatch(Integer maxTime, Integer minPriority, List<Todo> todos) {
-		if (todos.size() == 0) {
-			return;
-		}
-
+	public Result<TodoList> addPatch(Long uid, Integer maxTime, Integer minPriority, List<Todo> todos) {
 		// 初始化TodoList
 		TodoList todoList = new TodoList();
-		todoList.setUid(1L);
 		todoList.setId(todos.get(0).getListId());
+		todoList.setUid(uid);
 		todoList.setMinPriority(minPriority);
 		todoList.setMaxTime(maxTime);
 		int totalTime = 0;
@@ -63,10 +61,17 @@ public class TodoServiceImpl implements TodoService {
 			}
 		});
 		addData(todoList, todos);
+		return Result.success(todoList);
 	}
 
-	public void update(Long id) {
-		updateData(id);
+	@Override
+	public Result<List<TodoList>> searchTodoList(Long uid, Integer offset, Integer count, Long timeMillis) {
+		return null;
+	}
+
+	@Override
+	public Result<List<Todo>> searchTodosByListId(Long id, Long uid) {
+		return null;
 	}
 
 	/**
@@ -133,17 +138,4 @@ public class TodoServiceImpl implements TodoService {
 		});
 	}
 
-	@Transactional(rollbackFor = Exception.class)
-	public void updateData(Long id) {
-		Todo todo = todoMapper.select(id);
-		todo.setValue(id.intValue());
-		todo.setUpdateTime(System.currentTimeMillis());
-		todoMapper.update(todo);
-
-		TodoList todoList = new TodoList();
-		todoList.setId(todo.getListId());
-		todoList.setUpdateTime(System.currentTimeMillis());
-		todoList.setValue(50);
-		todoListMapper.update(todoList);
-	}
 }

@@ -1,6 +1,5 @@
 package fun.johntaylor.kunkka.utils.result;
 
-import fun.johntaylor.kunkka.utils.error.ErrorCode;
 import fun.johntaylor.kunkka.utils.error.MessageUtil;
 import fun.johntaylor.kunkka.utils.json.JsonUtil;
 
@@ -44,12 +43,12 @@ public final class Result<T> {
 		return new Result<>(S_FAIL, code, MessageUtil.getMessage(code), null);
 	}
 
-	public static <T> Result<T> failWithMessage(String message) {
-		return new Result<>(S_FAIL, ErrorCode.SYS_CUSTOMIZE_ERROR, message, null);
+	public static <T> Result<T> failWithMessage(String code, String message) {
+		return new Result<>(S_FAIL, code, message, null);
 	}
 
-	public static <T> Result<T> failWithMessageData(String code, T data) {
-		return new Result<>(S_FAIL, code, MessageUtil.getMessage(code), data);
+	public static <T> Result<T> failWithMessage(String code, T data) {
+		return new Result<>(S_FAIL, code, JsonUtil.toJson(data), null);
 	}
 
 	public boolean isSuccess() {
