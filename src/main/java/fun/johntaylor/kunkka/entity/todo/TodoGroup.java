@@ -11,7 +11,7 @@ import javax.validation.constraints.Min;
  * @Date 2020/7/7 9:12 PM
  **/
 @Data
-public class TodoList {
+public class TodoGroup {
 	private Long id;
 
 	/**

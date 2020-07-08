@@ -8,7 +8,7 @@
             <if test="value!=null">value = #{value},</if>
             <if test="estimateTime!=null">estimate_time = #{estimateTime},</if>
             <if test="realityTime!=null">reality_time = #{realityTime},</if>
-            <if test="listId!=null">list_id = #{listId},</if>
+            <if test="groupId!=null">group_id = #{groupId},</if>
             <if test="createTime!=null">create_time = #{createTime},</if>
             <if test="updateTime!=null">update_time = #{updateTime},</if>
             <if test="priority!=null">priority = #{priority},</if>
@@ -24,7 +24,7 @@
             <if test="new.value!=null">value = #{new.value},</if>
             <if test="new.estimateTime!=null">estimate_time = #{new.estimateTime},</if>
             <if test="new.realityTime!=null">reality_time = #{new.realityTime},</if>
-            <if test="new.listId!=null">list_id = #{new.listId},</if>
+            <if test="new.groupId!=null">group_id = #{new.groupId},</if>
             <if test="new.createTime!=null">create_time = #{new.createTime},</if>
             <if test="new.updateTime!=null">update_time = #{new.updateTime},</if>
             <if test="new.priority!=null">priority = #{new.priority},</if>
@@ -36,7 +36,7 @@
             <if test="new.value!=null and old.value!=null">and value = #{old.value}</if>
             <if test="new.estimateTime!=null and old.estimateTime!=null">and estimate_time = #{old.estimateTime}</if>
             <if test="new.realityTime!=null and old.realityTime!=null">and reality_time = #{old.realityTime}</if>
-            <if test="new.listId!=null and old.listId!=null">and list_id = #{old.listId}</if>
+            <if test="new.groupId!=null and old.listId!=null">and group_id = #{old.groupId}</if>
             <if test="new.createTime!=null and old.createTime!=null">and create_time = #{old.createTime}</if>
             <if test="new.updateTime!=null and old.updateTime!=null">and update_time = #{old.updateTime}</if>
             <if test="new.priority!=null and old.priority!=null">and priority = #{old.priority}</if>

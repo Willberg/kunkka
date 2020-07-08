@@ -25,5 +25,5 @@ public class AddPatchRequest {
 
 	@NotNull
 	@Valid
-	private List<Todo> todos;
+	private List<Todo> todoList;
 }

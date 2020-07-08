@@ -1,7 +1,5 @@
 package dao;
 
-import fun.johntaylor.kunkka.entity.todo.Todo;
-import fun.johntaylor.kunkka.entity.todo.TodoList;
 import fun.johntaylor.kunkka.entity.user.User;
 
 import java.lang.reflect.Field;

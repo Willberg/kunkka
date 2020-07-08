@@ -3,6 +3,7 @@ package fun.johntaylor.kunkka.controller.todo;
 import fun.johntaylor.kunkka.component.encryption.Jwt;
 import fun.johntaylor.kunkka.component.thread.pool.DbThreadPool;
 import fun.johntaylor.kunkka.entity.todo.Todo;
+import fun.johntaylor.kunkka.entity.todo.TodoGroup;
 import fun.johntaylor.kunkka.entity.todo.request.AddPatchRequest;
 import fun.johntaylor.kunkka.entity.user.User;
 import fun.johntaylor.kunkka.service.todo.TodoService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -42,7 +44,7 @@ public class TodoController {
 		return Mono.just(todo)
 				.publishOn(dbThreadPool.daoInstance())
 				.map(t -> {
-					if (Objects.isNull(todo.getListId())) {
+					if (Objects.isNull(todo.getGroupId())) {
 						return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "必须指定任务组").toString();
 					}
 					todo.setCreateTime(System.currentTimeMillis());
@@ -57,13 +59,37 @@ public class TodoController {
 		return Mono.just(entity)
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
-					if (v.getTodos().size() == 0) {
+					if (v.getTodoList().size() == 0) {
 						return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "必须指定一个或多个任务").toString();
 					}
 					int maxTime = Optional.ofNullable(v.getMaxTime()).orElse(480);
 					int minPriority = Optional.ofNullable(v.getMinPriority()).orElse(1);
 					User user = jwt.getUser(request);
-					return todoService.addPatch(user.getId(), maxTime, minPriority, v.getTodos()).toString();
+					// 初始化TodoList
+					List<Todo> todoList = v.getTodoList();
+					TodoGroup todoGroup = new TodoGroup();
+					todoGroup.setId(todoList.get(0).getGroupId());
+					todoGroup.setUid(user.getId());
+					todoGroup.setMinPriority(minPriority);
+					todoGroup.setMaxTime(maxTime);
+					int totalTime = 0;
+					for (Todo t : todoList) {
+						totalTime += t.getEstimateTime();
+					}
+					todoGroup.setTotalTime(totalTime);
+					todoGroup.setCreateTime(System.currentTimeMillis());
+					todoGroup.setUpdateTime(System.currentTimeMillis());
+					todoGroup.setStatus(TodoGroup.S_FINISHED);
+
+					// 按优先级给todos排序
+					todoList.sort((o1, o2) -> {
+						if (o1.getPriority() < o2.getPriority()) {
+							return 1;
+						} else {
+							return -1;
+						}
+					});
+					return todoService.addPatch(todoGroup, todoList).toString();
 				});
 	}
 

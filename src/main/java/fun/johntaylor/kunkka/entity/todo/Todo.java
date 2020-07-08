@@ -39,9 +39,9 @@ public class Todo {
 	private Integer realityTime;
 
 	/**
-	 * 关联的listId
+	 * 关联的groupId
 	 */
-	private Long listId;
+	private Long groupId;
 
 	private Long createTime;
 

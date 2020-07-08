@@ -1,7 +1,7 @@
 package fun.johntaylor.kunkka.service.todo;
 
 import fun.johntaylor.kunkka.entity.todo.Todo;
-import fun.johntaylor.kunkka.entity.todo.TodoList;
+import fun.johntaylor.kunkka.entity.todo.TodoGroup;
 import fun.johntaylor.kunkka.utils.result.Result;
 
 import java.util.List;
@@ -16,26 +16,24 @@ public interface TodoService {
 	 * 单独增加任务(已知todoList)
 	 * @param todo
 	 */
-	Result<TodoList> addTodo(Todo todo);
+	Result<TodoGroup> addTodo(Todo todo);
 
 	/**
 	 * 批量增加任务
-	 * @param uid
-	 * @param maxTime
-	 * @param minPriority
-	 * @param todos
+	 * @param todoGroup
+	 * @param todoList
 	 */
-	Result<TodoList> addPatch(Long uid, Integer maxTime, Integer minPriority, List<Todo> todos);
+	Result<TodoGroup> addPatch(TodoGroup todoGroup, List<Todo> todoList);
 
 
 	/**
 	 * @Author John
-	 * @Description 查询timeMillis以来的todoList
+	 * @Description 查询timeMillis以来的todoGroup
 	 * @Date 2020/7/7 8:41 PM
 	 * @Param
 	 * @return
 	 **/
-	Result<List<TodoList>> searchTodoList(Long uid, Integer offset, Integer count, Long timeMillis);
+	Result<List<TodoGroup>> searchTodoGroupList(Long uid, Integer offset, Integer count, Long timeMillis);
 
 	/**
 	 * @Author John
@@ -44,5 +42,5 @@ public interface TodoService {
 	 * @Param
 	 * @return
 	 **/
-	Result<List<Todo>> searchTodosByListId(Long id, Long uid);
+	Result<List<Todo>> searchTodoListByGroupId(Long id, Long uid);
 }

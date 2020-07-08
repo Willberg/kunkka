@@ -1,5 +1,5 @@
-drop table if exists `t_todo_list`;
-create table `t_todo_list` (
+drop table if exists `t_todo_group`;
+create table `t_todo_group` (
 	`id` bigint(20) not null auto_increment comment 'id',
 	`uid` bigint(20) default null comment '用户ID',
 	`value` bigint(20) default null comment '价值',
