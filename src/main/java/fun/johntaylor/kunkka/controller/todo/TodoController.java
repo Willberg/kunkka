@@ -1,6 +1,5 @@
 package fun.johntaylor.kunkka.controller.todo;
 
-import fun.johntaylor.kunkka.component.encryption.Jwt;
 import fun.johntaylor.kunkka.component.thread.pool.DbThreadPool;
 import fun.johntaylor.kunkka.entity.todo.Todo;
 import fun.johntaylor.kunkka.entity.todo.TodoGroup;
@@ -8,8 +7,8 @@ import fun.johntaylor.kunkka.entity.todo.request.AddPatchRequest;
 import fun.johntaylor.kunkka.entity.user.User;
 import fun.johntaylor.kunkka.service.todo.TodoService;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
-import fun.johntaylor.kunkka.utils.json.JsonUtil;
 import fun.johntaylor.kunkka.utils.result.Result;
+import fun.johntaylor.kunkka.utils.session.SessionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -18,12 +17,11 @@ import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
  * @Author John
- * @Description
+ * @Description todo服务0
  * @Date 2020/6/22 8:08 PM
  **/
 @RestController
@@ -35,24 +33,12 @@ public class TodoController {
 	@Autowired
 	private DbThreadPool dbThreadPool;
 
-	@Autowired
-	private Jwt jwt;
-
-	@PostMapping(value = "/api/todo/add")
-	public Mono<String> add(@Valid @RequestBody Todo todo) {
-		log.info("add: " + JsonUtil.toJson(todo));
-		return Mono.just(todo)
-				.publishOn(dbThreadPool.daoInstance())
-				.map(t -> {
-					if (Objects.isNull(todo.getGroupId())) {
-						return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "必须指定任务组").toString();
-					}
-					todo.setCreateTime(System.currentTimeMillis());
-					todo.setUpdateTime(System.currentTimeMillis());
-					return todoService.addTodo(todo).toString();
-				});
-	}
-
+	/**
+	 * 添加任务，没有任务组，自动创建任务组
+	 * @param request
+	 * @param entity
+	 * @return 任务组
+	 */
 	@PostMapping(value = "/api/todo/patch/add")
 	public Mono<String> addPatch(ServerHttpRequest request,
 			@Valid @RequestBody AddPatchRequest entity) {
@@ -64,7 +50,7 @@ public class TodoController {
 					}
 					int maxTime = Optional.ofNullable(v.getMaxTime()).orElse(480);
 					int minPriority = Optional.ofNullable(v.getMinPriority()).orElse(1);
-					User user = jwt.getUser(request);
+					User user = SessionUtil.getUser(request);
 					// 初始化TodoList
 					List<Todo> todoList = v.getTodoList();
 					TodoGroup todoGroup = new TodoGroup();
@@ -72,14 +58,9 @@ public class TodoController {
 					todoGroup.setUid(user.getId());
 					todoGroup.setMinPriority(minPriority);
 					todoGroup.setMaxTime(maxTime);
-					int totalTime = 0;
-					for (Todo t : todoList) {
-						totalTime += t.getEstimateTime();
-					}
-					todoGroup.setTotalTime(totalTime);
 					todoGroup.setCreateTime(System.currentTimeMillis());
 					todoGroup.setUpdateTime(System.currentTimeMillis());
-					todoGroup.setStatus(TodoGroup.S_FINISHED);
+					todoGroup.setIsPrivate(false);
 
 					// 按优先级给todos排序
 					todoList.sort((o1, o2) -> {
@@ -93,14 +74,25 @@ public class TodoController {
 				});
 	}
 
-	@GetMapping(value = "/api/todo/list")
+	/**
+	 * 查询任务组
+	 * @param request
+	 * @param offset
+	 * @param count
+	 * @param timeMillis
+	 * @param sort
+	 * @return 任务组列表
+	 */
+	@GetMapping(value = "/api/todo/group/list")
 	public Mono<String> search(ServerHttpRequest request,
 			@RequestParam(value = "offset", defaultValue = "0") Integer offset,
-			@RequestParam(value = "count", defaultValue = "10") Integer count) {
-		return Mono.just(jwt.getUser(request))
+			@RequestParam(value = "count", defaultValue = "10") Integer count,
+			@RequestParam(value = "timeMillis", defaultValue = "0") Long timeMillis,
+			@RequestParam(value = "sort", defaultValue = "asc") String sort) {
+		return Mono.just(SessionUtil.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
-					return Result.success().toString();
+					return todoService.searchTodoGroupList(v.getId(), offset, count, timeMillis, sort).toString();
 				});
 	}
 }

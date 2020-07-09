@@ -60,10 +60,20 @@ public class TodoGroup {
 	 */
 	private Integer status;
 
+	public static final Integer PRIVATE_YES = 1;
+	public static final Integer PRIVATE_NO = 0;
 
 	public static final Integer MAX_PRIORITY = 10;
 
 	public static final Integer S_PENDING = 1;
 	public static final Integer S_DEL = 50;
 	public static final Integer S_FINISHED = 100;
+
+//	public Boolean getIsPrivate() {
+//		return PRIVATE_YES.equals(this.isPrivate);
+//	}
+//
+//	public void setIsPrivate(Boolean isPrivate) {
+//		this.isPrivate = isPrivate ? PRIVATE_YES : PRIVATE_NO;
+//	}
 }

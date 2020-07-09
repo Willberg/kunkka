@@ -1,5 +1,6 @@
 package dao;
 
+import fun.johntaylor.kunkka.entity.todo.TodoGroup;
 import fun.johntaylor.kunkka.entity.user.User;
 
 import java.lang.reflect.Field;
@@ -208,6 +209,6 @@ public class GenerateDbCode {
     }
 
     public static void main(String[] args) {
-        printSql(User.class, "id");
+        printSql(TodoGroup.class, "id");
     }
 }

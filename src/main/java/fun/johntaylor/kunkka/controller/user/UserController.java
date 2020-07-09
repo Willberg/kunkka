@@ -1,16 +1,17 @@
 package fun.johntaylor.kunkka.controller.user;
 
-import fun.johntaylor.kunkka.component.encryption.Jwt;
 import fun.johntaylor.kunkka.component.thread.pool.DbThreadPool;
 import fun.johntaylor.kunkka.entity.encrypt.user.EncryptUser;
 import fun.johntaylor.kunkka.entity.user.User;
 import fun.johntaylor.kunkka.service.user.UserService;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
 import fun.johntaylor.kunkka.utils.result.Result;
+import fun.johntaylor.kunkka.utils.session.SessionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,9 +35,6 @@ public class UserController {
 	@Autowired
 	private DbThreadPool dbThreadPool;
 
-	@Autowired
-	private Jwt jwt;
-
 	/**
 	 * @Author John
 	 * @Description 注册
@@ -54,7 +52,7 @@ public class UserController {
 						return Result.fail(ErrorCode.SYS_PARAMETER_ERROR).toString();
 					}
 					Result<EncryptUser> result = userService.register(v);
-					jwt.setTokenHeader(response, result);
+					SessionUtil.setCookie(response, result);
 					return result.toString();
 				});
 	}
@@ -73,21 +71,24 @@ public class UserController {
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					Result<EncryptUser> result = userService.login(v);
-					jwt.setTokenHeader(response, result);
+					SessionUtil.setCookie(response, result);
 					return result.toString();
 				});
 	}
 
 	/**
 	 * @Author John
-	 * @Description 刷新jwt
+	 * @Description 退出
 	 * @Date 2020/6/22 9:47 PM
 	 * @Param
 	 * @return
 	 **/
-	@PostMapping(value = "/api/user/jwt/refresh")
-	public Mono<String> refresh(ServerHttpRequest request) {
-		return Mono.just(jwt.getUser(request))
-				.map(user -> Result.success(jwt.createToken(user.getId())).toString());
+	@GetMapping(value = "/api/user/logout")
+	public Mono<String> logout(ServerHttpRequest request) {
+		return Mono.just(Result.success())
+				.map(result -> {
+					SessionUtil.clearSession(request);
+					return result.toString();
+				});
 	}
 }

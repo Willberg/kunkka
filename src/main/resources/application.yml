@@ -27,10 +27,11 @@ spring:
 
 jwt:
   subject: kunkka
-  expiration: 1296000000
+  # 认证过期时间 0.5h
+  expiration: 1800000
   secret: dJF&*JOFJO#Jdiojocijiosj23e2d9i0fjsdj
   auth.id: kunkkaId
-  authentication.whitelist.urls: '^.*/api/user/login.*$|^.*/api/public/.*$|^.*/api/user/register.*$'
+  authentication.urls: '^.*/api/open.*$'
 
 salt:
   password: IDJIFJio329&*&*ejenfi323hdhhdh
@@ -40,4 +41,6 @@ limit.max: 5
 csrf.whitelist.urls: '^http://localhost.*$|^https://localhost.*$'
 # 测试
 #csrf.whitelist.urls: '^$'
+
+authentication.whitelist.urls: '^.*/api/user/login.*$|^.*/api/public/.*$|^.*/api/user/register.*$|^.*/api/open.*$'
 

@@ -40,7 +40,4 @@ public interface TodoMapper {
 
 	@Select("select " + COLUMNS + " from t_todo where group_id=#{groupId}")
 	List<Todo> selectTodoList(Long groupId);
-
-	@Select("select " + COLUMNS + " from t_todo where group_id=#{groupId} and status = #{status}")
-	List<Todo> selectTodoList(Long groupId, Integer status);
 }

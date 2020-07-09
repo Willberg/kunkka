@@ -13,10 +13,10 @@ import java.util.List;
  **/
 public interface TodoService {
 	/**
-	 * 单独增加任务(已知todoList)
+	 * 单独增加任务(已知todoList), 开放服务
 	 * @param todo
 	 */
-	Result<TodoGroup> addTodo(Todo todo);
+	Result<TodoGroup> openAddTodo(Todo todo);
 
 	/**
 	 * 批量增加任务
@@ -33,14 +33,14 @@ public interface TodoService {
 	 * @Param
 	 * @return
 	 **/
-	Result<List<TodoGroup>> searchTodoGroupList(Long uid, Integer offset, Integer count, Long timeMillis);
+	Result<List<TodoGroup>> searchTodoGroupList(Long uid, Integer offset, Integer count, Long timeMillis, String sort);
 
 	/**
 	 * @Author John
-	 * @Description 根据listId和uid查询todo任务
+	 * @Description 根据groupId查询todo任务
 	 * @Date 2020/7/7 8:41 PM
 	 * @Param
 	 * @return
 	 **/
-	Result<List<Todo>> searchTodoListByGroupId(Long id, Long uid);
+	Result<List<Todo>> searchTodoListByGroupId(Long groupId);
 }

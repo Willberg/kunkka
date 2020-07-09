@@ -8,4 +8,5 @@ package fun.johntaylor.kunkka.constant.cache;
 public final class CacheDomain {
 	public static final String USER_CACHE = "user";
 	public static final String LIMIT_CACHE = "limit";
+	public static final String SESSION_CACHE = "session";
 }

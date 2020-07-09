@@ -226,40 +226,55 @@
 	<!--开发环境:打印控制台-->
 	<springProfile name="dev">
 		<!--对不同包设置不同的日志级别-->
-		<logger name="fun.johntaylor.kunkka" level="debug">
+		<logger name="fun.johntaylor.kunkka" level="debug" additivity="false">
 			<appender-ref ref="CONSOLE"/>
 			<appender-ref ref="DEBUG_FILE"/>
 		</logger>
+
+		<!-- spring启动相关的log只打印warn及以上的-->
+		<root level="warn">
+			<appender-ref ref="CONSOLE"/>
+		</root>
 	</springProfile>
 
 	<!--开发环境:打印控制台-->
 	<springProfile name="test">
 		<!--对不同包设置不同的日志级别-->
-		<logger name="fun.johntaylor.kunkka" level="info">
+		<logger name="fun.johntaylor.kunkka" level="info" additivity="false">
 			<appender-ref ref="INFO_FILE"/>
-			<appender-ref ref="ERROR_FILE"/>
 			<appender-ref ref="WARN_FILE"/>
+			<appender-ref ref="ERROR_FILE"/>
 		</logger>
 
-		<logger name="fun.johntaylor.kunkka.repository" level="debug">
+		<logger name="fun.johntaylor.kunkka.repository" level="debug" additivity="false">
 			<appender-ref ref="DB_FILE"/>
 		</logger>
+
+		<root level="warn">
+			<appender-ref ref="WARN_FILE"/>
+			<appender-ref ref="ERROR_FILE"/>
+		</root>
 	</springProfile>
 
 	<!--生产环境:输出到文件-->
 	<springProfile name="pro">
-		<logger name="fun.johntaylor.kunkka.controller" level="info">
+		<logger name="fun.johntaylor.kunkka.controller" level="info" additivity="false">
 			<appender-ref ref="REQUEST_FILE"/>
 		</logger>
 
-		<logger name="fun.johntaylor.kunkka" level="warn">
+		<logger name="fun.johntaylor.kunkka" level="warn" additivity="false">
 			<appender-ref ref="WARN_FILE"/>
 			<appender-ref ref="ERROR_FILE"/>
 		</logger>
 
-		<logger name="fun.johntaylor.kunkka.repository" level="debug">
+		<logger name="fun.johntaylor.kunkka.repository" level="debug" additivity="false">
 			<appender-ref ref="DB_FILE"/>
 		</logger>
+
+		<root level="warn">
+			<appender-ref ref="WARN_FILE"/>
+			<appender-ref ref="ERROR_FILE"/>
+		</root>
 	</springProfile>
 
 </configuration>

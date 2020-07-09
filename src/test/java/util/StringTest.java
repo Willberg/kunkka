@@ -4,11 +4,13 @@ import fun.johntaylor.kunkka.constant.cache.CacheDomain;
 import fun.johntaylor.kunkka.entity.encrypt.user.EncryptUser;
 import fun.johntaylor.kunkka.entity.user.User;
 import fun.johntaylor.kunkka.utils.cache.BaseCache;
+import fun.johntaylor.kunkka.utils.cache.impl.SessionCache;
 import fun.johntaylor.kunkka.utils.cache.impl.UserCache;
 import fun.johntaylor.kunkka.utils.general.CopyUtil;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 public class StringTest {
@@ -52,7 +54,11 @@ public class StringTest {
 
 		UserCache.set(null, null);
 		u = UserCache.get(null, User.class);
-		System.out.println(u.getId());
+//		System.out.println(u.getId());
+
+		Long uid = SessionCache.get(null, Long.class);
+		uid = SessionCache.get(uid.toString(), Long.class);
+		User user = UserCache.get(uid, User.class);
 	}
 
 	@Test
@@ -61,4 +67,24 @@ public class StringTest {
 		String s = null;
 		System.out.println(Long.parseLong(Optional.ofNullable(s).orElse("")));
 	}
+
+	@Test
+	public void testCache2() throws InterruptedException {
+		SessionCache.set("test", 11L);
+		Thread.sleep(35000);
+		System.out.println(SessionCache.get("test", Long.class));
+
+		SessionCache.set("test",12L);
+		Thread.sleep(25000);
+		System.out.println(SessionCache.get("test", Long.class));
+		SessionCache.set("test", 12L);
+		Thread.sleep(25000);
+		System.out.println(SessionCache.get("test", Long.class));
+	}
+
+	@Test
+	public void testUUID() {
+		System.out.println(UUID.randomUUID().toString());
+	}
+
 }
