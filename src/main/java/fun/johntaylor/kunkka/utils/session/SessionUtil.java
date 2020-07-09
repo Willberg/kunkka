@@ -62,7 +62,7 @@ public final class SessionUtil {
 	 * @param request
 	 */
 	public static void clearSession(ServerHttpRequest request) {
-		HttpCookie cookie = request.getCookies().getFirst(SESSION_COOKIE_NAME);
+		HttpCookie cookie = request.getCookies().getFirst(SESSION_ID);
 		if (Objects.nonNull(cookie)) {
 			String cookieValue = cookie.getValue();
 			SessionCache.clear(cookieValue);
