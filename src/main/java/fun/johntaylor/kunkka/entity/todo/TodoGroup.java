@@ -51,6 +51,11 @@ public class TodoGroup {
 	private Long updateTime;
 
 	/**
+	 * 是否私有
+	 */
+	private Boolean isPrivate;
+
+	/**
 	 * 1-- 待处理， 50- 作废， 100- 完成
 	 */
 	private Integer status;

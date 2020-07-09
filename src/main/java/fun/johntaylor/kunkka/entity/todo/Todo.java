@@ -59,7 +59,11 @@ public class Todo {
 	 */
 	private Integer status;
 
-	public static final Integer S_PENDING = 1;
+	public static final Integer P_MIN = 1;
+	public static final Integer P_MAX = 10;
+
+	public static final Integer S_INITIAL = 1;
+	public static final Integer S_PENDING = 10;
 	public static final Integer S_DEL = 50;
 	public static final Integer S_FINISHED = 100;
 }

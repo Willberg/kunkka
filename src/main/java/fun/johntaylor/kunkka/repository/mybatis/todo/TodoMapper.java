@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectKey;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,4 +37,10 @@ public interface TodoMapper {
 			"on duplicate key update update_time = #{updateTime}, status = #{status}")
 	@SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "id", before = false, resultType = Long.class)
 	int insertWithUpdateStatus(Todo todo);
+
+	@Select("select " + COLUMNS + " from t_todo where group_id=#{groupId}")
+	List<Todo> selectTodoList(Long groupId);
+
+	@Select("select " + COLUMNS + " from t_todo where group_id=#{groupId} and status = #{status}")
+	List<Todo> selectTodoList(Long groupId, Integer status);
 }

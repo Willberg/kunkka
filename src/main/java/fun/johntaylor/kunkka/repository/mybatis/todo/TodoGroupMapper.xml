@@ -12,6 +12,7 @@
             <if test="minPriority!=null">min_priority = #{minPriority},</if>
             <if test="createTime!=null">create_time = #{createTime},</if>
             <if test="updateTime!=null">update_time = #{updateTime},</if>
+            <if test="isPrivate!=null">is_private = #{isPrivate},</if>
             <if test="status!=null">status = #{status},</if>
         </set>
         where id=#{id}
@@ -28,6 +29,7 @@
             <if test="new.minPriority!=null">min_priority = #{new.minPriority},</if>
             <if test="new.createTime!=null">create_time = #{new.createTime},</if>
             <if test="new.updateTime!=null">update_time = #{new.updateTime},</if>
+            <if test="new.isPrivate!=null">is_private = #{new.isPrivate},</if>
             <if test="new.status!=null">status = #{new.status},</if>
         </set>
         <where>
@@ -40,6 +42,7 @@
             <if test="new.minPriority!=null and old.minPriority!=null">and min_priority = #{old.minPriority}</if>
             <if test="new.createTime!=null and old.createTime!=null">and create_time = #{old.createTime}</if>
             <if test="new.updateTime!=null and old.updateTime!=null">and update_time = #{old.updateTime}</if>
+            <if test="new.isPrivate!=null and old.isPrivate!=null">and is_private = #{old.isPrivate}</if>
             <if test="new.status!=null and old.status!=null">and status = #{old.status}</if>
         </where>
     </update>
