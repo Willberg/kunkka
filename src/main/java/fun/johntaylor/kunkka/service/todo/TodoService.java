@@ -5,6 +5,7 @@ import fun.johntaylor.kunkka.entity.todo.TodoGroup;
 import fun.johntaylor.kunkka.utils.result.Result;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author John
@@ -17,6 +18,12 @@ public interface TodoService {
 	 * @param todo
 	 */
 	Result<TodoGroup> openAddTodo(Todo todo);
+
+	/**
+	 * 修改任务(已知todoList), 开放服务
+	 * @param todo
+	 */
+	Result<TodoGroup> openUpdateTodo(Todo todo);
 
 	/**
 	 * 批量增加任务
@@ -42,5 +49,15 @@ public interface TodoService {
 	 * @Param
 	 * @return
 	 **/
-	Result<List<Todo>> searchTodoListByGroupId(Long groupId);
+	Result<Map<Integer, List<Todo>>> searchTodoListByGroupId(Long groupId);
+
+
+	/**
+	 * @Author John
+	 * @Description 更新任务
+	 * @Date 2020/7/12 5:24 PM
+	 * @Param
+	 * @return
+	 **/
+	Result<Todo> updateTodo(Todo todo);
 }

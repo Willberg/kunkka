@@ -1,5 +1,6 @@
 package fun.johntaylor.kunkka.controller.user;
 
+import fun.johntaylor.kunkka.component.encryption.Jwt;
 import fun.johntaylor.kunkka.component.thread.pool.DbThreadPool;
 import fun.johntaylor.kunkka.entity.encrypt.user.EncryptUser;
 import fun.johntaylor.kunkka.entity.user.User;
@@ -11,10 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
@@ -34,6 +32,9 @@ public class UserController {
 
 	@Autowired
 	private DbThreadPool dbThreadPool;
+
+	@Autowired
+	private Jwt jwt;
 
 	/**
 	 * @Author John
@@ -90,5 +91,20 @@ public class UserController {
 					SessionUtil.clearSession(request);
 					return result.toString();
 				});
+	}
+
+
+	/**
+	 * @Author John
+	 * @Description 生成用户授权todo链接
+	 * @Date 2020/7/11 10:44 PM
+	 * @Param
+	 * @return
+	 **/
+	@GetMapping(value = "/api/user/open/todo/url/create")
+	public Mono<String> createUrl(@RequestParam(value = "url") String url,
+			@RequestParam(value = "groupId") Long groupId) {
+		return Mono.just(jwt.createToken(groupId))
+				.map(v -> Result.success(String.format("%s?token=%s", url, v)).toString());
 	}
 }

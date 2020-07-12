@@ -2,9 +2,6 @@ package fun.johntaylor.kunkka.entity.todo;
 
 import lombok.Data;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-
 /**
  * @Author John
  * @Description 任务组
@@ -42,8 +39,6 @@ public class TodoGroup {
 	/**
 	 * 最低优先级，高于此优先级的任务不可过滤
 	 */
-	@Min(value = 1, message = "不能小于1")
-	@Max(value = 10, message = "不能超过10")
 	private Integer minPriority;
 
 	private Long createTime;
@@ -60,20 +55,11 @@ public class TodoGroup {
 	 */
 	private Integer status;
 
-	public static final Integer PRIVATE_YES = 1;
-	public static final Integer PRIVATE_NO = 0;
 
-	public static final Integer MAX_PRIORITY = 10;
+	public static final Integer PRIORITY_MIN_VALUE = 1;
+	public static final Integer PRIORITY_MAX_VALUE = 10;
 
 	public static final Integer S_PENDING = 1;
 	public static final Integer S_DEL = 50;
 	public static final Integer S_FINISHED = 100;
-
-//	public Boolean getIsPrivate() {
-//		return PRIVATE_YES.equals(this.isPrivate);
-//	}
-//
-//	public void setIsPrivate(Boolean isPrivate) {
-//		this.isPrivate = isPrivate ? PRIVATE_YES : PRIVATE_NO;
-//	}
 }

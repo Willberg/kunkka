@@ -16,4 +16,5 @@ public final class ErrorCode {
 
 	public static String USER_EXISTS = "user.0001";
 	public static String USER_AUTHENTICATION_ERROR = "user.0002";
+	public static String USER_ILLEGAL_OPERATION = "user.0003";
 }

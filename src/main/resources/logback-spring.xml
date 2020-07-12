@@ -237,7 +237,7 @@
 		</root>
 	</springProfile>
 
-	<!--开发环境:打印控制台-->
+	<!--测试环境:打印控制台-->
 	<springProfile name="test">
 		<!--对不同包设置不同的日志级别-->
 		<logger name="fun.johntaylor.kunkka" level="info" additivity="false">

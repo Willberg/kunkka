@@ -1,5 +1,7 @@
 package fun.johntaylor.kunkka.entity.todo;
 
+import fun.johntaylor.kunkka.entity.validation.Insert;
+import fun.johntaylor.kunkka.entity.validation.Update;
 import lombok.Data;
 
 import javax.validation.constraints.Max;
@@ -18,14 +20,14 @@ public class Todo {
 	/**
 	 * 任务
 	 */
-	@NotNull(message = "请指定任务内容")
+	@NotNull(message = "请指定任务内容", groups = Insert.class)
 	private String task;
 
 	/**
 	 * 价值 1-100
 	 */
-	@Min(value = 1, message = "不能小于1")
-	@Max(value = 100, message = "不能超过10")
+	@Min(value = 1, message = "价值不能小于1")
+	@Max(value = 100, message = "价值不能超过100")
 	private Integer value;
 
 	/**
@@ -41,6 +43,7 @@ public class Todo {
 	/**
 	 * 关联的groupId
 	 */
+	@NotNull(message = "必须指定任务组")
 	private Long groupId;
 
 	private Long createTime;
@@ -50,12 +53,15 @@ public class Todo {
 	/**
 	 * 优先级 1-10， 数值越小，优先级越高
 	 */
-	@Min(value = 1, message = "不能小于1")
-	@Max(value = 10, message = "不能超过10")
+	@Min(value = 1, message = "优先级不能小于1")
+	@Max(value = 10, message = "优先级不能超过10")
+	@NotNull(message = "请确定优先级", groups = Insert.class)
 	private Integer priority;
 
 	/**
-	 * 1-- 待处理， 50- 作废， 100- 完成
+	 * 1--初始（任务发起者），10--待处理（任务发起者和任务执行者均可处理），
+	 * 20-- 处理中（任务发起者无权修改，任务执行者进行中）， 50- 作废（任务发起者可以处理），
+	 * 100- 完成
 	 */
 	private Integer status;
 
@@ -64,6 +70,7 @@ public class Todo {
 
 	public static final Integer S_INITIAL = 1;
 	public static final Integer S_PENDING = 10;
+	public static final Integer S_PROCESSING = 20;
 	public static final Integer S_DEL = 50;
 	public static final Integer S_FINISHED = 100;
 }
