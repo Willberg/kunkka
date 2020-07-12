@@ -5,7 +5,7 @@ import fun.johntaylor.kunkka.entity.todo.Todo;
 import fun.johntaylor.kunkka.entity.todo.TodoGroup;
 import fun.johntaylor.kunkka.entity.todo.request.AddPatchRequest;
 import fun.johntaylor.kunkka.entity.user.User;
-import fun.johntaylor.kunkka.entity.validation.Insert;
+import fun.johntaylor.kunkka.entity.validation.todo.InsertPatchTodo;
 import fun.johntaylor.kunkka.service.todo.TodoService;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
 import fun.johntaylor.kunkka.utils.result.Result;
@@ -19,7 +19,6 @@ import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @Author John
@@ -43,7 +42,7 @@ public class TodoController {
 	 */
 	@PostMapping(value = "/api/todo/patch/add")
 	public Mono<String> addPatch(ServerHttpRequest request,
-			@Validated(value = {Insert.class}) @RequestBody AddPatchRequest entity) {
+			@Validated(value = {InsertPatchTodo.class}) @RequestBody AddPatchRequest entity) {
 		return Mono.just(entity)
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
@@ -96,11 +95,6 @@ public class TodoController {
 			@Valid @RequestBody Todo todo) {
 		return Mono.just(SessionUtil.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
-				.map(v -> {
-					if (Objects.isNull(todo.getEstimateTime())) {
-						return Result.failWithMessage(ErrorCode.SYS_CUSTOMIZE_ERROR, "请填写估计时间").toString();
-					}
-					return Result.success(todoService.updateTodo(todo)).toString();
-				});
+				.map(v -> todoService.updateTodo(todo).toString());
 	}
 }

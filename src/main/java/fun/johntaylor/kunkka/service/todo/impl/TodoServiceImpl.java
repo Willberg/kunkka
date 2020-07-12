@@ -116,7 +116,7 @@ public class TodoServiceImpl implements TodoService {
 
 			for (Todo t : oldTodoList) {
 				if (Todo.S_PENDING.equals(t.getStatus())) {
-					// initial状态需要重新规划
+					// pending状态需要重新规划
 					todoList.add(t);
 				}
 
@@ -178,22 +178,49 @@ public class TodoServiceImpl implements TodoService {
 			return Result.failWithMessage(ErrorCode.SYS_CUSTOMIZE_ERROR, "任务不存在");
 		}
 
+		TodoGroup oldTodoGroup = todoGroupMapper.select(oldTodo.getGroupId());
+		if (Objects.isNull(oldTodoGroup)) {
+			return Result.failWithMessage(ErrorCode.SYS_CUSTOMIZE_ERROR, "任务组不存在");
+		}
+
 		if (Todo.S_FINISHED.equals(oldTodo.getStatus())) {
 			return Result.failWithMessage(ErrorCode.SYS_CUSTOMIZE_ERROR, "事都做完了，还改啥，重新分配个任务呗");
 		}
 
-		// 价值和预估时间同时为空或同时设置
-		if (Objects.isNull(todo.getEstimateTime())) {
-
-		}
-
 		// pending任务且预估时间和价值修改，需要重新进行动态规划, initial, pending, del, processing,finished
 		// task内容修改，必定影响预估时间和价值，也必须要重新规划
-		if (Todo.S_PENDING.equals(todo.getStatus())) {
+		// pending,processing, finished预估时间和价值必须都被设置,且finished的实际用时也必须设置
+		if (Todo.S_PENDING.equals(todo.getStatus())
+				|| Todo.S_PROCESSING.equals(todo.getStatus())
+				|| Todo.S_FINISHED.equals(todo.getStatus())) {
+			if (Objects.isNull(oldTodo.getEstimateTime()) && Objects.isNull(todo.getEstimateTime())) {
+				return Result.failWithMessage(ErrorCode.SYS_CUSTOMIZE_ERROR, "请设置预估时间");
+			}
 
+			if (Objects.isNull(oldTodo.getValue()) && Objects.isNull(todo.getValue())) {
+				return Result.failWithMessage(ErrorCode.SYS_CUSTOMIZE_ERROR, "请设置价值");
+			}
+
+			if (Todo.S_FINISHED.equals(todo.getStatus())) {
+				if (Objects.isNull(oldTodo.getRealityTime()) && Objects.isNull(todo.getRealityTime())) {
+					return Result.failWithMessage(ErrorCode.SYS_CUSTOMIZE_ERROR, "请设置实际用时");
+				}
+			}
 		}
 
+		todoMapper.update(todo);
+		List<Todo> todoList = new ArrayList<>();
+		Result<TodoGroup> result = process(oldTodoGroup, todoList);
+		if (!result.isSuccess()) {
+			return Result.failWithMessage(result.getCode(), result.getMessage());
+		}
 
+		oldTodoGroup.setUpdateTime(System.currentTimeMillis());
+		todoGroupMapper.insertWithUpdate(oldTodoGroup);
+		todoList.forEach(t -> {
+			t.setGroupId(oldTodoGroup.getId());
+			todoMapper.insert(t);
+		});
 		return Result.success(todo);
 	}
 

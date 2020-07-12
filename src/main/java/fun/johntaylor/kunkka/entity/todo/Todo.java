@@ -1,7 +1,7 @@
 package fun.johntaylor.kunkka.entity.todo;
 
 import fun.johntaylor.kunkka.entity.validation.Insert;
-import fun.johntaylor.kunkka.entity.validation.Update;
+import fun.johntaylor.kunkka.entity.validation.todo.InsertPatchTodo;
 import lombok.Data;
 
 import javax.validation.constraints.Max;
@@ -28,11 +28,13 @@ public class Todo {
 	 */
 	@Min(value = 1, message = "价值不能小于1")
 	@Max(value = 100, message = "价值不能超过100")
+	@NotNull(message = "请输入价值", groups = InsertPatchTodo.class)
 	private Integer value;
 
 	/**
 	 * 预估时间 单位分钟
 	 */
+	@NotNull(message = "请输入预估时间", groups = InsertPatchTodo.class)
 	private Integer estimateTime;
 
 	/**
@@ -55,7 +57,7 @@ public class Todo {
 	 */
 	@Min(value = 1, message = "优先级不能小于1")
 	@Max(value = 10, message = "优先级不能超过10")
-	@NotNull(message = "请确定优先级", groups = Insert.class)
+	@NotNull(message = "请确定优先级", groups = {Insert.class, InsertPatchTodo.class})
 	private Integer priority;
 
 	/**
