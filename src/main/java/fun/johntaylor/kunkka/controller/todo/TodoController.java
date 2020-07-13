@@ -53,7 +53,7 @@ public class TodoController {
 					// 初始化TodoList
 					List<Todo> todoList = v.getTodoList();
 					TodoGroup todoGroup = new TodoGroup();
-					todoGroup.setId(todoList.get(0).getGroupId());
+					todoGroup.setId(entity.getGroupId());
 					todoGroup.setUid(user.getId());
 					todoGroup.setMinPriority(v.getMinPriority());
 					todoGroup.setMaxTime(v.getMaxTime());

@@ -33,11 +33,6 @@ public interface TodoMapper {
 	@Delete("delete from Todo where id=#{id}")
 	int delete(Long id);
 
-	@Insert("insert into t_todo(id, task, value, estimate_time, reality_time, group_id, create_time, update_time, priority, status) values(#{id}, #{task}, #{value}, #{estimateTime}, #{realityTime}, #{groupId}, #{createTime}, #{updateTime}, #{priority}, #{status}) " +
-			"on duplicate key update update_time = #{updateTime}, status = #{status}")
-	@SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "id", before = false, resultType = Long.class)
-	int insertWithUpdateStatus(Todo todo);
-
 	@Select("select " + COLUMNS + " from t_todo where group_id=#{groupId}")
 	List<Todo> selectTodoList(Long groupId);
 }

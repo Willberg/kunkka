@@ -1,7 +1,6 @@
 package fun.johntaylor.kunkka.entity.todo.request;
 
 import fun.johntaylor.kunkka.entity.todo.Todo;
-import fun.johntaylor.kunkka.entity.validation.Update;
 import lombok.Data;
 
 import javax.validation.Valid;
@@ -17,6 +16,8 @@ import java.util.List;
  **/
 @Data
 public class AddPatchRequest {
+	private Long groupId;
+
 	@Min(value = 1, message = "最长时间不能少于1")
 	@NotNull(message = "请确定任务组最长时间")
 	private Integer maxTime;

@@ -87,8 +87,13 @@ public class TodoServiceImpl implements TodoService {
 			return Result.failWithCustomMessage(result.getMessage());
 		}
 
+		if (Objects.isNull(todoGroup.getId())) {
+			todoGroupMapper.insert(todoGroup);
+		} else {
+			todoGroupMapper.update(todoGroup);
+		}
+
 		Set<Long> updateTodoSet = result.getData();
-		todoGroupMapper.insertWithUpdate(todoGroup);
 		todoList.forEach(t -> {
 			t.setGroupId(todoGroup.getId());
 			if (updateTodoSet.contains(t.getId())) {
@@ -219,18 +224,18 @@ public class TodoServiceImpl implements TodoService {
 		}
 
 		todoMapper.update(todo);
-		List<Todo> todoList = new ArrayList<>();
-		Result<Set<Long>> result = process(oldTodoGroup, todoList);
-		if (!result.isSuccess()) {
-			return Result.failWithCustomMessage(result.getMessage());
+		// 只有pending状态需要重新规划
+		if (Todo.S_PENDING.equals(todo.getStatus())) {
+			List<Todo> todoList = new ArrayList<>();
+			Result<Set<Long>> result = process(oldTodoGroup, todoList);
+			if (!result.isSuccess()) {
+				return Result.failWithCustomMessage(result.getMessage());
+			}
+			oldTodoGroup.setUpdateTime(System.currentTimeMillis());
+			todoGroupMapper.update(oldTodoGroup);
+			todoList.forEach(t -> todoMapper.update(t));
 		}
 
-		oldTodoGroup.setUpdateTime(System.currentTimeMillis());
-		todoGroupMapper.insertWithUpdate(oldTodoGroup);
-		todoList.forEach(t -> {
-			t.setGroupId(oldTodoGroup.getId());
-			todoMapper.update(t);
-		});
 		return Result.success(todo);
 	}
 
@@ -345,7 +350,7 @@ public class TodoServiceImpl implements TodoService {
 					int preValue = dp[j - todoList.get(i).getEstimateTime()] + todoList.get(i).getValue() * (TodoGroup.PRIORITY_MAX_VALUE - todoList.get(i).getPriority());
 					dp[j] = Math.max(dp[j], preValue);
 					if (dp[j] == preValue) {
-						todoList.get(i).setStatus(Todo.S_INITIAL);
+						todoList.get(i).setStatus(Todo.S_PENDING);
 					} else {
 						todoList.get(i).setStatus(Todo.S_DEL);
 					}
