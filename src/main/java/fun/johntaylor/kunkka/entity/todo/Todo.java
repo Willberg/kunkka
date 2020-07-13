@@ -69,6 +69,8 @@ public class Todo {
 	public static final Integer P_MIN = 1;
 	public static final Integer P_MAX = 10;
 
+	public static final Integer V_MAX_VALUE = 100;
+
 	public static final Integer S_INITIAL = 1;
 	public static final Integer S_PENDING = 10;
 	public static final Integer S_PROCESSING = 20;

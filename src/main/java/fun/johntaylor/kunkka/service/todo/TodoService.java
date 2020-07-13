@@ -17,13 +17,13 @@ public interface TodoService {
 	 * 单独增加任务(已知todoList), 开放服务
 	 * @param todo
 	 */
-	Result<TodoGroup> openAddTodo(Todo todo);
+	Result<Todo> openAddTodo(Todo todo);
 
 	/**
 	 * 修改任务(已知todoList), 开放服务
 	 * @param todo
 	 */
-	Result<TodoGroup> openUpdateTodo(Todo todo);
+	Result<Todo> openUpdateTodo(Todo todo);
 
 	/**
 	 * 批量增加任务

@@ -4,8 +4,9 @@ import fun.johntaylor.kunkka.component.encryption.Jwt;
 import fun.johntaylor.kunkka.component.thread.pool.DbThreadPool;
 import fun.johntaylor.kunkka.entity.todo.Todo;
 import fun.johntaylor.kunkka.entity.validation.Insert;
+import fun.johntaylor.kunkka.repository.mybatis.todo.TodoMapper;
 import fun.johntaylor.kunkka.service.todo.TodoService;
-import fun.johntaylor.kunkka.utils.error.ErrorCode;
+import fun.johntaylor.kunkka.utils.general.CopyUtil;
 import fun.johntaylor.kunkka.utils.json.JsonUtil;
 import fun.johntaylor.kunkka.utils.result.Result;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,8 @@ public class OpenTodoController {
 	@Autowired
 	private Jwt jwt;
 
+	@Autowired
+	private TodoMapper todoMapper;
 
 	/**
 	 * @Author John
@@ -72,13 +75,24 @@ public class OpenTodoController {
 		return Mono.just(todo)
 				.publishOn(dbThreadPool.daoInstance())
 				.map(t -> {
-					if (Objects.isNull(todo.getGroupId())) {
-						return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "必须指定任务组").toString();
+					Todo old = todoMapper.select(t.getId());
+					if (Objects.isNull(old)) {
+						return Result.failWithCustomMessage("任务不存在").toString();
 					}
 
-					todo.setUpdateTime(System.currentTimeMillis());
-					todo.setStatus(Todo.S_INITIAL);
-					return todoService.openUpdateTodo(todo).toString();
+					if (Todo.S_PROCESSING.equals(old.getStatus()) || Todo.S_FINISHED.equals(old.getStatus())) {
+						return Result.failWithCustomMessage("大哥，任务都在处理了，你还想偷偷改").toString();
+					}
+
+					Todo newTodo = new Todo();
+					newTodo.setId(t.getId());
+					newTodo.setTask(t.getTask());
+					newTodo.setPriority(t.getPriority());
+					newTodo.setUpdateTime(System.currentTimeMillis());
+					newTodo.setStatus(Todo.S_INITIAL);
+					todoService.openUpdateTodo(newTodo);
+					CopyUtil.copy(newTodo, old);
+					return Result.success(old).toString();
 				});
 	}
 

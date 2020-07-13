@@ -44,7 +44,7 @@ public class Jwt {
 		return Jwts
 				.builder()
 				.setSubject(subject)
-				.claim(authId, authId)
+				.claim(authId, id)
 				.setIssuedAt(new Date())
 				.setExpiration(new Date(System.currentTimeMillis() + expiration))
 				.signWith(SignatureAlgorithm.HS256, secret)

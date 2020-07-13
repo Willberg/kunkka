@@ -3,7 +3,9 @@ package fun.johntaylor.kunkka.controller.user;
 import fun.johntaylor.kunkka.component.encryption.Jwt;
 import fun.johntaylor.kunkka.component.thread.pool.DbThreadPool;
 import fun.johntaylor.kunkka.entity.encrypt.user.EncryptUser;
+import fun.johntaylor.kunkka.entity.todo.TodoGroup;
 import fun.johntaylor.kunkka.entity.user.User;
+import fun.johntaylor.kunkka.repository.mybatis.todo.TodoGroupMapper;
 import fun.johntaylor.kunkka.service.user.UserService;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
 import fun.johntaylor.kunkka.utils.result.Result;
@@ -35,6 +37,9 @@ public class UserController {
 
 	@Autowired
 	private Jwt jwt;
+
+	@Autowired
+	private TodoGroupMapper todoGroupMapper;
 
 	/**
 	 * @Author John
@@ -102,9 +107,17 @@ public class UserController {
 	 * @return
 	 **/
 	@GetMapping(value = "/api/user/open/todo/url/create")
-	public Mono<String> createUrl(@RequestParam(value = "url") String url,
+	public Mono<String> createUrl(ServerHttpRequest request,
+			@RequestParam(value = "url") String url,
 			@RequestParam(value = "groupId") Long groupId) {
-		return Mono.just(jwt.createToken(groupId))
-				.map(v -> Result.success(String.format("%s?token=%s", url, v)).toString());
+		return Mono.just(SessionUtil.getUser(request))
+				.publishOn(dbThreadPool.daoInstance())
+				.map(v -> {
+					TodoGroup todoGroup = todoGroupMapper.select(groupId);
+					if (Objects.isNull(todoGroup) || !Objects.equals(todoGroup.getUid(), v.getId())) {
+						return Result.fail(ErrorCode.USER_ILLEGAL_OPERATION).toString();
+					}
+					return Result.success(String.format("%s?token=%s", url, jwt.createToken(groupId))).toString();
+				});
 	}
 }

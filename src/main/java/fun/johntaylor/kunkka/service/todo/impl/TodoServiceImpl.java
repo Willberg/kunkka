@@ -6,6 +6,7 @@ import fun.johntaylor.kunkka.repository.mybatis.todo.TodoGroupMapper;
 import fun.johntaylor.kunkka.repository.mybatis.todo.TodoMapper;
 import fun.johntaylor.kunkka.service.todo.TodoService;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
+import fun.johntaylor.kunkka.utils.general.CopyUtil;
 import fun.johntaylor.kunkka.utils.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class TodoServiceImpl implements TodoService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public Result<TodoGroup> openAddTodo(Todo todo) {
+	public Result<Todo> openAddTodo(Todo todo) {
 		TodoGroup todoGroup = todoGroupMapper.select(todo.getGroupId());
 		if (Objects.isNull(todoGroup)) {
 			return Result.failWithCustomMessage("任务组不存在");
@@ -51,22 +52,12 @@ public class TodoServiceImpl implements TodoService {
 			return Result.failWithCustomMessage("我今天的任务都做不完了");
 		}
 		todoMapper.insert(todo);
-		return Result.success(todoGroup);
+		return Result.success(todo);
 	}
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public Result<TodoGroup> openUpdateTodo(Todo todo) {
-		Todo oldTodo = todoMapper.select(todo.getId());
-		if (Objects.isNull(oldTodo)) {
-			return Result.failWithCustomMessage("任务不存在");
-		}
-
-		if (Todo.S_PROCESSING.equals(oldTodo.getStatus())
-				|| Todo.S_FINISHED.equals(oldTodo.getStatus())) {
-			return Result.failWithCustomMessage("大哥，任务都在处理了，你还想偷偷改");
-		}
-
+	public Result<Todo> openUpdateTodo(Todo todo) {
 		// 以后改成幂等操作
 		todoMapper.update(todo);
 		return Result.success();
@@ -224,6 +215,10 @@ public class TodoServiceImpl implements TodoService {
 		}
 
 		todoMapper.update(todo);
+		// 从内存中构造返回的todo
+		Todo retTodo = CopyUtil.deepCopy(oldTodo, Todo.class);
+		CopyUtil.copy(todo, retTodo);
+
 		// 只有pending状态需要重新规划
 		if (Todo.S_PENDING.equals(todo.getStatus())) {
 			List<Todo> todoList = new ArrayList<>();
@@ -233,10 +228,15 @@ public class TodoServiceImpl implements TodoService {
 			}
 			oldTodoGroup.setUpdateTime(System.currentTimeMillis());
 			todoGroupMapper.update(oldTodoGroup);
-			todoList.forEach(t -> todoMapper.update(t));
+			todoList.forEach(t -> {
+				todoMapper.update(t);
+				if (Objects.equals(retTodo.getId(), t.getId())) {
+					CopyUtil.copy(t, retTodo);
+				}
+			});
 		}
 
-		return Result.success(todo);
+		return Result.success(retTodo);
 	}
 
 
@@ -297,18 +297,21 @@ public class TodoServiceImpl implements TodoService {
 
 	/**
 	 * 按预估时间排序（最短的靠前）；最后按价值排序（最大的靠前)
+	 * 没有预估时间和价值的，默认排最前
 	 * @param todoList
 	 */
 	public void sortTodoList(List<Todo> todoList) {
 		todoList.sort((o1, o2) -> {
-			int o1Time = Todo.S_FINISHED.equals(o1.getStatus()) ? o1.getRealityTime() : o1.getEstimateTime();
-			int o2Time = Todo.S_FINISHED.equals(o2.getStatus()) ? o2.getRealityTime() : o2.getEstimateTime();
+			int o1Time = Optional.ofNullable(Todo.S_FINISHED.equals(o1.getStatus()) ? o1.getRealityTime() : o1.getEstimateTime()).orElse(1);
+			int o2Time = Optional.ofNullable(Todo.S_FINISHED.equals(o2.getStatus()) ? o2.getRealityTime() : o2.getEstimateTime()).orElse(1);
 			if (o1Time > o2Time) {
 				return 1;
 			} else if (o1Time < o2Time) {
 				return -1;
 			} else {
-				if (o1.getValue() < o2.getValue()) {
+				int v1 = Optional.ofNullable(o1.getValue()).orElse(Todo.V_MAX_VALUE);
+				int v2 = Optional.ofNullable(o2.getValue()).orElse(Todo.V_MAX_VALUE);
+				if (v1 < v2) {
 					return 1;
 				} else {
 					return -1;
@@ -318,16 +321,17 @@ public class TodoServiceImpl implements TodoService {
 	}
 
 	/**
-	 * 按性价比排，value / time（1/480～100/1） 从大到小
+	 * 按性价比排，value / time（1/480～100/1） 从大到小;
+	 * 如果用时或价值不存在，默认性价比最高
 	 * @param todoList
 	 */
 	public void sortTodoListByCp(int maxTime, List<Todo> todoList) {
 		todoList.sort((o1, o2) -> {
-			int o1Time = Todo.S_FINISHED.equals(o1.getStatus()) ? o1.getRealityTime() : o1.getEstimateTime();
-			int o2Time = Todo.S_FINISHED.equals(o2.getStatus()) ? o2.getRealityTime() : o2.getEstimateTime();
+			int o1Time = Optional.ofNullable(Todo.S_FINISHED.equals(o1.getStatus()) ? o1.getRealityTime() : o1.getEstimateTime()).orElse(1);
+			int o2Time = Optional.ofNullable(Todo.S_FINISHED.equals(o2.getStatus()) ? o2.getRealityTime() : o2.getEstimateTime()).orElse(1);
 			// 性价比
-			int cp1 = o1.getValue() * maxTime / o1Time;
-			int cp2 = o2.getValue() * maxTime / o2Time;
+			int cp1 = Optional.ofNullable(o1.getValue()).orElse(Todo.V_MAX_VALUE) * maxTime / o1Time;
+			int cp2 = Optional.ofNullable(o2.getValue()).orElse(Todo.V_MAX_VALUE) * maxTime / o2Time;
 			if (cp1 < cp2) {
 				return 1;
 			} else {

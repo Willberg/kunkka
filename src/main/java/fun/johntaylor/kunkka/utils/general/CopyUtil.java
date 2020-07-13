@@ -66,7 +66,7 @@ public final class CopyUtil {
 	 * @Param
 	 * @return
 	 **/
-	public static <S, T> T copy(S s, T t) {
+	public static <S, T> void copy(S s, T t) {
 		Field[] targetFields = t.getClass().getDeclaredFields();
 
 		try {
@@ -85,7 +85,6 @@ public final class CopyUtil {
 		} catch (Exception e) {
 			log.error("copy error, {} to {}", s.getClass().getName(), t.getClass().getName(), e);
 		}
-		return t;
 	}
 
 	/**

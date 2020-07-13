@@ -28,7 +28,7 @@ public class GlobalException {
 
 	/**
 	 * @Author John
-	 * @Description 通用异常
+	 * @Description 通用异常, 系统错误不宜展示给用户
 	 * @Date 2020/7/13 10:32 AM
 	 * @Param
 	 * @return
@@ -46,7 +46,7 @@ public class GlobalException {
 
 	/**
 	 * @Author John
-	 * @Description 请求参数异常处理(针对缺少参数)
+	 * @Description 请求参数异常处理(针对缺少参数), 系统错误不宜展示给用户
 	 * @Date 2020/7/13 10:49 AM
 	 * @Param
 	 * @return
@@ -58,7 +58,7 @@ public class GlobalException {
 				.just(ResponseEntity
 						.badRequest()
 						.header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-						.body(Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, e.getReason()).toString())
+						.body(Result.failWithMessage(ErrorCode.SYS_ERROR, e.getReason()).toString())
 				);
 	}
 
