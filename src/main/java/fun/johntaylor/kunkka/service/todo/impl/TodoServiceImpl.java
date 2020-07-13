@@ -33,7 +33,7 @@ public class TodoServiceImpl implements TodoService {
 	public Result<TodoGroup> openAddTodo(Todo todo) {
 		TodoGroup todoGroup = todoGroupMapper.select(todo.getGroupId());
 		if (Objects.isNull(todoGroup)) {
-			return Result.failWithMessage(ErrorCode.SYS_CUSTOMIZE_ERROR, "任务组不存在");
+			return Result.failWithCustomMessage("任务组不存在");
 		}
 
 		List<Todo> todoList = todoMapper.selectTodoList(todo.getGroupId());
@@ -48,7 +48,7 @@ public class TodoServiceImpl implements TodoService {
 		}
 
 		if (totalTime >= todoGroup.getMaxTime()) {
-			return Result.failWithMessage(ErrorCode.SYS_CUSTOMIZE_ERROR, "我今天的任务都做不完了");
+			return Result.failWithCustomMessage("我今天的任务都做不完了");
 		}
 		todoMapper.insert(todo);
 		return Result.success(todoGroup);
@@ -59,12 +59,12 @@ public class TodoServiceImpl implements TodoService {
 	public Result<TodoGroup> openUpdateTodo(Todo todo) {
 		Todo oldTodo = todoMapper.select(todo.getId());
 		if (Objects.isNull(oldTodo)) {
-			return Result.failWithMessage(ErrorCode.SYS_CUSTOMIZE_ERROR, "任务不存在");
+			return Result.failWithCustomMessage("任务不存在");
 		}
 
 		if (Todo.S_PROCESSING.equals(oldTodo.getStatus())
 				|| Todo.S_FINISHED.equals(oldTodo.getStatus())) {
-			return Result.failWithMessage(ErrorCode.SYS_CUSTOMIZE_ERROR, "大哥，任务都在处理了，你还想偷偷改");
+			return Result.failWithCustomMessage("大哥，任务都在处理了，你还想偷偷改");
 		}
 
 		// 以后改成幂等操作
@@ -82,15 +82,20 @@ public class TodoServiceImpl implements TodoService {
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public Result<TodoGroup> addPatch(TodoGroup todoGroup, List<Todo> todoList) {
-		Result<TodoGroup> result = process(todoGroup, todoList);
+		Result<Set<Long>> result = process(todoGroup, todoList);
 		if (!result.isSuccess()) {
-			return result;
+			return Result.failWithCustomMessage(result.getMessage());
 		}
 
+		Set<Long> updateTodoSet = result.getData();
 		todoGroupMapper.insertWithUpdate(todoGroup);
 		todoList.forEach(t -> {
 			t.setGroupId(todoGroup.getId());
-			todoMapper.insert(t);
+			if (updateTodoSet.contains(t.getId())) {
+				todoMapper.update(t);
+			} else {
+				todoMapper.insert(t);
+			}
 		});
 		return Result.success(todoGroup);
 	}
@@ -103,11 +108,13 @@ public class TodoServiceImpl implements TodoService {
 	 * @Param
 	 * @return
 	 **/
-	private Result<TodoGroup> process(TodoGroup todoGroup, List<Todo> todoList) {
+	private Result<Set<Long>> process(TodoGroup todoGroup, List<Todo> todoList) {
 		// 根据背包问题方案解决, f[v] = max{f[v], f[v-w[i]] +v[i]}
 		int capacity = todoGroup.getMaxTime();
 		int usedTotalTime = 0;
 		int usedTotalValue = 0;
+		// 需要更新的todo
+		Set<Long> updateTodoSet = new HashSet<>();
 		if (Objects.nonNull(todoGroup.getId())) {
 			// pending状态的任务要重新进行动态规划，processing状态和finished不需要，只有finished状态的任务采用实际用时，initial,delete状态不参与
 			// totalTime = pending + processing + finished
@@ -118,6 +125,7 @@ public class TodoServiceImpl implements TodoService {
 				if (Todo.S_PENDING.equals(t.getStatus())) {
 					// pending状态需要重新规划
 					todoList.add(t);
+					updateTodoSet.add(t.getId());
 				}
 
 				if (Todo.S_PROCESSING.equals(t.getStatus())) {
@@ -136,7 +144,7 @@ public class TodoServiceImpl implements TodoService {
 		}
 		// 没有时间做别的事了
 		if (capacity <= 0) {
-			return Result.failWithMessage(ErrorCode.SYS_CUSTOMIZE_ERROR, "我今天的任务都做不完了");
+			return Result.failWithCustomMessage("我今天的任务都做不完了");
 		}
 
 		int[] dp = calMaxValueByDp(capacity, todoList);
@@ -149,7 +157,9 @@ public class TodoServiceImpl implements TodoService {
 			if (Todo.S_DEL.equals(t.getStatus()) && todoGroup.getMinPriority() >= t.getPriority()) {
 				t.setStatus(Todo.S_PENDING);
 			}
-			t.setCreateTime(System.currentTimeMillis());
+			if (!updateTodoSet.contains(t.getId())) {
+				t.setCreateTime(System.currentTimeMillis());
+			}
 			t.setUpdateTime(System.currentTimeMillis());
 
 			// 不能超过总时长
@@ -167,7 +177,7 @@ public class TodoServiceImpl implements TodoService {
 				todoGroup.setStatus(TodoGroup.S_PENDING);
 			}
 		}
-		return Result.success();
+		return Result.success(updateTodoSet);
 	}
 
 	@Override
@@ -175,16 +185,16 @@ public class TodoServiceImpl implements TodoService {
 	public Result<Todo> updateTodo(Todo todo) {
 		Todo oldTodo = todoMapper.select(todo.getId());
 		if (Objects.isNull(oldTodo)) {
-			return Result.failWithMessage(ErrorCode.SYS_CUSTOMIZE_ERROR, "任务不存在");
+			return Result.failWithCustomMessage("任务不存在");
 		}
 
 		TodoGroup oldTodoGroup = todoGroupMapper.select(oldTodo.getGroupId());
 		if (Objects.isNull(oldTodoGroup)) {
-			return Result.failWithMessage(ErrorCode.SYS_CUSTOMIZE_ERROR, "任务组不存在");
+			return Result.failWithCustomMessage("任务组不存在");
 		}
 
 		if (Todo.S_FINISHED.equals(oldTodo.getStatus())) {
-			return Result.failWithMessage(ErrorCode.SYS_CUSTOMIZE_ERROR, "事都做完了，还改啥，重新分配个任务呗");
+			return Result.failWithCustomMessage("事都做完了，还改啥，重新分配个任务呗");
 		}
 
 		// pending任务且预估时间和价值修改，需要重新进行动态规划, initial, pending, del, processing,finished
@@ -194,32 +204,32 @@ public class TodoServiceImpl implements TodoService {
 				|| Todo.S_PROCESSING.equals(todo.getStatus())
 				|| Todo.S_FINISHED.equals(todo.getStatus())) {
 			if (Objects.isNull(oldTodo.getEstimateTime()) && Objects.isNull(todo.getEstimateTime())) {
-				return Result.failWithMessage(ErrorCode.SYS_CUSTOMIZE_ERROR, "请设置预估时间");
+				return Result.failWithCustomMessage("请设置预估时间");
 			}
 
 			if (Objects.isNull(oldTodo.getValue()) && Objects.isNull(todo.getValue())) {
-				return Result.failWithMessage(ErrorCode.SYS_CUSTOMIZE_ERROR, "请设置价值");
+				return Result.failWithCustomMessage("请设置价值");
 			}
 
 			if (Todo.S_FINISHED.equals(todo.getStatus())) {
 				if (Objects.isNull(oldTodo.getRealityTime()) && Objects.isNull(todo.getRealityTime())) {
-					return Result.failWithMessage(ErrorCode.SYS_CUSTOMIZE_ERROR, "请设置实际用时");
+					return Result.failWithCustomMessage("请设置实际用时");
 				}
 			}
 		}
 
 		todoMapper.update(todo);
 		List<Todo> todoList = new ArrayList<>();
-		Result<TodoGroup> result = process(oldTodoGroup, todoList);
+		Result<Set<Long>> result = process(oldTodoGroup, todoList);
 		if (!result.isSuccess()) {
-			return Result.failWithMessage(result.getCode(), result.getMessage());
+			return Result.failWithCustomMessage(result.getMessage());
 		}
 
 		oldTodoGroup.setUpdateTime(System.currentTimeMillis());
 		todoGroupMapper.insertWithUpdate(oldTodoGroup);
 		todoList.forEach(t -> {
 			t.setGroupId(oldTodoGroup.getId());
-			todoMapper.insert(t);
+			todoMapper.update(t);
 		});
 		return Result.success(todo);
 	}
@@ -234,7 +244,20 @@ public class TodoServiceImpl implements TodoService {
 	@Override
 	public Result<Map<Integer, List<Todo>>> searchTodoListByGroupId(Long groupId) {
 		TodoGroup todoGroup = todoGroupMapper.select(groupId);
+		if (Objects.isNull(todoGroup) || Objects.isNull(todoGroup.getUid())) {
+			return Result.fail(ErrorCode.USER_ILLEGAL_OPERATION);
+		}
+		return getSortTodoList(groupId, todoGroup);
+	}
 
+	/**
+	 * @Author John
+	 * @Description 通过状态划分排序的sort列表
+	 * @Date 2020/7/13 10:13 AM
+	 * @Param groupId, todoGroup
+	 * @return Result
+	 **/
+	private Result<Map<Integer, List<Todo>>> getSortTodoList(Long groupId, TodoGroup todoGroup) {
 		List<Todo> oldList = todoMapper.selectTodoList(groupId);
 		if (Objects.isNull(oldList)) {
 			return Result.success();
@@ -252,6 +275,19 @@ public class TodoServiceImpl implements TodoService {
 
 		retMap.forEach((s, l) -> sortTodoListByCp(todoGroup.getMaxTime(), l));
 		return Result.success(retMap);
+	}
+
+	@Override
+	public Result<Map<Integer, List<Todo>>> searchTodoListByUidGroupId(Long uid, Long groupId) {
+		TodoGroup todoGroup = todoGroupMapper.select(groupId);
+		if (Objects.isNull(todoGroup) || Objects.isNull(todoGroup.getUid())) {
+			return Result.fail(ErrorCode.USER_ILLEGAL_OPERATION);
+		}
+
+		if (!todoGroup.getUid().equals(uid)) {
+			return Result.fail(ErrorCode.USER_ILLEGAL_OPERATION);
+		}
+		return getSortTodoList(groupId, todoGroup);
 	}
 
 	/**

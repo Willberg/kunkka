@@ -51,6 +51,14 @@ public interface TodoService {
 	 **/
 	Result<Map<Integer, List<Todo>>> searchTodoListByGroupId(Long groupId);
 
+	/**
+	 * @Author John
+	 * @Description 根据groupId, uid查询todo任务
+	 * @Date 2020/7/7 8:41 PM
+	 * @Param
+	 * @return
+	 **/
+	Result<Map<Integer, List<Todo>>> searchTodoListByUidGroupId(Long uid, Long groupId);
 
 	/**
 	 * @Author John

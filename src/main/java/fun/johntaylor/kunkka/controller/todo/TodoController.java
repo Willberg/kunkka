@@ -65,7 +65,7 @@ public class TodoController {
 	}
 
 	/**
-	 * 查询任务组
+	 * 查询任务组列表
 	 * @param request
 	 * @param offset
 	 * @param count
@@ -82,6 +82,20 @@ public class TodoController {
 		return Mono.just(SessionUtil.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> todoService.searchTodoGroupList(v.getId(), offset, count, timeMillis, sort).toString());
+	}
+
+	/**
+	 * 查询任务列表
+	 * @param request
+	 * @param groupId
+	 * @return 任务组列表
+	 */
+	@GetMapping(value = "/api/todo/list")
+	public Mono<String> todoList(ServerHttpRequest request,
+			@RequestParam(value = "groupId") Long groupId) {
+		return Mono.just(SessionUtil.getUser(request))
+				.publishOn(dbThreadPool.daoInstance())
+				.map(v -> todoService.searchTodoListByUidGroupId(v.getId(), groupId).toString());
 	}
 
 	/**

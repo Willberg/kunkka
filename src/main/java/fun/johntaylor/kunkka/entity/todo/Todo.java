@@ -45,7 +45,6 @@ public class Todo {
 	/**
 	 * 关联的groupId
 	 */
-	@NotNull(message = "必须指定任务组")
 	private Long groupId;
 
 	private Long createTime;

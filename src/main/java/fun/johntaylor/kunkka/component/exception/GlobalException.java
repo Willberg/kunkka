@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.support.WebExchangeBindException;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -24,6 +25,14 @@ import java.util.Optional;
 @Slf4j
 public class GlobalException {
 
+
+	/**
+	 * @Author John
+	 * @Description 通用异常
+	 * @Date 2020/7/13 10:32 AM
+	 * @Param
+	 * @return
+	 **/
 	@ExceptionHandler(Throwable.class)
 	public Mono<ResponseEntity<String>> generalExceptions(Throwable t) {
 		log.error("exception: {}", t);
@@ -37,7 +46,25 @@ public class GlobalException {
 
 	/**
 	 * @Author John
-	 * @Description 请求参数异常处理
+	 * @Description 请求参数异常处理(针对缺少参数)
+	 * @Date 2020/7/13 10:49 AM
+	 * @Param
+	 * @return
+	 **/
+	@ExceptionHandler(ServerWebInputException.class)
+	public Mono<ResponseEntity<String>> ServerWebInputExceptions(ServerWebInputException e) {
+		log.error("exception: {}", e);
+		return Mono
+				.just(ResponseEntity
+						.badRequest()
+						.header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+						.body(Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, e.getReason()).toString())
+				);
+	}
+
+	/**
+	 * @Author John
+	 * @Description 请求参数异常处理（针对无法解析）
 	 * @Date 2020/6/21 3:55 PM
 	 **/
 	@ExceptionHandler(WebExchangeBindException.class)
@@ -54,7 +81,8 @@ public class GlobalException {
 					message.add(e.getDefaultMessage());
 					return list;
 				})
-				.map(data -> ResponseEntity.ok()
+				.map(data -> ResponseEntity
+						.badRequest()
 						.header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
 						.body(Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, data).toString()));
 	}
