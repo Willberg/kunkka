@@ -8,6 +8,7 @@ import fun.johntaylor.kunkka.entity.user.User;
 import fun.johntaylor.kunkka.repository.mybatis.todo.TodoGroupMapper;
 import fun.johntaylor.kunkka.service.user.UserService;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
+import fun.johntaylor.kunkka.utils.json.JsonUtil;
 import fun.johntaylor.kunkka.utils.result.Result;
 import fun.johntaylor.kunkka.utils.session.SessionUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -71,8 +72,10 @@ public class UserController {
 	 * @return
 	 **/
 	@PostMapping(value = "/api/user/login")
-	public Mono<String> login(ServerHttpResponse response,
+	public Mono<String> login(ServerHttpRequest request,
+			ServerHttpResponse response,
 			@Valid @RequestBody User reqUser) {
+		log.info("login: {}, port: {}", JsonUtil.toJson(reqUser), request.getLocalAddress().getPort());
 		return Mono.just(reqUser)
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {

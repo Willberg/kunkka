@@ -7,7 +7,6 @@ import fun.johntaylor.kunkka.entity.validation.Insert;
 import fun.johntaylor.kunkka.repository.mybatis.todo.TodoMapper;
 import fun.johntaylor.kunkka.service.todo.TodoService;
 import fun.johntaylor.kunkka.utils.general.CopyUtil;
-import fun.johntaylor.kunkka.utils.json.JsonUtil;
 import fun.johntaylor.kunkka.utils.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +50,6 @@ public class OpenTodoController {
 	 **/
 	@PostMapping(value = "/api/open/todo/add")
 	public Mono<String> add(@Validated(value = Insert.class) @RequestBody Todo todo) {
-		log.info("add: " + JsonUtil.toJson(todo));
 		return Mono.just(todo)
 				.publishOn(dbThreadPool.daoInstance())
 				.map(t -> {
@@ -71,7 +69,6 @@ public class OpenTodoController {
 	 **/
 	@PostMapping(value = "/api/open/todo/update")
 	public Mono<String> update(@Valid @RequestBody Todo todo) {
-		log.info("update: " + JsonUtil.toJson(todo));
 		return Mono.just(todo)
 				.publishOn(dbThreadPool.daoInstance())
 				.map(t -> {
