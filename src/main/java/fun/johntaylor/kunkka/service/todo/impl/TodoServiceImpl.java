@@ -78,6 +78,9 @@ public class TodoServiceImpl implements TodoService {
 			if (Objects.isNull(oldTodoGroup) || !todoGroup.getUid().equals(oldTodoGroup.getUid())) {
 				return Result.fail(ErrorCode.USER_ILLEGAL_OPERATION);
 			}
+
+			todoGroup.setMinPriority(Optional.ofNullable(todoGroup.getMinPriority()).orElse(oldTodoGroup.getMinPriority()));
+			todoGroup.setMaxTime(Optional.ofNullable(todoGroup.getMaxTime()).orElse(oldTodoGroup.getMaxTime()));
 		} else {
 			if (Objects.isNull(todoGroup.getMinPriority())) {
 				return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "请确定必须完成的任务优先级");
