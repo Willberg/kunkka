@@ -13,3 +13,6 @@ cd /home/code && git clone https://github.com/Willberg/kunkka.git
 cp /home/code/kunkka/src/main/resources/application.yml /home/resource/kunkka
 cp /home/code/kunkka/src/main/resources/logback-spring.xml /home/resource/kunkka
 cp /home/code/kunkka/sh/kunkka.sh /home/build
+
+# 部署脚本加执行权限
+chmod +x /home/build/kunkka.sh
