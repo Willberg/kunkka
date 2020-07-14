@@ -78,6 +78,14 @@ public class TodoServiceImpl implements TodoService {
 			if (Objects.isNull(oldTodoGroup) || !todoGroup.getUid().equals(oldTodoGroup.getUid())) {
 				return Result.fail(ErrorCode.USER_ILLEGAL_OPERATION);
 			}
+		} else {
+			if (Objects.isNull(todoGroup.getMinPriority())) {
+				return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "请确定必须完成的任务优先级");
+			}
+
+			if (Objects.isNull(todoGroup.getMaxTime())) {
+				return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "请确定任务组最长时间");
+			}
 		}
 		Result<Set<Long>> result = process(todoGroup, todoList);
 		if (!result.isSuccess()) {
