@@ -73,6 +73,12 @@ public class TodoServiceImpl implements TodoService {
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public Result<TodoGroup> addPatch(TodoGroup todoGroup, List<Todo> todoList) {
+		if (Objects.nonNull(todoGroup.getId())) {
+			TodoGroup oldTodoGroup = todoGroupMapper.select(todoGroup.getId());
+			if (Objects.isNull(oldTodoGroup) || !todoGroup.getUid().equals(oldTodoGroup.getUid())) {
+				return Result.fail(ErrorCode.USER_ILLEGAL_OPERATION);
+			}
+		}
 		Result<Set<Long>> result = process(todoGroup, todoList);
 		if (!result.isSuccess()) {
 			return Result.failWithCustomMessage(result.getMessage());
