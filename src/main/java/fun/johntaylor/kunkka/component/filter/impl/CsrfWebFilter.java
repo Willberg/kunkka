@@ -4,6 +4,7 @@ import fun.johntaylor.kunkka.component.filter.BaseFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -18,12 +19,17 @@ import java.util.Objects;
  * @Date 2020/7/3 9:33 AM
  **/
 @Component
-@Order(100)
+@Order(50)
 public class CsrfWebFilter extends BaseFilter implements WebFilter {
 	/**
 	 * 请求来源
 	 */
 	private static final String ORIGIN = "Origin";
+
+	/**
+	 * 预检请求
+	 */
+	private static final String OPTIONS = "options";
 
 	@Value("${csrf.whitelist.urls}")
 	private String csrfWhiteListUrls;
@@ -39,7 +45,17 @@ public class CsrfWebFilter extends BaseFilter implements WebFilter {
 		}
 
 		if (origin.matches(csrfWhiteListUrls)) {
-			// 允许的跨域请求
+			// 允许跨域资源共享的请求, Preflighted Request(预检请求)设置允许cors
+			ServerHttpResponse response = serverWebExchange.getResponse();
+			response.getHeaders().add("Access-Control-Allow-Origin", origin);
+			// 如果不设置为true，浏览器将无法获取response
+			response.getHeaders().add("Access-Control-Allow-Credentials", "true");
+			if (OPTIONS.equalsIgnoreCase(request.getMethodValue())) {
+				response.getHeaders().add("Access-Control-Allow-Methods", "*");
+				response.getHeaders().add("Access-Control-Allow-Headers", "*, Content-Type");
+				return response.writeWith(Mono.just(response.bufferFactory().wrap("".getBytes())));
+			}
+
 			return webFilterChain.filter(serverWebExchange);
 		} else {
 			// 非法跨域请求
