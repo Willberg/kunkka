@@ -11,6 +11,7 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.util.DigestUtils;
 
+import java.time.Duration;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -36,10 +37,28 @@ public final class SessionUtil {
 			ResponseCookie cookie = ResponseCookie.from(SESSION_ID, cookieValue)
 					//利用浏览器防止csrf
 					.httpOnly(true)
+					.maxAge(Duration.ofMinutes(30))
 					.path("/")
 					.build();
 			response.getCookies().set(SESSION_COOKIE_NAME, cookie);
 		}
+	}
+
+	/**
+	 * 设置cookie和session
+	 * @param response
+	 * @param uid
+	 */
+	public static void refreshCookie(ServerHttpResponse response, Long uid) {
+		String cookieValue = DigestUtils.md5DigestAsHex(String.format("%s%s", System.currentTimeMillis(), UUID.randomUUID().toString()).getBytes());
+		SessionCache.set(cookieValue, uid);
+		ResponseCookie cookie = ResponseCookie.from(SESSION_ID, cookieValue)
+				//利用浏览器防止csrf
+				.httpOnly(true)
+				.maxAge(Duration.ofMinutes(30))
+				.path("/")
+				.build();
+		response.getCookies().set(SESSION_COOKIE_NAME, cookie);
 	}
 
 	/**

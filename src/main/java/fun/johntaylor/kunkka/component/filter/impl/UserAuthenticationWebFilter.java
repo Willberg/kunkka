@@ -5,6 +5,7 @@ import fun.johntaylor.kunkka.entity.user.User;
 import fun.johntaylor.kunkka.utils.cache.impl.SessionCache;
 import fun.johntaylor.kunkka.utils.cache.impl.UserCache;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
+import fun.johntaylor.kunkka.utils.session.SessionUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpCookie;
@@ -52,12 +53,16 @@ public class UserAuthenticationWebFilter extends BaseFilter implements WebFilter
 			return setErrorResponse(response, ErrorCode.USER_AUTHENTICATION_ERROR);
 		}
 
+		// 刷新session
+		SessionUtil.refreshCookie(response, uid);
+
 		// 权限校验
 
-		// 认证成功刷新cookie
-		SessionCache.set(cookieValue, uid);
-
-		return webFilterChain.filter(serverWebExchange);
+		return webFilterChain.filter(serverWebExchange)
+				.doFinally(s -> {
+					// 认证成功删除旧cookie
+					SessionCache.clear(cookieValue);
+				});
 
 	}
 }
