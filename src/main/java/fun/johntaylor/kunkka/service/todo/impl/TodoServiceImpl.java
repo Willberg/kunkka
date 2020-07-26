@@ -79,6 +79,10 @@ public class TodoServiceImpl implements TodoService {
 				return Result.fail(ErrorCode.USER_ILLEGAL_OPERATION);
 			}
 
+			if (!TodoGroup.S_PENDING.equals(oldTodoGroup.getStatus())) {
+				return Result.failWithCustomMessage("任务组已完成或删除，请新建新任务组");
+			}
+
 			todoGroup.setMinPriority(Optional.ofNullable(todoGroup.getMinPriority()).orElse(oldTodoGroup.getMinPriority()));
 			todoGroup.setMaxTime(Optional.ofNullable(todoGroup.getMaxTime()).orElse(oldTodoGroup.getMaxTime()));
 		} else {
@@ -89,6 +93,8 @@ public class TodoServiceImpl implements TodoService {
 			if (Objects.isNull(todoGroup.getMaxTime())) {
 				return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "请确定任务组最长时间");
 			}
+			// 默认是删除，后面发现有pending的任务再改为pending
+			todoGroup.setStatus(TodoGroup.S_DEL);
 		}
 		Result<Set<Long>> result = process(todoGroup, todoList);
 		if (!result.isSuccess()) {
@@ -154,6 +160,9 @@ public class TodoServiceImpl implements TodoService {
 
 			// 剩余的时间
 			capacity = capacity - usedTotalTime;
+		} else {
+			// 初始任务组，状态为pending
+			todoGroup.setStatus(TodoGroup.S_PENDING);
 		}
 		// 没有时间做别的事了
 		if (capacity <= 0) {
@@ -162,6 +171,9 @@ public class TodoServiceImpl implements TodoService {
 
 		int[] dp = calMaxValueByDp(capacity, todoList);
 		log.info("groupId: {}, total value: {}", todoGroup.getId(), dp[capacity]);
+
+		// 排序
+		sortTodoListByStatusCp(todoGroup.getMaxTime(), todoList);
 
 		int totalTime = usedTotalTime;
 		int totalValue = usedTotalValue;
@@ -185,11 +197,11 @@ public class TodoServiceImpl implements TodoService {
 
 			if (Todo.S_PENDING.equals(t.getStatus())) {
 				// 存在未完成任务
-				todoGroup.setTotalTime(totalTime);
-				todoGroup.setValue(totalValue);
 				todoGroup.setStatus(TodoGroup.S_PENDING);
 			}
 		}
+		todoGroup.setTotalTime(totalTime);
+		todoGroup.setValue(totalValue);
 		return Result.success(updateTodoSet);
 	}
 
@@ -210,25 +222,9 @@ public class TodoServiceImpl implements TodoService {
 			return Result.failWithCustomMessage("事都做完了，还改啥，重新分配个任务呗");
 		}
 
-		// pending任务且预估时间和价值修改，需要重新进行动态规划, initial, pending, del, processing,finished
-		// task内容修改，必定影响预估时间和价值，也必须要重新规划
-		// pending,processing, finished预估时间和价值必须都被设置,且finished的实际用时也必须设置
-		if (Todo.S_PENDING.equals(todo.getStatus())
-				|| Todo.S_PROCESSING.equals(todo.getStatus())
-				|| Todo.S_FINISHED.equals(todo.getStatus())) {
-			if (Objects.isNull(oldTodo.getEstimateTime()) && Objects.isNull(todo.getEstimateTime())) {
-				return Result.failWithCustomMessage("请设置预估时间");
-			}
-
-			if (Objects.isNull(oldTodo.getValue()) && Objects.isNull(todo.getValue())) {
-				return Result.failWithCustomMessage("请设置价值");
-			}
-
-			if (Todo.S_FINISHED.equals(todo.getStatus())) {
-				if (Objects.isNull(oldTodo.getRealityTime()) && Objects.isNull(todo.getRealityTime())) {
-					return Result.failWithCustomMessage("请设置实际用时");
-				}
-			}
+		Result<Todo> checkResult = checkUpdateTodo(todo, oldTodo);
+		if (!checkResult.isSuccess()) {
+			return checkResult;
 		}
 
 		todoMapper.update(todo);
@@ -253,7 +249,90 @@ public class TodoServiceImpl implements TodoService {
 			});
 		}
 
+		// 如果任务完成或删除，要检查任务组是否还有未完成的任务，如果没有要将任务组标记为完成
+		if (Todo.S_FINISHED.equals(todo.getStatus()) || Todo.S_DEL.equals(todo.getStatus())) {
+			boolean isChangeStatus = true;
+			boolean isFinished = false;
+			int finishedValue = 0;
+			List<Todo> todoList = todoMapper.selectTodoList(oldTodoGroup.getId());
+			for (Todo t : todoList) {
+				if (!Todo.S_DEL.equals(t.getStatus()) && !Todo.S_FINISHED.equals(t.getStatus())) {
+					isChangeStatus = false;
+				} else {
+					if (Todo.S_FINISHED.equals(t.getStatus())) {
+						finishedValue += t.getValue();
+						isFinished = true;
+					}
+				}
+			}
+
+			if (isChangeStatus) {
+				if (isFinished) {
+					oldTodoGroup.setStatus(TodoGroup.S_FINISHED);
+				} else {
+					oldTodoGroup.setStatus(TodoGroup.S_DEL);
+				}
+			}
+
+			if (Todo.S_DEL.equals(todo.getStatus()) && !Todo.S_INITIAL.equals(oldTodo.getStatus())) {
+				oldTodoGroup.setValue(oldTodoGroup.getValue() - oldTodo.getValue());
+			}
+			oldTodoGroup.setUpdateTime(System.currentTimeMillis());
+			oldTodoGroup.setFinishValue(finishedValue);
+			todoGroupMapper.update(oldTodoGroup);
+		}
+
 		return Result.success(retTodo);
+	}
+
+	private Result<Todo> checkUpdateTodo(Todo todo, Todo oldTodo) {
+		if (Todo.S_DEL.equals(todo.getStatus()) && Todo.S_DEL.equals(oldTodo.getStatus())) {
+			return Result.failWithCustomMessage("此任务已经被删除了");
+		}
+
+		// pending任务且预估时间和价值修改，需要重新进行动态规划, initial, pending, del, processing,finished
+		// task内容修改，必定影响预估时间和价值，也必须要重新规划
+		// pending,processing, finished预估时间和价值必须都被设置,且finished的实际用时也必须设置
+		if (Todo.S_PENDING.equals(todo.getStatus())
+				|| Todo.S_PROCESSING.equals(todo.getStatus())
+				|| Todo.S_FINISHED.equals(todo.getStatus())) {
+			if (Objects.isNull(oldTodo.getEstimateTime()) && Objects.isNull(todo.getEstimateTime())) {
+				return Result.failWithCustomMessage("请设置预估时间");
+			}
+
+			if (Objects.isNull(oldTodo.getValue()) && Objects.isNull(todo.getValue())) {
+				return Result.failWithCustomMessage("请设置价值");
+			}
+
+			if (Todo.S_FINISHED.equals(todo.getStatus())) {
+				if (Objects.isNull(oldTodo.getRealityTime()) && Objects.isNull(todo.getRealityTime())) {
+					return Result.failWithCustomMessage("请设置实际用时");
+				}
+			}
+		}
+
+		if (Objects.nonNull(oldTodo.getEstimateTime()) && Objects.nonNull(todo.getEstimateTime())) {
+			if (!Objects.equals(oldTodo.getEstimateTime(), todo.getEstimateTime())
+					&& !Todo.S_PENDING.equals(todo.getStatus())) {
+				return Result.failWithCustomMessage("修改预估时间，必须重新动态规划");
+			}
+		}
+
+		if (Objects.nonNull(oldTodo.getValue()) && Objects.nonNull(todo.getValue())) {
+			if (!Objects.equals(oldTodo.getValue(), todo.getValue())
+					&& !Todo.S_PENDING.equals(todo.getStatus())) {
+				return Result.failWithCustomMessage("修改价值，必须重新动态规划");
+			}
+		}
+
+		if (Objects.nonNull(oldTodo.getRealityTime()) && Objects.nonNull(todo.getRealityTime())) {
+			if (!Objects.equals(oldTodo.getRealityTime(), todo.getRealityTime())
+					&& !Todo.S_FINISHED.equals(todo.getStatus())) {
+				return Result.failWithCustomMessage("修改实际用时，必须在完成任务后");
+			}
+		}
+
+		return Result.success();
 	}
 
 
@@ -338,6 +417,32 @@ public class TodoServiceImpl implements TodoService {
 	}
 
 	/**
+	 * 先按状态排序，pending > del, 再按性价比排，value / time（1/480～100/1） 从大到小;
+	 * 如果用时或价值不存在，默认性价比最高
+	 * @param todoList
+	 */
+	public void sortTodoListByStatusCp(int maxTime, List<Todo> todoList) {
+		todoList.sort((o1, o2) -> {
+			if (o1.getStatus() > o2.getStatus()) {
+				return 1;
+			} else if (o1.getStatus() < o2.getStatus()) {
+				return -1;
+			} else {
+				int o1Time = o1.getEstimateTime();
+				int o2Time = o2.getEstimateTime();
+				// 性价比
+				int cp1 = Optional.ofNullable(o1.getValue()).orElse(Todo.V_MAX_VALUE) * maxTime / o1Time;
+				int cp2 = Optional.ofNullable(o2.getValue()).orElse(Todo.V_MAX_VALUE) * maxTime / o2Time;
+				if (cp1 < cp2) {
+					return 1;
+				} else {
+					return -1;
+				}
+			}
+		});
+	}
+
+	/**
 	 * 按性价比排，value / time（1/480～100/1） 从大到小;
 	 * 如果用时或价值不存在，默认性价比最高
 	 * @param todoList
@@ -367,7 +472,7 @@ public class TodoServiceImpl implements TodoService {
 		int[] dp = new int[capacity + 1];
 		for (int i = 0; i < todoList.size(); i++) {
 			for (int j = capacity; j >= 0; j--) {
-				if (j > todoList.get(i).getEstimateTime()) {
+				if (j >= todoList.get(i).getEstimateTime()) {
 					int preValue = dp[j - todoList.get(i).getEstimateTime()] + todoList.get(i).getValue() * (TodoGroup.PRIORITY_MAX_VALUE - todoList.get(i).getPriority());
 					dp[j] = Math.max(dp[j], preValue);
 					if (dp[j] == preValue) {
@@ -375,6 +480,9 @@ public class TodoServiceImpl implements TodoService {
 					} else {
 						todoList.get(i).setStatus(Todo.S_DEL);
 					}
+				} else {
+					// 此时背包容量不足以装载此任务
+					todoList.get(i).setStatus(Todo.S_DEL);
 				}
 			}
 		}

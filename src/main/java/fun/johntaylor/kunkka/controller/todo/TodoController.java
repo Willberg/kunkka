@@ -107,8 +107,13 @@ public class TodoController {
 	@PostMapping(value = "/api/todo/update")
 	public Mono<String> update(ServerHttpRequest request,
 			@Valid @RequestBody Todo todo) {
-		return Mono.just(SessionUtil.getUser(request))
+		return Mono.just(todo)
 				.publishOn(dbThreadPool.daoInstance())
-				.map(v -> todoService.updateTodo(todo).toString());
+				.map(v -> {
+					if (Todo.S_INITIAL.equals(v.getStatus())) {
+						return Result.failWithCustomMessage("不能改成初始状态").toString();
+					}
+					return todoService.updateTodo(v).toString();
+				});
 	}
 }
