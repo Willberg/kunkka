@@ -374,7 +374,6 @@ public class TodoServiceImpl implements TodoService {
 			todoList.add(o);
 		});
 
-		retMap.forEach((s, l) -> sortTodoListByCp(todoGroup.getMaxTime(), l));
 		return Result.success(retMap);
 	}
 
@@ -438,26 +437,6 @@ public class TodoServiceImpl implements TodoService {
 				} else {
 					return -1;
 				}
-			}
-		});
-	}
-
-	/**
-	 * 按性价比排，value / time（1/480～100/1） 从大到小;
-	 * 如果用时或价值不存在，默认性价比最高
-	 * @param todoList
-	 */
-	public void sortTodoListByCp(int maxTime, List<Todo> todoList) {
-		todoList.sort((o1, o2) -> {
-			int o1Time = Optional.ofNullable(Todo.S_FINISHED.equals(o1.getStatus()) ? o1.getRealityTime() : o1.getEstimateTime()).orElse(1);
-			int o2Time = Optional.ofNullable(Todo.S_FINISHED.equals(o2.getStatus()) ? o2.getRealityTime() : o2.getEstimateTime()).orElse(1);
-			// 性价比
-			int cp1 = Optional.ofNullable(o1.getValue()).orElse(Todo.V_MAX_VALUE) * maxTime / o1Time;
-			int cp2 = Optional.ofNullable(o2.getValue()).orElse(Todo.V_MAX_VALUE) * maxTime / o2Time;
-			if (cp1 < cp2) {
-				return 1;
-			} else {
-				return -1;
 			}
 		});
 	}

@@ -46,20 +46,5 @@ public class MineSort {
 		todoList.forEach(t -> {
 			System.out.println(JsonUtil.toJson(t));
 		});
-
-		todoService.sortTodoListByCp(maxTime, todoList);
-		System.out.println("排序后：");
-		todoList.forEach(t -> {
-			int time = Todo.S_FINISHED.equals(t.getStatus()) ? t.getRealityTime() : t.getEstimateTime();
-			System.out.print("cp:" + (t.getValue() * maxTime / time));
-			System.out.println(JsonUtil.toJson(t));
-		});
-
-		System.out.println("排序后：");
-		retMap.forEach((s, l) -> todoService.sortTodoListByCp(maxTime, l));
-		retMap.forEach((s, l) -> {
-			System.out.print(s + ":");
-			l.forEach(o -> System.out.println(JsonUtil.toJson(o)));
-		});
 	}
 }
