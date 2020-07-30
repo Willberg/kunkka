@@ -4,6 +4,7 @@ import fun.johntaylor.kunkka.component.thread.pool.DbThreadPool;
 import fun.johntaylor.kunkka.entity.todo.Todo;
 import fun.johntaylor.kunkka.entity.todo.TodoGroup;
 import fun.johntaylor.kunkka.entity.todo.request.AddPatchRequest;
+import fun.johntaylor.kunkka.entity.todo.request.TodoGroupRequest;
 import fun.johntaylor.kunkka.entity.user.User;
 import fun.johntaylor.kunkka.entity.validation.todo.InsertPatchTodo;
 import fun.johntaylor.kunkka.service.todo.TodoService;
@@ -114,6 +115,25 @@ public class TodoController {
 						return Result.failWithCustomMessage("不能改成初始状态").toString();
 					}
 					return todoService.updateTodo(v).toString();
+				});
+	}
+
+	/**
+	 * 更新任务组
+	 * @param todoGroupRequest
+	 * @return 任务组列表
+	 */
+	@PostMapping(value = "/api/todo/group/update")
+	public Mono<String> updateTodoGroup(@Valid @RequestBody TodoGroupRequest todoGroupRequest) {
+		return Mono.just(todoGroupRequest)
+				.publishOn(dbThreadPool.daoInstance())
+				.map(v -> {
+					TodoGroup todoGroup = new TodoGroup();
+					todoGroup.setId(v.getId());
+					todoGroup.setMaxTime(v.getMaxTime());
+					todoGroup.setMinPriority(v.getMinPriority());
+					todoGroup.setIsPrivate(v.getIsPrivate());
+					return todoService.updateTodoGroup(todoGroup).toString();
 				});
 	}
 }

@@ -285,6 +285,12 @@ public class TodoServiceImpl implements TodoService {
 		return Result.success(retTodo);
 	}
 
+	@Override
+	public Result<TodoGroup> updateTodoGroup(TodoGroup todoGroup) {
+		todoGroupMapper.update(todoGroup);
+		return Result.success(todoGroup);
+	}
+
 	private Result<Todo> checkUpdateTodo(Todo todo, Todo oldTodo) {
 		if (Todo.S_DEL.equals(todo.getStatus()) && Todo.S_DEL.equals(oldTodo.getStatus())) {
 			return Result.failWithCustomMessage("此任务已经被删除了");

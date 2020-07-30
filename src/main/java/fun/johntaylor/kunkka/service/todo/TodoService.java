@@ -68,4 +68,14 @@ public interface TodoService {
 	 * @return
 	 **/
 	Result<Todo> updateTodo(Todo todo);
+
+
+	/**
+	 * @Author John
+	 * @Description 更新任务组
+	 * @Date 2020/7/30 3:35 PM
+	 * @Param todoGroup
+	 * @return
+	 **/
+	Result<TodoGroup> updateTodoGroup(TodoGroup todoGroup);
 }
