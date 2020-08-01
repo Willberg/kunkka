@@ -52,7 +52,7 @@ public class CsrfWebFilter extends BaseFilter implements WebFilter {
 			response.getHeaders().add("Access-Control-Allow-Credentials", "true");
 			if (OPTIONS.equalsIgnoreCase(request.getMethodValue())) {
 				response.getHeaders().add("Access-Control-Allow-Methods", "*");
-				response.getHeaders().add("Access-Control-Allow-Headers", "*, Content-Type");
+				response.getHeaders().add("Access-Control-Allow-Headers", "*, Content-Type, Authorization");
 				return response.writeWith(Mono.just(response.bufferFactory().wrap("".getBytes())));
 			}
 
