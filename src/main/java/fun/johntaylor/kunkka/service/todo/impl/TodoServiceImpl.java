@@ -72,7 +72,8 @@ public class TodoServiceImpl implements TodoService {
 	 */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public Result<TodoGroup> addPatch(TodoGroup todoGroup, List<Todo> todoList) {
+	public Result<Object> addPatch(TodoGroup todoGroup, List<Todo> todoList) {
+		boolean hasGroupId = true;
 		if (Objects.nonNull(todoGroup.getId())) {
 			TodoGroup oldTodoGroup = todoGroupMapper.select(todoGroup.getId());
 			if (Objects.isNull(oldTodoGroup) || !todoGroup.getUid().equals(oldTodoGroup.getUid())) {
@@ -86,6 +87,7 @@ public class TodoServiceImpl implements TodoService {
 			todoGroup.setMinPriority(Optional.ofNullable(todoGroup.getMinPriority()).orElse(oldTodoGroup.getMinPriority()));
 			todoGroup.setMaxTime(Optional.ofNullable(todoGroup.getMaxTime()).orElse(oldTodoGroup.getMaxTime()));
 		} else {
+			hasGroupId = false;
 			if (Objects.isNull(todoGroup.getMinPriority())) {
 				return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "请确定必须完成的任务优先级");
 			}
@@ -116,6 +118,9 @@ public class TodoServiceImpl implements TodoService {
 				todoMapper.insert(t);
 			}
 		});
+		if (hasGroupId) {
+			return Result.success(todoList);
+		}
 		return Result.success(todoGroup);
 	}
 

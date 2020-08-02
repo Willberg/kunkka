@@ -30,7 +30,7 @@ public interface TodoService {
 	 * @param todoGroup
 	 * @param todoList
 	 */
-	Result<TodoGroup> addPatch(TodoGroup todoGroup, List<Todo> todoList);
+	Result<Object> addPatch(TodoGroup todoGroup, List<Todo> todoList);
 
 
 	/**
