@@ -380,7 +380,7 @@ public class TodoServiceImpl implements TodoService {
 	 * 没有预估时间和价值的，默认排最前
 	 * @param todoList
 	 */
-	public void sortTodooList(List<Todo> todoList) {
+	public void sortTodoList(List<Todo> todoList) {
 		todoList.sort((o1, o2) -> {
 			int o1Time = Optional.ofNullable(Todo.S_FINISHED.equals(o1.getStatus()) ? o1.getRealityTime() : o1.getEstimateTime()).orElse(1);
 			int o2Time = Optional.ofNullable(Todo.S_FINISHED.equals(o2.getStatus()) ? o2.getRealityTime() : o2.getEstimateTime()).orElse(1);
