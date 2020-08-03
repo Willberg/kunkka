@@ -56,8 +56,9 @@ public class TodoController {
 					List<Todo> todoList = v.getTodoList();
 					TodoGroup todoGroup = new TodoGroup();
 					todoGroup.setId(entity.getGroupId());
+					// 用于校验存在任务组时，是否是给自己的任务组添加任务
+					todoGroup.setUid(user.getId());
 					if (Objects.isNull(entity.getGroupId())) {
-						todoGroup.setUid(user.getId());
 						todoGroup.setMinPriority(v.getMinPriority());
 						todoGroup.setMaxTime(v.getMaxTime());
 						todoGroup.setCreateTime(System.currentTimeMillis());
