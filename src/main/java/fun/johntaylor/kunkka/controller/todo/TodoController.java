@@ -20,6 +20,7 @@ import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @Author John
@@ -55,12 +56,14 @@ public class TodoController {
 					List<Todo> todoList = v.getTodoList();
 					TodoGroup todoGroup = new TodoGroup();
 					todoGroup.setId(entity.getGroupId());
-					todoGroup.setUid(user.getId());
-					todoGroup.setMinPriority(v.getMinPriority());
-					todoGroup.setMaxTime(v.getMaxTime());
-					todoGroup.setCreateTime(System.currentTimeMillis());
+					if (Objects.isNull(entity.getGroupId())) {
+						todoGroup.setUid(user.getId());
+						todoGroup.setMinPriority(v.getMinPriority());
+						todoGroup.setMaxTime(v.getMaxTime());
+						todoGroup.setCreateTime(System.currentTimeMillis());
+						todoGroup.setIsPrivate(false);
+					}
 					todoGroup.setUpdateTime(System.currentTimeMillis());
-					todoGroup.setIsPrivate(false);
 					return todoService.addPatch(todoGroup, todoList).toString();
 				});
 	}
