@@ -354,42 +354,16 @@ public class TodoServiceImpl implements TodoService {
 	}
 
 	@Override
-	public Result<Map<Integer, List<Todo>>> searchTodoListByGroupId(Long groupId) {
+	public Result<List<Todo>> searchTodoListByGroupId(Long groupId) {
 		TodoGroup todoGroup = todoGroupMapper.select(groupId);
-		if (Objects.isNull(todoGroup) || Objects.isNull(todoGroup.getUid())) {
+		if (Objects.isNull(todoGroup)) {
 			return Result.fail(ErrorCode.USER_ILLEGAL_OPERATION);
 		}
-		return getSortTodoList(groupId, todoGroup);
-	}
-
-	/**
-	 * @Author John
-	 * @Description 通过状态划分排序的sort列表
-	 * @Date 2020/7/13 10:13 AM
-	 * @Param groupId, todoGroup
-	 * @return Result
-	 **/
-	private Result<Map<Integer, List<Todo>>> getSortTodoList(Long groupId, TodoGroup todoGroup) {
-		List<Todo> oldList = todoMapper.selectTodoList(groupId);
-		if (Objects.isNull(oldList)) {
-			return Result.success();
-		}
-
-		Map<Integer, List<Todo>> retMap = new HashMap<>(5);
-		oldList.forEach(o -> {
-			List<Todo> todoList = retMap.get(o.getStatus());
-			if (Objects.isNull(todoList)) {
-				todoList = new LinkedList<>();
-				retMap.put(o.getStatus(), todoList);
-			}
-			todoList.add(o);
-		});
-
-		return Result.success(retMap);
+		return Result.success(todoMapper.selectTodoList(groupId));
 	}
 
 	@Override
-	public Result<Map<Integer, List<Todo>>> searchTodoListByUidGroupId(Long uid, Long groupId) {
+	public Result<List<Todo>> searchTodoListByUidGroupId(Long uid, Long groupId) {
 		TodoGroup todoGroup = todoGroupMapper.select(groupId);
 		if (Objects.isNull(todoGroup) || Objects.isNull(todoGroup.getUid())) {
 			return Result.fail(ErrorCode.USER_ILLEGAL_OPERATION);
@@ -398,7 +372,7 @@ public class TodoServiceImpl implements TodoService {
 		if (!todoGroup.getUid().equals(uid)) {
 			return Result.fail(ErrorCode.USER_ILLEGAL_OPERATION);
 		}
-		return getSortTodoList(groupId, todoGroup);
+		return Result.success(todoMapper.selectTodoList(groupId));
 	}
 
 	/**
@@ -406,7 +380,7 @@ public class TodoServiceImpl implements TodoService {
 	 * 没有预估时间和价值的，默认排最前
 	 * @param todoList
 	 */
-	public void sortTodoList(List<Todo> todoList) {
+	public void sortTodooList(List<Todo> todoList) {
 		todoList.sort((o1, o2) -> {
 			int o1Time = Optional.ofNullable(Todo.S_FINISHED.equals(o1.getStatus()) ? o1.getRealityTime() : o1.getEstimateTime()).orElse(1);
 			int o2Time = Optional.ofNullable(Todo.S_FINISHED.equals(o2.getStatus()) ? o2.getRealityTime() : o2.getEstimateTime()).orElse(1);

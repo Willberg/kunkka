@@ -5,7 +5,6 @@ import fun.johntaylor.kunkka.entity.todo.TodoGroup;
 import fun.johntaylor.kunkka.utils.result.Result;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @Author John
@@ -49,7 +48,7 @@ public interface TodoService {
 	 * @Param
 	 * @return
 	 **/
-	Result<Map<Integer, List<Todo>>> searchTodoListByGroupId(Long groupId);
+	Result<List<Todo>> searchTodoListByGroupId(Long groupId);
 
 	/**
 	 * @Author John
@@ -58,7 +57,7 @@ public interface TodoService {
 	 * @Param
 	 * @return
 	 **/
-	Result<Map<Integer, List<Todo>>> searchTodoListByUidGroupId(Long uid, Long groupId);
+	Result<List<Todo>> searchTodoListByUidGroupId(Long uid, Long groupId);
 
 	/**
 	 * @Author John
