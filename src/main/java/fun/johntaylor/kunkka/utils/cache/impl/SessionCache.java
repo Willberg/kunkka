@@ -14,11 +14,11 @@ import java.util.concurrent.TimeUnit;
  * @Date 2020/7/9 3:37 PM
  **/
 public final class SessionCache extends BaseCache {
-	private static Cache<String, String> limitCache;
+	private static Cache<String, String> sessionCache;
 
 	static {
-		limitCache = CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
-		CACHE.put(CacheDomain.SESSION_CACHE, limitCache);
+		sessionCache = CacheBuilder.newBuilder().expireAfterWrite(15, TimeUnit.DAYS).build();
+		CACHE.put(CacheDomain.SESSION_CACHE, sessionCache);
 	}
 
 	public static <T> void set(String key, T value) {
@@ -34,6 +34,6 @@ public final class SessionCache extends BaseCache {
 	}
 
 	public static void clear(String key) {
-		limitCache.invalidate(key);
+		sessionCache.invalidate(key);
 	}
 }
