@@ -55,7 +55,7 @@ public final class SessionUtil {
 		ResponseCookie cookie = ResponseCookie.from(SESSION_ID, cookieValue)
 				//利用浏览器防止csrf
 				.httpOnly(true)
-				.maxAge(Duration.ofMinutes(30))
+				.maxAge(Duration.ofDays(15))
 				.path("/")
 				.build();
 		response.getCookies().set(SESSION_COOKIE_NAME, cookie);
