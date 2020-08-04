@@ -77,8 +77,8 @@ public class OpenTodoController {
 						return Result.failWithCustomMessage("任务不存在").toString();
 					}
 
-					if (Todo.S_PROCESSING.equals(old.getStatus()) || Todo.S_FINISHED.equals(old.getStatus())) {
-						return Result.failWithCustomMessage("大哥，任务都在处理了，你还想偷偷改").toString();
+					if (!Todo.S_INITIAL.equals(old.getStatus()) && !Todo.S_PENDING.equals(old.getStatus())) {
+						return Result.failWithCustomMessage("任务已经定稿了，你TMD还想偷偷改").toString();
 					}
 
 					Todo newTodo = new Todo();
