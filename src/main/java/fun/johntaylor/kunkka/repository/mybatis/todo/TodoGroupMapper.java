@@ -35,4 +35,7 @@ public interface TodoGroupMapper {
 
 	@Select("select " + COLUMNS + " from t_todo_group where uid=#{uid} and create_time>#{timeMillis} order by create_time ${sort} limit #{offset}, #{count}")
 	List<TodoGroup> selectList(Long uid, Integer offset, Integer count, Long timeMillis, String sort);
+
+	@Select("select count(1) from t_todo_group where uid=#{uid}")
+	TodoGroup selectCountByUid(Long uid);
 }

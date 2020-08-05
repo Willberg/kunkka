@@ -7,6 +7,7 @@ import fun.johntaylor.kunkka.entity.todo.request.AddPatchRequest;
 import fun.johntaylor.kunkka.entity.todo.request.TodoGroupRequest;
 import fun.johntaylor.kunkka.entity.user.User;
 import fun.johntaylor.kunkka.entity.validation.todo.InsertPatchTodo;
+import fun.johntaylor.kunkka.repository.mybatis.todo.TodoGroupMapper;
 import fun.johntaylor.kunkka.service.todo.TodoService;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
 import fun.johntaylor.kunkka.utils.result.Result;
@@ -35,6 +36,9 @@ public class TodoController {
 
 	@Autowired
 	private DbThreadPool dbThreadPool;
+
+	@Autowired
+	private TodoGroupMapper todoGroupMapper;
 
 	/**
 	 * 添加任务，没有任务组，自动创建任务组
@@ -139,5 +143,17 @@ public class TodoController {
 					todoGroup.setIsPrivate(v.getIsPrivate());
 					return todoService.updateTodoGroup(todoGroup).toString();
 				});
+	}
+
+	/**
+	 * 获取任务组数量
+	 * @param request
+	 * @return 任务组数量
+	 */
+	@GetMapping(value = "/api/todo/group/total")
+	public Mono<String> countTodoGroup(ServerHttpRequest request) {
+		return Mono.just(SessionUtil.getUser(request))
+				.publishOn(dbThreadPool.daoInstance())
+				.map(v -> Result.success(todoGroupMapper.selectCountByUid(v.getId())).toString());
 	}
 }
