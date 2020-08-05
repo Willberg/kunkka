@@ -37,5 +37,5 @@ public interface TodoGroupMapper {
 	List<TodoGroup> selectList(Long uid, Integer offset, Integer count, Long timeMillis, String sort);
 
 	@Select("select count(1) from t_todo_group where uid=#{uid}")
-	TodoGroup selectCountByUid(Long uid);
+	int selectCountByUid(Long uid);
 }
