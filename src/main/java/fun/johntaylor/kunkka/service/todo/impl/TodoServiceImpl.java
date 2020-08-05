@@ -481,6 +481,6 @@ public class TodoServiceImpl implements TodoService {
 	 * @return
 	 **/
 	private int calTodoValue(int i, List<Todo> todoList) {
-		return todoList.get(i).getValue() * (TodoGroup.PRIORITY_MAX_VALUE - todoList.get(i).getPriority());
+		return todoList.get(i).getValue() * (TodoGroup.PRIORITY_MAX_VALUE - todoList.get(i).getPriority() + 1);
 	}
 }
