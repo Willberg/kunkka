@@ -174,8 +174,13 @@ public class TodoServiceImpl implements TodoService {
 			return Result.failWithCustomMessage("我今天的任务都做不完了");
 		}
 
-		int[] dp = calMaxValueByDp(capacity, todoList);
-		log.info("groupId: {}, total value: {}", todoGroup.getId(), dp[capacity]);
+		//为了动态规划，引入一个空的todo，使用完需要删除
+		todoList.add(0, new Todo());
+		int[][] dp = calMaxValueByDp(capacity, todoList);
+		log.info("groupId: {}, total value: {}", todoGroup.getId(), dp[todoList.size() - 1][capacity]);
+		// 找出最优解
+		findWho(todoList.size() - 1, capacity, dp, todoList);
+		todoList.remove(0);
 
 		// 排序
 		sortTodoListByStatusCp(todoGroup.getMaxTime(), todoList);
@@ -427,29 +432,55 @@ public class TodoServiceImpl implements TodoService {
 	}
 
 	/**
-	 * @decription 价值评判由优先级(越小权优先级高)×价值决定
+	 * @decription 价值评判由优先级(越小权优先级高)×价值决定,因为要回溯找最优解，所以无法使用空间压缩的算法
 	 * @param capacity
 	 * @param todoList
 	 * @return
 	 */
-	private int[] calMaxValueByDp(int capacity, List<Todo> todoList) {
-		int[] dp = new int[capacity + 1];
-		for (int i = 0; i < todoList.size(); i++) {
-			for (int j = capacity; j >= 0; j--) {
-				if (j >= todoList.get(i).getEstimateTime()) {
-					int preValue = dp[j - todoList.get(i).getEstimateTime()] + todoList.get(i).getValue() * (TodoGroup.PRIORITY_MAX_VALUE - todoList.get(i).getPriority());
-					dp[j] = Math.max(dp[j], preValue);
-					if (dp[j] == preValue) {
-						todoList.get(i).setStatus(Todo.S_PENDING);
-					} else {
-						todoList.get(i).setStatus(Todo.S_DEL);
-					}
+	private int[][] calMaxValueByDp(int capacity, List<Todo> todoList) {
+		int[][] dp = new int[todoList.size()][capacity + 1];
+		for (int i = 1; i < todoList.size(); i++) {
+			for (int j = 1; j <= capacity; j++) {
+				if (j < todoList.get(i).getEstimateTime()) {
+					dp[i][j] = dp[i - 1][j];
 				} else {
-					// 此时背包容量不足以装载此任务
-					todoList.get(i).setStatus(Todo.S_DEL);
+					int newValue = dp[i - 1][j - todoList.get(i).getEstimateTime()] + calTodoValue(i, todoList);
+					dp[i][j] = Math.max(dp[i - 1][j], newValue);
 				}
 			}
 		}
 		return dp;
+	}
+
+
+	/**
+	 * @Author John
+	 * @Description 通过回溯找到最优解
+	 * @Date 2020/8/5 11:16 AM
+	 * @Param
+	 * @return
+	 **/
+	private void findWho(int i, int j, int[][] dp, List<Todo> todoList) {
+		if (i >= 1) {
+			if (dp[i][j] == dp[i - 1][j]) {
+				todoList.get(i).setStatus(Todo.S_DEL);
+				findWho(i - 1, j, dp, todoList);
+			} else if (j - todoList.get(i).getEstimateTime() >= 0 && dp[i][j] == dp[i - 1][j - todoList.get(i).getEstimateTime()] + calTodoValue(i, todoList)) {
+				todoList.get(i).setStatus(Todo.S_PENDING);
+				findWho(i - 1, j - todoList.get(i).getEstimateTime(), dp, todoList);
+			}
+		}
+	}
+
+
+	/**
+	 * @Author John
+	 * @Description 计算任务价值
+	 * @Date 2020/8/5 11:18 AM
+	 * @Param
+	 * @return
+	 **/
+	private int calTodoValue(int i, List<Todo> todoList) {
+		return todoList.get(i).getValue() * (TodoGroup.PRIORITY_MAX_VALUE - todoList.get(i).getPriority());
 	}
 }
