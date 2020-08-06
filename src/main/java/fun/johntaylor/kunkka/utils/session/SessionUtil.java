@@ -45,12 +45,12 @@ public final class SessionUtil {
 	}
 
 	/**
-	 * 设置cookie和session
+	 * 刷新cookie和session的时间
 	 * @param response
+	 * @param cookieValue
 	 * @param uid
 	 */
-	public static void refreshCookie(ServerHttpResponse response, Long uid) {
-		String cookieValue = DigestUtils.md5DigestAsHex(String.format("%s%s", System.currentTimeMillis(), UUID.randomUUID().toString()).getBytes());
+	public static void refreshCookie(ServerHttpResponse response, String cookieValue, Long uid) {
 		SessionCache.set(cookieValue, uid);
 		ResponseCookie cookie = ResponseCookie.from(SESSION_ID, cookieValue)
 				//利用浏览器防止csrf

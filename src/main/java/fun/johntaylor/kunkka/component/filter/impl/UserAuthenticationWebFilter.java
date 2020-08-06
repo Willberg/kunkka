@@ -54,15 +54,11 @@ public class UserAuthenticationWebFilter extends BaseFilter implements WebFilter
 		}
 
 		// 刷新session
-		SessionUtil.refreshCookie(response, uid);
+		SessionUtil.refreshCookie(response, cookieValue, uid);
 
 		// 权限校验
 
-		return webFilterChain.filter(serverWebExchange)
-				.doFinally(s -> {
-					// 认证成功删除旧cookie
-					SessionCache.clear(cookieValue);
-				});
+		return webFilterChain.filter(serverWebExchange);
 
 	}
 }
