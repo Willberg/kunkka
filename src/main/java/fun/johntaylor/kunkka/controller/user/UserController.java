@@ -7,7 +7,9 @@ import fun.johntaylor.kunkka.entity.todo.TodoGroup;
 import fun.johntaylor.kunkka.entity.user.User;
 import fun.johntaylor.kunkka.repository.mybatis.todo.TodoGroupMapper;
 import fun.johntaylor.kunkka.service.user.UserService;
+import fun.johntaylor.kunkka.utils.cache.impl.UserCache;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
+import fun.johntaylor.kunkka.utils.general.CopyUtil;
 import fun.johntaylor.kunkka.utils.json.JsonUtil;
 import fun.johntaylor.kunkka.utils.result.Result;
 import fun.johntaylor.kunkka.utils.session.SessionUtil;
@@ -121,6 +123,23 @@ public class UserController {
 						return Result.fail(ErrorCode.USER_ILLEGAL_OPERATION).toString();
 					}
 					return Result.success(String.format("%s?token=%s", url, jwt.createToken(groupId))).toString();
+				});
+	}
+
+	/**
+	 * @Author John
+	 * @Description 登录
+	 * @Date 2020/6/22 9:47 PM
+	 * @Param
+	 * @return
+	 **/
+	@GetMapping(value = "/api/user/profile")
+	public Mono<String> getUser(ServerHttpRequest request) {
+		return Mono.just(SessionUtil.getUser(request))
+				.map(v -> {
+					User u = UserCache.get(v.getId(), User.class);
+					EncryptUser encryptUser = CopyUtil.copyWithSet(u, new EncryptUser());
+					return Result.success(encryptUser).toString();
 				});
 	}
 }
