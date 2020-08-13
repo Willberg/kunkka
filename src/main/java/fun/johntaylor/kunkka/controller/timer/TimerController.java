@@ -18,10 +18,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @Author John
@@ -98,19 +95,14 @@ public class TimerController {
 						timerList.remove(timerList.size() - 1);
 					}
 
-					int days = startLocalDate.plus(1, ChronoUnit.MONTHS).getDayOfYear() - startLocalDate.getDayOfYear();
-					LocalDate now = LocalDate.now();
-					if (now.getYear() == startLocalDate.getYear() && now.getMonthValue() == startLocalDate.getMonthValue()) {
-						days = now.getDayOfMonth();
-					}
-
 					long start = 0;
+					int days = startLocalDate.plus(1, ChronoUnit.MONTHS).getDayOfYear() - startLocalDate.getDayOfYear();
 					Map<String, Map<Integer, Long>> map = new HashMap<>(days);
 					for (Timer t : timerList) {
 						String dateStr = TimeUtil.getDateStrByTimestamp(t.getCreateTime(), "yyyy-MM-dd");
 						Map<Integer, Long> detail = map.get(dateStr);
 						if (Objects.isNull(detail)) {
-							detail = new HashMap<>(5);
+							detail = new HashMap<>(6);
 							detail.put(Timer.T_WORK, 0L);
 							detail.put(Timer.T_EAT, 0L);
 							detail.put(Timer.T_ENTERTAINMENT, 0L);
@@ -148,7 +140,23 @@ public class TimerController {
 						}
 						detail.put(Timer.T_UNKNOWN, total - useTime);
 					});
-					return Result.success(map).toString();
+
+					Map<String, Map<Integer, Long>> retMap = new LinkedHashMap<>(days);
+					for (int day = 0; day < days; day++) {
+						String dateStr = TimeUtil.getDateStrByLocalDate(startLocalDate.plusDays(day), "yyyy-MM-dd");
+						Map<Integer, Long> detail = map.get(dateStr);
+						if (Objects.isNull(detail)) {
+							detail = new HashMap<>(6);
+							detail.put(Timer.T_WORK, 0L);
+							detail.put(Timer.T_EAT, defaultEatTime);
+							detail.put(Timer.T_ENTERTAINMENT, 0L);
+							detail.put(Timer.T_SLEEP, defaultSleepTime);
+							detail.put(Timer.T_STUDY, 0L);
+							detail.put(Timer.T_UNKNOWN, total - (defaultEatTime + defaultSleepTime));
+						}
+						retMap.put(dateStr, detail);
+					}
+					return Result.success(retMap).toString();
 				});
 	}
 

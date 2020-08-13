@@ -78,6 +78,16 @@ public final class TimeUtil {
 	}
 
 	/**
+	 * 根据LocalDate获取本地日期
+	 * @param localDate
+	 * @param format
+	 * @return date
+	 */
+	public static String getDateStrByLocalDate(LocalDate localDate, String format) {
+		return localDate.format(DateTimeFormatter.ofPattern(format));
+	}
+
+	/**
 	 * 根据开始日期, 间隔月份和格式，返回月初和月末的时间戳
 	 * @param startDate
 	 * @param format
