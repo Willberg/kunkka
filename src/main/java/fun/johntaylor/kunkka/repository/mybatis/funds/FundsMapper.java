@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectKey;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -26,4 +27,11 @@ public interface FundsMapper {
 
 	@Delete("delete from Funds where id=#{id}")
 	int delete(Long id);
+
+	@Select("select " + COLUMNS + " from t_funds where uid=#{uid} and create_time>=#{startTime} and create_time<=#{endTime} and status=1")
+	List<Funds> searchList(Long uid, Long startTime, Long endTime);
+
+
+	@Select("select " + COLUMNS + " from t_funds where uid=#{uid} and type=#{type} and create_time>=#{startTime} and create_time<=#{endTime} and status=1")
+	List<Funds> searchListByType(Integer type, Long uid, Long startTime, Long endTime);
 }

@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Objects;
 import java.util.TimeZone;
@@ -74,5 +75,25 @@ public final class TimeUtil {
 		LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), TimeZone.getDefault().toZoneId());
 		LocalDate localDate = localDateTime.toLocalDate();
 		return localDate.format(DateTimeFormatter.ofPattern(format));
+	}
+
+	/**
+	 * 根据开始日期, 间隔月份和格式，返回月初和月末的时间戳
+	 * @param startDate
+	 * @param format
+	 * @return Long[]
+	 */
+	public static Long[] getStartEndTimestamp(long diff, String startDate, String format) {
+		LocalDate startLocalDate = TimeUtil.getLocalDate(startDate, format);
+		if (Objects.isNull(startLocalDate)) {
+			return null;
+		}
+		startLocalDate = startLocalDate.atStartOfDay().toLocalDate();
+		long startTime = TimeUtil.getTimestampByLocalDate(startLocalDate);
+		long endTime = TimeUtil.getTimestampByLocalDate(startLocalDate.plus(diff, ChronoUnit.MONTHS));
+		Long[] timestamps = new Long[2];
+		timestamps[0] = startTime;
+		timestamps[1] = endTime;
+		return timestamps;
 	}
 }
