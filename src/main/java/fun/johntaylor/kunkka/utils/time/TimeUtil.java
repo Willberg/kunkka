@@ -1,0 +1,78 @@
+package fun.johntaylor.kunkka.utils.time;
+
+import lombok.extern.slf4j.Slf4j;
+
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.Objects;
+import java.util.TimeZone;
+
+/**
+ * @Author John
+ * @Description 时间工具类
+ * @Date 2020/8/12 10:19 PM
+ **/
+@Slf4j
+public final class TimeUtil {
+	private TimeUtil() {
+
+	}
+
+	/**
+	 * 将日期字符串转为特定格式的日期
+	 * @param dateStr
+	 * @param format
+	 * @return Date
+	 */
+	public static Date getDate(String dateStr, String format) {
+		Date date = null;
+		try {
+			date = new SimpleDateFormat(format).parse(dateStr);
+		} catch (ParseException e) {
+			log.error("convert date error", e);
+		}
+		return date;
+	}
+
+	/**
+	 * 将日期字符串转为特定格式的LocalDate
+	 * @param dateStr
+	 * @param format
+	 * @return LocalDate
+	 */
+	public static LocalDate getLocalDate(String dateStr, String format) {
+		Date date = getDate(dateStr, format);
+		if (Objects.isNull(date)) {
+			return null;
+		}
+		return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+	}
+
+	/**
+	 * 根据localDate获取时间戳
+	 * @param localDate
+	 * @return timestamp
+	 */
+	public static long getTimestampByLocalDate(LocalDate localDate) {
+		return Timestamp.valueOf(localDate.atStartOfDay()).getTime();
+	}
+
+	/**
+	 * 根据时间戳获取本地日期
+	 * @param timestamp
+	 * @param format
+	 * @return date
+	 */
+	public static String getDateStrByTimestamp(Long timestamp, String format) {
+		LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), TimeZone.getDefault().toZoneId());
+		LocalDate localDate = localDateTime.toLocalDate();
+		return localDate.format(DateTimeFormatter.ofPattern(format));
+	}
+}
