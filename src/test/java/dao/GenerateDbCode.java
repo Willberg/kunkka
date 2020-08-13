@@ -1,6 +1,6 @@
 package dao;
 
-import fun.johntaylor.kunkka.entity.timer.Timer;
+import fun.johntaylor.kunkka.entity.funds.Funds;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -208,6 +208,6 @@ public class GenerateDbCode {
 	}
 
 	public static void main(String[] args) {
-		printSql(Timer.class, "id");
+		printSql(Funds.class, "id");
 	}
 }

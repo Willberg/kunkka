@@ -48,4 +48,16 @@ public class Funds {
 	 * 状态，1-- 正常， 0-- 删除
 	 */
 	private Integer status;
+
+	public static final Integer T_DISBURSEMENT = 1;
+	public static final Integer T_INCOME = 2;
+
+	public static final Integer C_FOOD = 1;
+	public static final Integer C_CLOTH = 2;
+	public static final Integer C_TRAVEL = 3;
+	public static final Integer C_CHAT = 4;
+	public static final Integer C_HOSPITAL = 5;
+	public static final Integer C_LIVE = 6;
+	public static final Integer C_BOOK = 7;
+	public static final Integer C_ENTERTAINMENT = 8;
 }
