@@ -34,11 +34,13 @@ public final class SessionUtil {
 			EncryptUser u = result.getData();
 			String cookieValue = DigestUtils.md5DigestAsHex(String.format("%s%s", System.currentTimeMillis(), UUID.randomUUID().toString()).getBytes());
 			SessionCache.set(cookieValue, u.getId());
+			// cookie被同一个host的不同port共享，https://stackoverflow.com/questions/1612177/are-http-cookies-port-specific
 			ResponseCookie cookie = ResponseCookie.from(SESSION_ID, cookieValue)
 					//防止xss, 不能使用Document.cookie访问, https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies
 					.httpOnly(true)
 					// Specify SameSite=None and Secure if the cookie should be sent in cross-site requests. This enables third-party use.
 					.sameSite("None")
+					.secure(true)
 					.maxAge(Duration.ofDays(15))
 					.path("/")
 					.build();
@@ -59,6 +61,7 @@ public final class SessionUtil {
 				.httpOnly(true)
 				// Specify SameSite=None and Secure if the cookie should be sent in cross-site requests. This enables third-party use.
 				.sameSite("None")
+				.secure(true)
 				.maxAge(Duration.ofDays(15))
 				.path("/")
 				.build();
