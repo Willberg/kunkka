@@ -17,12 +17,12 @@ import java.util.Map;
  **/
 @Repository
 public interface TimerMapper {
-	String COLUMNS = "id, uid, create_time as createTime, type, related_id as relatedId, status";
+	String COLUMNS = "id, uid, create_time as createTime, update_time as updateTime, type, related_id as relatedId, status";
 
 	@Select("select " + COLUMNS + " from t_timer where id=#{id}")
 	Timer select(Long id);
 
-	@Insert("insert into t_timer(id, uid, create_time, type, related_id, status) values(#{id}, #{uid}, #{createTime}, #{type}, #{relatedId}, #{status})")
+	@Insert("insert into t_timer(id, uid, create_time, update_time, type, related_id, status) values(#{id}, #{uid}, #{createTime}, #{updateTime}, #{type}, #{relatedId}, #{status})")
 	@SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "id", before = false, resultType = Long.class)
 	int insert(Timer timer);
 

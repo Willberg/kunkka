@@ -30,6 +30,11 @@ public class Timer {
 	private Long createTime;
 
 	/**
+	 * 更新时间
+	 */
+	private Long updateTime;
+
+	/**
 	 * 类别， 1-- 工作， 2--吃饭， 3--休闲娱乐， 4--睡觉, 5--学习, 6--未知
 	 */
 	@NotNull(message = "请选择类别", groups = {Insert.class})

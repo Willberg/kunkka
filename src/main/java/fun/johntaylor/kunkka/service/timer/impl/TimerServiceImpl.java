@@ -62,6 +62,7 @@ public class TimerServiceImpl implements TimerService {
 			Timer t = new Timer();
 			t.setId(timer.getRelatedId());
 			t.setRelatedId(timer.getId());
+			t.setUpdateTime(System.currentTimeMillis());
 			timerMapper.update(t);
 		}
 		return Result.success(timer);
@@ -104,6 +105,7 @@ public class TimerServiceImpl implements TimerService {
 				Timer t = new Timer();
 				t.setId(relatedOne.getId());
 				t.setType(timer.getType());
+				t.setUpdateTime(System.currentTimeMillis());
 				timerMapper.update(t);
 			}
 		}

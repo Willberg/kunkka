@@ -48,6 +48,7 @@ public class TimerController {
 					Timer t = new Timer();
 					t.setUid(v.getId());
 					t.setCreateTime(System.currentTimeMillis());
+					t.setUpdateTime(System.currentTimeMillis());
 					t.setType(reqTimer.getType());
 					t.setRelatedId(reqTimer.getRelatedId());
 					t.setStatus(reqTimer.getStatus());
@@ -67,6 +68,7 @@ public class TimerController {
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					reqTimer.setUid(v.getId());
+					reqTimer.setUpdateTime(System.currentTimeMillis());
 					return timerService.update(reqTimer).toString();
 				});
 	}
