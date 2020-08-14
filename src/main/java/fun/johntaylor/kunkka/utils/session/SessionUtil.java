@@ -35,8 +35,10 @@ public final class SessionUtil {
 			String cookieValue = DigestUtils.md5DigestAsHex(String.format("%s%s", System.currentTimeMillis(), UUID.randomUUID().toString()).getBytes());
 			SessionCache.set(cookieValue, u.getId());
 			ResponseCookie cookie = ResponseCookie.from(SESSION_ID, cookieValue)
-					//利用浏览器防止csrf
+					//防止xss, 不能使用Document.cookie访问, https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies
 					.httpOnly(true)
+					// Specify SameSite=None and Secure if the cookie should be sent in cross-site requests. This enables third-party use.
+					.sameSite("None")
 					.maxAge(Duration.ofDays(15))
 					.path("/")
 					.build();
@@ -53,8 +55,10 @@ public final class SessionUtil {
 	public static void refreshCookie(ServerHttpResponse response, String cookieValue, Long uid) {
 		SessionCache.set(cookieValue, uid);
 		ResponseCookie cookie = ResponseCookie.from(SESSION_ID, cookieValue)
-				//利用浏览器防止csrf
+				//防止xss, 不能使用Document.cookie访问, https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies
 				.httpOnly(true)
+				// Specify SameSite=None and Secure if the cookie should be sent in cross-site requests. This enables third-party use.
+				.sameSite("None")
 				.maxAge(Duration.ofDays(15))
 				.path("/")
 				.build();
