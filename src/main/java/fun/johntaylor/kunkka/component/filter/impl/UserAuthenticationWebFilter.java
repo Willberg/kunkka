@@ -6,7 +6,6 @@ import fun.johntaylor.kunkka.utils.cache.impl.SessionCache;
 import fun.johntaylor.kunkka.utils.cache.impl.UserCache;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
 import fun.johntaylor.kunkka.utils.session.SessionUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpCookie;
@@ -29,7 +28,6 @@ import static fun.johntaylor.kunkka.utils.session.SessionUtil.SESSION_ID;
  **/
 @Component
 @Order(200)
-@Slf4j
 public class UserAuthenticationWebFilter extends BaseFilter implements WebFilter {
 
 	@Value("${authentication.whitelist.urls}")
@@ -46,16 +44,12 @@ public class UserAuthenticationWebFilter extends BaseFilter implements WebFilter
 		// 认证
 		HttpCookie cookie = request.getCookies().getFirst(SESSION_ID);
 		if (Objects.isNull(cookie)) {
-			log.warn("cookie is null");
 			return setErrorResponse(response, ErrorCode.USER_AUTHENTICATION_ERROR);
 		}
 		String cookieValue = cookie.getValue();
-		log.warn("cookie=" + cookieValue);
 		Long uid = SessionCache.get(cookieValue, Long.class);
-		log.warn("uid=" + uid);
 		User user = UserCache.get(uid, User.class);
 		if (Objects.isNull(user)) {
-			log.warn("user is null");
 			return setErrorResponse(response, ErrorCode.USER_AUTHENTICATION_ERROR);
 		}
 
