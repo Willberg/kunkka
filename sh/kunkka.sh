@@ -3,7 +3,7 @@
 rm -rf /home/code/kunkka/target
 
 # 更新代码
-cd /home/code/kunkka && git pull
+cd /home/code/kunkka && git stash && git pull
 
 # 拷贝配置文件
 cp /home/resource/kunkka/application.yml /home/code/kunkka/src/main/resources
