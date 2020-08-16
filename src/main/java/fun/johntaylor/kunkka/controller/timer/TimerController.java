@@ -76,15 +76,16 @@ public class TimerController {
 	/**
 	 * 查询计时
 	 * @param request
-	 * @return
+	 * @param selectedMonth
+	 * @return Mono
 	 */
 	@GetMapping(value = "/api/timer/list")
 	public Mono<String> select(ServerHttpRequest request,
-			@RequestParam(value = "startDate") String startDate) {
+			@RequestParam(value = "selectedMonth") String selectedMonth) {
 		return Mono.just(SessionUtil.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
-					LocalDate startLocalDate = TimeUtil.getLocalDate(startDate, "yyyy-MM-dd");
+					LocalDate startLocalDate = TimeUtil.getLocalDate(selectedMonth, "yyyy-MM");
 					if (Objects.isNull(startLocalDate)) {
 						return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "日期错误").toString();
 					}

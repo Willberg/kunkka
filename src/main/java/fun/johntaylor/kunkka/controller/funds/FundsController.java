@@ -87,16 +87,16 @@ public class FundsController {
 	/**
 	 * 获取月支出流水
 	 * @param request
-	 * @param startDate
+	 * @param selectedMonth
 	 * @return Mono
 	 */
 	@GetMapping(value = "/api/funds/disbursement/list")
 	public Mono<String> listDisbursement(ServerHttpRequest request,
-			@RequestParam(value = "startDate") String startDate) {
+			@RequestParam(value = "selectedMonth") String selectedMonth) {
 		return Mono.just(SessionUtil.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
-					Long[] timestamps = TimeUtil.getStartEndTimestamp(1, startDate, "yyyy-MM-dd");
+					Long[] timestamps = TimeUtil.getStartEndTimestamp(1, selectedMonth, "yyyy-MM");
 					if (Objects.isNull(timestamps)) {
 						return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "日期错误").toString();
 					}
@@ -119,16 +119,16 @@ public class FundsController {
 	/**
 	 * 获取资金流水
 	 * @param request
-	 * @param startDate
+	 * @param selectedMonth
 	 * @return Mono
 	 */
 	@GetMapping(value = "/api/funds/list")
 	public Mono<String> list(ServerHttpRequest request,
-			@RequestParam(value = "startDate") String startDate) {
+			@RequestParam(value = "selectedMonth") String selectedMonth) {
 		return Mono.just(SessionUtil.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
-					Long[] timestamps = TimeUtil.getStartEndTimestamp(1, startDate, "yyyy-MM-dd");
+					Long[] timestamps = TimeUtil.getStartEndTimestamp(1, selectedMonth, "yyyy-MM");
 					if (Objects.isNull(timestamps)) {
 						return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "日期错误").toString();
 					}

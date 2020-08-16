@@ -15,6 +15,7 @@ import fun.johntaylor.kunkka.utils.result.Result;
 import fun.johntaylor.kunkka.utils.session.SessionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +32,8 @@ import java.util.Objects;
 @RestController
 @Slf4j
 public class UserController {
+	@Value("${env}")
+	private String env;
 
 	@Autowired
 	private UserService userService;
@@ -61,7 +64,7 @@ public class UserController {
 						return Result.fail(ErrorCode.SYS_PARAMETER_ERROR).toString();
 					}
 					Result<EncryptUser> result = userService.register(v);
-					SessionUtil.setCookie(response, result);
+					SessionUtil.setCookie(env, response, result);
 					return result.toString();
 				});
 	}
@@ -82,7 +85,7 @@ public class UserController {
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					Result<EncryptUser> result = userService.login(v);
-					SessionUtil.setCookie(response, result);
+					SessionUtil.setCookie(env, response, result);
 					return result.toString();
 				});
 	}

@@ -30,6 +30,9 @@ import static fun.johntaylor.kunkka.utils.session.SessionUtil.SESSION_ID;
 @Order(200)
 public class UserAuthenticationWebFilter extends BaseFilter implements WebFilter {
 
+	@Value("${env}")
+	private String env;
+
 	@Value("${authentication.whitelist.urls}")
 	private String authenticationWhiteListUrls;
 
@@ -54,7 +57,7 @@ public class UserAuthenticationWebFilter extends BaseFilter implements WebFilter
 		}
 
 		// 刷新session
-		SessionUtil.refreshCookie(response, cookieValue, uid);
+		SessionUtil.refreshCookie(env, response, cookieValue, uid);
 
 		// 权限校验
 

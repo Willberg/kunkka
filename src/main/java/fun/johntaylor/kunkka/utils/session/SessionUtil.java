@@ -26,16 +26,44 @@ public final class SessionUtil {
 
 	/**
 	 * 设置cookie和session
+	 * @param env
 	 * @param response
 	 * @param result
 	 */
-	public static void setCookie(ServerHttpResponse response, Result<EncryptUser> result) {
+	public static void setCookie(String env, ServerHttpResponse response, Result<EncryptUser> result) {
 		if (result.isSuccess()) {
 			EncryptUser u = result.getData();
 			String cookieValue = DigestUtils.md5DigestAsHex(String.format("%s%s", System.currentTimeMillis(), UUID.randomUUID().toString()).getBytes());
 			SessionCache.set(cookieValue, u.getId());
+			ResponseCookie cookie = genResponseCookie(env, cookieValue);
+			response.getCookies().set(SESSION_COOKIE_NAME, cookie);
+		}
+	}
+
+	/**
+	 * 刷新cookie和session的时间
+	 * @param env
+	 * @param response
+	 * @param cookieValue
+	 * @param uid
+	 */
+	public static void refreshCookie(String env, ServerHttpResponse response, String cookieValue, Long uid) {
+		SessionCache.set(cookieValue, uid);
+		ResponseCookie cookie = genResponseCookie(env, cookieValue);
+		response.getCookies().set(SESSION_COOKIE_NAME, cookie);
+	}
+
+	/**
+	 * 根据环境设置cookie
+	 * @param env
+	 * @param cookieValue
+	 * @return ResponseCookie
+	 */
+	private static ResponseCookie genResponseCookie(String env, String cookieValue) {
+		boolean isProductive = "pro".equalsIgnoreCase(env);
+		if (isProductive) {
 			// cookie被同一个host的不同port共享，https://stackoverflow.com/questions/1612177/are-http-cookies-port-specific
-			ResponseCookie cookie = ResponseCookie.from(SESSION_ID, cookieValue)
+			return ResponseCookie.from(SESSION_ID, cookieValue)
 					//防止xss, 不能使用Document.cookie访问, https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies
 					.httpOnly(true)
 					// Specify SameSite=None and Secure if the cookie should be sent in cross-site requests. This enables third-party use.
@@ -44,28 +72,12 @@ public final class SessionUtil {
 					.maxAge(Duration.ofDays(15))
 					.path("/")
 					.build();
-			response.getCookies().set(SESSION_COOKIE_NAME, cookie);
+		} else {
+			return ResponseCookie.from(SESSION_ID, cookieValue)
+					.maxAge(Duration.ofDays(15))
+					.path("/")
+					.build();
 		}
-	}
-
-	/**
-	 * 刷新cookie和session的时间
-	 * @param response
-	 * @param cookieValue
-	 * @param uid
-	 */
-	public static void refreshCookie(ServerHttpResponse response, String cookieValue, Long uid) {
-		SessionCache.set(cookieValue, uid);
-		ResponseCookie cookie = ResponseCookie.from(SESSION_ID, cookieValue)
-				//防止xss, 不能使用Document.cookie访问, https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies
-				.httpOnly(true)
-				// Specify SameSite=None and Secure if the cookie should be sent in cross-site requests. This enables third-party use.
-				.sameSite("None")
-				.secure(true)
-				.maxAge(Duration.ofDays(15))
-				.path("/")
-				.build();
-		response.getCookies().set(SESSION_COOKIE_NAME, cookie);
 	}
 
 	/**

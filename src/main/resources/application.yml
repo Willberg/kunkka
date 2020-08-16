@@ -1,3 +1,4 @@
+env: local
 server:
   port: 40001
 spring:
