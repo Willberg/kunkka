@@ -44,6 +44,7 @@ public class Funds {
 
 	/**
 	 * 	类别， 1--餐饮食物，2--服饰美容，3--交通出行，4--通讯网络，5--医疗保健，6--住房物业，7--图书教育，8--娱乐聚餐
+	 * 	101-工资，102-理财，103-项目
 	 */
 	@NotNull(message = "请设置类别", groups = {Insert.class})
 	@Min(value = 1, message = "最小值为1")
