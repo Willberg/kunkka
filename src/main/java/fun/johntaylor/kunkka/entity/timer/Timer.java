@@ -48,7 +48,6 @@ public class Timer {
 	/**
 	 * 状态， 1-- 开始， 2--结束
 	 */
-	@NotNull(message = "请选择状态", groups = {Insert.class})
 	private Integer status;
 
 	public static final Integer T_WORK = 1;

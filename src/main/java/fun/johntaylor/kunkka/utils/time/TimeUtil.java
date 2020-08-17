@@ -115,4 +115,14 @@ public final class TimeUtil {
 		timestamps[1] = endTime;
 		return timestamps;
 	}
+
+	/**
+	 * 返回格式化的datetime
+	 * @param timestamp
+	 * @param format
+	 * @return datetime
+	 */
+	public static String getLocalDateTimeStrFromTimestamp(long timestamp, String format) {
+		return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), TimeZone.getDefault().toZoneId()).format(DateTimeFormatter.ofPattern(format));
+	}
 }

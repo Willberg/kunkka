@@ -5,6 +5,7 @@ import fun.johntaylor.kunkka.repository.mybatis.timer.TimerMapper;
 import fun.johntaylor.kunkka.service.timer.TimerService;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
 import fun.johntaylor.kunkka.utils.result.Result;
+import fun.johntaylor.kunkka.utils.time.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,8 +30,12 @@ public class TimerServiceImpl implements TimerService {
 	public Result<Timer> add(Timer timer) {
 		Timer lastOne = timerMapper.searchLastOne(timer.getUid());
 		if (Objects.isNull(lastOne)) {
-			if (!Timer.S_OPEN.equals(timer.getStatus())) {
-				return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "第一个计时器必须是打开状态");
+			timer.setStatus(Timer.S_OPEN);
+		} else {
+			if (Timer.S_CLOSED.equals(lastOne.getStatus())) {
+				timer.setStatus(Timer.S_OPEN);
+			} else {
+				timer.setStatus(Timer.S_CLOSED);
 			}
 		}
 
@@ -47,13 +52,17 @@ public class TimerServiceImpl implements TimerService {
 			if (!timer.getType().equals(relatedOne.getType()) || !Timer.S_OPEN.equals(relatedOne.getStatus())) {
 				return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "计时器类别或状态错误");
 			}
+
+			if (Objects.nonNull(relatedOne.getRelatedId())) {
+				return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "该计时器已关闭");
+			}
 		} else {
 			if (Objects.nonNull(timer.getRelatedId())) {
-				return Result.failWithCustomMessage("打开状态没有关联ID");
+				return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "刚打开的计时器没有关联计时器");
 			}
 
-			if (Objects.nonNull(lastOne) && !Timer.S_CLOSED.equals(lastOne.getStatus())) {
-				return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "计时器状态必须改变");
+			if (Objects.nonNull(lastOne) && Timer.S_OPEN.equals(lastOne.getStatus())) {
+				return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "上一个计时器未关闭");
 			}
 		}
 
@@ -71,16 +80,26 @@ public class TimerServiceImpl implements TimerService {
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public Result<Timer> update(Timer timer) {
-		Timer lastOne = timerMapper.searchLastOne(timer.getUid());
-		if (Objects.isNull(lastOne)) {
-			if (!Timer.S_OPEN.equals(timer.getStatus())) {
-				return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "第一个计时器必须是打开状态");
-			}
-		}
-
 		Timer old = timerMapper.select(timer.getId());
 		if (Objects.isNull(old) || !old.getUid().equals(timer.getUid())) {
 			return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "不存在该计时器");
+		}
+
+		if (Objects.nonNull(timer.getCreateTime())) {
+			// 创建时间不能改在别的计时器中间
+			if (timer.getCreateTime() < old.getCreateTime()) {
+				Timer recentOld = timerMapper.searchRecentOld(timer.getId(), timer.getUid());
+				if (Objects.nonNull(recentOld) && recentOld.getCreateTime() > timer.getCreateTime()) {
+					String dateTime = TimeUtil.getLocalDateTimeStrFromTimestamp(recentOld.getCreateTime(), "yyyy-MM-dd HH:mm:ss");
+					return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "创建时间不能小于" + dateTime);
+				}
+			} else if (timer.getCreateTime() > old.getCreateTime()) {
+				Timer recentNew = timerMapper.searchRecentNew(timer.getId(), timer.getUid());
+				if (Objects.nonNull(recentNew) && recentNew.getCreateTime() < timer.getCreateTime()) {
+					String dateTime = TimeUtil.getLocalDateTimeStrFromTimestamp(recentNew.getCreateTime(), "yyyy-MM-dd HH:mm:ss");
+					return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "创建时间不能大于" + dateTime);
+				}
+			}
 		}
 
 		Timer relatedOne = null;

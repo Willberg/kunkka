@@ -41,4 +41,10 @@ public interface TimerMapper {
 
 	@Select("select " + COLUMNS + " from t_timer where id=#{relatedId}")
 	Timer searchRelatedOne(Long relatedId);
+
+	@Select("select " + COLUMNS + " from t_timer where uid=#{uid} and id > #{id} order by id asc limit 1")
+	Timer searchRecentNew(Long id, Long uid);
+
+	@Select("select " + COLUMNS + " from t_timer where uid=#{uid} and id < #{id} order by id desc limit 1")
+	Timer searchRecentOld(Long id, Long uid);
 }

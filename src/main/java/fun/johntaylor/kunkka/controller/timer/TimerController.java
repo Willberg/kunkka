@@ -51,7 +51,6 @@ public class TimerController {
 					t.setUpdateTime(System.currentTimeMillis());
 					t.setType(reqTimer.getType());
 					t.setRelatedId(reqTimer.getRelatedId());
-					t.setStatus(reqTimer.getStatus());
 					return timerService.add(t).toString();
 				});
 	}
@@ -67,9 +66,13 @@ public class TimerController {
 		return Mono.just(SessionUtil.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
-					reqTimer.setUid(v.getId());
-					reqTimer.setUpdateTime(System.currentTimeMillis());
-					return timerService.update(reqTimer).toString();
+					Timer t = new Timer();
+					t.setId(reqTimer.getId());
+					t.setUid(v.getId());
+					t.setCreateTime(reqTimer.getCreateTime());
+					t.setUpdateTime(System.currentTimeMillis());
+					t.setType(reqTimer.getType());
+					return timerService.update(t).toString();
 				});
 	}
 
