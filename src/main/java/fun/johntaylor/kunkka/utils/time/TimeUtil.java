@@ -72,9 +72,18 @@ public final class TimeUtil {
 	 * @return date
 	 */
 	public static String getDateStrByTimestamp(Long timestamp, String format) {
-		LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), TimeZone.getDefault().toZoneId());
-		LocalDate localDate = localDateTime.toLocalDate();
+		LocalDate localDate = getLocalDateByTimestamp(timestamp);
 		return localDate.format(DateTimeFormatter.ofPattern(format));
+	}
+
+	/**
+	 * 根据时间戳获取本地日期
+	 * @param timestamp
+	 * @return LocalDate
+	 */
+	public static LocalDate getLocalDateByTimestamp(Long timestamp) {
+		LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), TimeZone.getDefault().toZoneId());
+		return localDateTime.toLocalDate();
 	}
 
 	/**

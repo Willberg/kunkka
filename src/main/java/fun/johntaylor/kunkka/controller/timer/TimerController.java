@@ -93,57 +93,79 @@ public class TimerController {
 					long startTime = TimeUtil.getTimestampByLocalDate(startLocalDate);
 					long endTime = TimeUtil.getTimestampByLocalDate(startLocalDate.plus(1, ChronoUnit.MONTHS));
 					List<Timer> timerList = timerService.list(v.getId(), startTime, endTime);
-					//去掉最后一个开始但还未关闭的计时器
-					if (timerList.size() > 0 && !Timer.S_CLOSED.equals(timerList.get(timerList.size() - 1).getStatus())) {
-						timerList.remove(timerList.size() - 1);
+					// 第一个计时器如果是关闭状态，表示该计时器的开始于上个月，则应该添加一个该月1号的计时器
+					if (timerList.size() > 0 && Timer.S_CLOSED.equals(timerList.get(0).getStatus())) {
+						Timer t = new Timer();
+						LocalDate localDate = TimeUtil.getLocalDateByTimestamp(timerList.get(0).getCreateTime());
+						t.setCreateTime(TimeUtil.getTimestampByLocalDate(localDate.withDayOfMonth(1)));
+						t.setType(timerList.get(0).getType());
+						t.setStatus(Timer.S_OPEN);
+						timerList.add(0, t);
 					}
 
+					//最后一个计时器如果是开始状态，表示该计时器结束于下一个月，则应该添加该月结束日最后时刻的计时器
+					if (timerList.size() > 0 && Timer.S_OPEN.equals(timerList.get(timerList.size() - 1).getStatus())) {
+						Timer lastTimer = timerList.get(timerList.size() - 1);
+
+						Timer t = new Timer();
+						LocalDate localDate = TimeUtil.getLocalDateByTimestamp(lastTimer.getCreateTime());
+						// 减1000，使日期为本月最后一秒
+						t.setCreateTime(TimeUtil.getTimestampByLocalDate(localDate.withDayOfMonth(1).plus(1, ChronoUnit.MONTHS)) - 1000);
+						t.setType(lastTimer.getType());
+						t.setStatus(Timer.S_CLOSED);
+						timerList.add(timerList.size(), t);
+					}
+
+					// 统计各种计时器的时间
 					long start = 0;
+					String lastDateStr = "";
 					int days = startLocalDate.plus(1, ChronoUnit.MONTHS).getDayOfYear() - startLocalDate.getDayOfYear();
 					Map<String, Map<Integer, Long>> map = new HashMap<>(days);
 					for (Timer t : timerList) {
 						String dateStr = TimeUtil.getDateStrByTimestamp(t.getCreateTime(), "yyyy-MM-dd");
-						Map<Integer, Long> detail = map.get(dateStr);
-						if (Objects.isNull(detail)) {
-							detail = new HashMap<>(6);
-							detail.put(Timer.T_WORK, 0L);
-							detail.put(Timer.T_EAT, 0L);
-							detail.put(Timer.T_ENTERTAINMENT, 0L);
-							detail.put(Timer.T_SLEEP, 0L);
-							detail.put(Timer.T_STUDY, 0L);
-							map.put(dateStr, detail);
-						}
+						Map<Integer, Long> detail = initDetailMap(dateStr, map);
 
 						if (Timer.S_OPEN.equals(t.getStatus())) {
+							lastDateStr = dateStr;
 							start = t.getCreateTime() / 1000;
 						} else {
-							long diff = t.getCreateTime() / 1000 - start;
-							long old = detail.get(t.getType());
-							detail.put(t.getType(), old + diff);
+							String endDateStr = TimeUtil.getDateStrByTimestamp(t.getCreateTime(), "yyyy-MM-dd");
+							if (lastDateStr.equals(endDateStr)) {
+								long diff = t.getCreateTime() / 1000 - start;
+								long old = detail.get(t.getType());
+								detail.put(t.getType(), old + diff);
+							} else {
+								// 结束时间与计时器开始时间不在同一天，应该拆分为多天分别计算，以两天的24时分割
+								LocalDate sLocalDate = TimeUtil.getLocalDate(lastDateStr, "yyyy-MM-dd");
+								LocalDate eLocalDate = TimeUtil.getLocalDateByTimestamp(t.getCreateTime());
+								int seDays = eLocalDate.getDayOfYear() - sLocalDate.getDayOfYear();
+								for (int i = 0; i < seDays; i++) {
+									detail = initDetailMap(lastDateStr, map);
+									LocalDate localDate = sLocalDate.plus(i + 1, ChronoUnit.DAYS);
+									long end = TimeUtil.getTimestampByLocalDate(localDate) / 1000;
+									long diff = end - start;
+									long old = detail.get(t.getType());
+									detail.put(t.getType(), old + diff);
+
+									lastDateStr = TimeUtil.getDateStrByLocalDate(localDate, "yyyy-MM-dd");
+									start = end;
+								}
+
+								detail = initDetailMap(endDateStr, map);
+								long old = detail.get(t.getType());
+								long diff = t.getCreateTime() / 1000 - start;
+								detail.put(t.getType(), old + diff);
+							}
 						}
 					}
 
-
+					// 将剩余时间进行分配
 					long total = 24 * 60 * 60;
 					long defaultSleepTime = 75 * 6 * 60;
 					long defaultEatTime = 25 * 6 * 60;
-					map.keySet().forEach(k -> {
-						Map<Integer, Long> detail = map.get(k);
-						if (detail.get(Timer.T_EAT) == 0) {
-							detail.put(Timer.T_EAT, defaultEatTime);
-						}
+					calMapRestTime(total, defaultSleepTime, defaultEatTime, map);
 
-						if (detail.get(Timer.T_SLEEP) == 0) {
-							detail.put(Timer.T_SLEEP, defaultSleepTime);
-						}
-
-						long useTime = 0;
-						for (Long dv : detail.values()) {
-							useTime += dv;
-						}
-						detail.put(Timer.T_UNKNOWN, total - useTime);
-					});
-
+					// 构建返回值
 					Map<String, Map<Integer, Long>> retMap = new LinkedHashMap<>(days);
 					for (int day = 0; day < days; day++) {
 						String dateStr = TimeUtil.getDateStrByLocalDate(startLocalDate.plusDays(day), "yyyy-MM-dd");
@@ -161,6 +183,81 @@ public class TimerController {
 					}
 					return Result.success(retMap).toString();
 				});
+	}
+
+	/**
+	 * 将剩余时间进行分配
+	 * @param total
+	 * @param defaultSleepTime
+	 * @param defaultEatTime
+	 * @param map
+	 */
+	private void calMapRestTime(long total, long defaultSleepTime, long defaultEatTime, Map<String, Map<Integer, Long>> map) {
+		map.keySet().forEach(k -> {
+			Map<Integer, Long> detail = map.get(k);
+
+			long useTime = 0;
+			for (Long dv : detail.values()) {
+				useTime += dv;
+			}
+
+			long restTime = total - useTime;
+			long sleepTime = detail.get(Timer.T_SLEEP);
+			long eatTime = detail.get(Timer.T_EAT);
+			if (sleepTime != 0 && eatTime != 0) {
+				detail.put(Timer.T_UNKNOWN, restTime - sleepTime - eatTime);
+			} else if (sleepTime == 0 && eatTime != 0) {
+				restTime -= eatTime;
+				if (restTime >= defaultSleepTime) {
+					sleepTime = defaultSleepTime;
+				} else {
+					sleepTime = restTime;
+				}
+				detail.put(Timer.T_SLEEP, sleepTime);
+				detail.put(Timer.T_UNKNOWN, restTime - sleepTime);
+			} else if (sleepTime != 0) {
+				restTime -= sleepTime;
+				if (restTime >= defaultEatTime) {
+					eatTime = defaultEatTime;
+				} else {
+					eatTime = restTime;
+				}
+				detail.put(Timer.T_EAT, eatTime);
+				detail.put(Timer.T_UNKNOWN, restTime - eatTime);
+			} else {
+				if (restTime >= defaultSleepTime + defaultEatTime) {
+					detail.put(Timer.T_EAT, defaultEatTime);
+					detail.put(Timer.T_SLEEP, defaultSleepTime);
+					detail.put(Timer.T_UNKNOWN, total - (defaultEatTime + defaultSleepTime));
+				} else {
+					sleepTime = Double.valueOf(restTime * 0.75).longValue();
+					detail.put(Timer.T_SLEEP, sleepTime);
+					eatTime = Double.valueOf(restTime * 0.25).longValue();
+					detail.put(Timer.T_EAT, eatTime);
+					detail.put(Timer.T_UNKNOWN, total - (sleepTime + eatTime));
+				}
+			}
+		});
+	}
+
+	/**
+	 * 初始化detailMap
+	 * @param dateStr
+	 * @param map
+	 * @return detailMap
+	 */
+	private Map<Integer, Long> initDetailMap(String dateStr, Map<String, Map<Integer, Long>> map) {
+		Map<Integer, Long> detail = map.get(dateStr);
+		if (Objects.isNull(detail)) {
+			detail = new HashMap<>(6);
+			detail.put(Timer.T_WORK, 0L);
+			detail.put(Timer.T_EAT, 0L);
+			detail.put(Timer.T_ENTERTAINMENT, 0L);
+			detail.put(Timer.T_SLEEP, 0L);
+			detail.put(Timer.T_STUDY, 0L);
+			map.put(dateStr, detail);
+		}
+		return detail;
 	}
 
 	/**
