@@ -60,7 +60,7 @@ public class Funds {
 	private Integer type;
 
 	/**
-	 * 状态，1-- 正常， 0-- 删除
+	 * 状态，1-- 正常， 2-- 删除
 	 */
 	private Integer status;
 

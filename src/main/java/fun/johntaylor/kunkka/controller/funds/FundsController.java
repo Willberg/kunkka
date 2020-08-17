@@ -166,7 +166,7 @@ public class FundsController {
 					if (!v.getId().equals(funds.getUid())) {
 						return Result.failWithCustomMessage("无权操作").toString();
 					}
-					return Result.success().toString();
+					return Result.success(funds).toString();
 				});
 	}
 }
