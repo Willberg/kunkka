@@ -1,11 +1,13 @@
 package fun.johntaylor.kunkka.controller.funds;
 
+import com.google.gson.reflect.TypeToken;
 import fun.johntaylor.kunkka.component.thread.pool.DbThreadPool;
 import fun.johntaylor.kunkka.entity.funds.Funds;
 import fun.johntaylor.kunkka.entity.validation.Insert;
 import fun.johntaylor.kunkka.entity.validation.Update;
 import fun.johntaylor.kunkka.service.funds.FundsService;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
+import fun.johntaylor.kunkka.utils.general.CopyUtil;
 import fun.johntaylor.kunkka.utils.result.Result;
 import fun.johntaylor.kunkka.utils.session.SessionUtil;
 import fun.johntaylor.kunkka.utils.time.TimeUtil;
@@ -144,6 +146,15 @@ public class FundsController {
 							amount += f.getAmount();
 						}
 						retMap.put(dateStr, amount);
+					}
+
+					// 去掉收支平衡的项
+					Set<String> set = CopyUtil.deepCopy(retMap.keySet(), new TypeToken<Set<String>>() {
+					}.getType());
+					for (String date : set) {
+						if (retMap.get(date) == 0D) {
+							retMap.remove(date);
+						}
 					}
 
 					return Result.success(retMap).toString();
