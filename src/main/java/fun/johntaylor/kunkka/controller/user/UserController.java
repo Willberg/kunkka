@@ -61,7 +61,7 @@ public class UserController {
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					if (Objects.isNull(reqUser.getUserName()) && Objects.isNull(reqUser.getPhoneNumber()) && Objects.isNull(reqUser.getEmail())) {
-						return Result.fail(ErrorCode.SYS_PARAMETER_ERROR).toString();
+						return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "注册信息不全").toString();
 					}
 					Result<EncryptUser> result = userService.register(v);
 					SessionUtil.setCookie(env, response, result);

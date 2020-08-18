@@ -4,8 +4,6 @@ import fun.johntaylor.kunkka.entity.validation.Insert;
 import fun.johntaylor.kunkka.entity.validation.Update;
 import lombok.Data;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -47,16 +45,12 @@ public class Funds {
 	 * 	101-工资，102-理财，103-项目
 	 */
 	@NotNull(message = "请设置类别", groups = {Insert.class})
-	@Min(value = 1, message = "最小值为1")
-	@Max(value = 8, message = "最小值为8")
 	private Integer category;
 
 	/**
 	 * 类型， 1-- 支出， 2-- 收入
 	 */
 	@NotNull(message = "请设置类型", groups = {Insert.class})
-	@Min(value = 1, message = "最小值为1")
-	@Max(value = 2, message = "最小值为2")
 	private Integer type;
 
 	/**
