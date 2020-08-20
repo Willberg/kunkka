@@ -27,7 +27,7 @@ public final class EncryptUtil {
 	public static String encryptPhoneNumber(String phoneNumber) {
 		return Optional
 				.ofNullable(phoneNumber)
-				.map(p -> String.format("%s****%s", p.substring(0, 3), p.substring(6)))
+				.map(p -> String.format("%s****%s", p.substring(0, 3), p.substring(7)))
 				.orElse(null);
 	}
 

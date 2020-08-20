@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @Author John
@@ -34,10 +33,9 @@ public class CipherServiceImpl implements CipherService {
 	@Override
 	public Result<EncryptCipher> update(Cipher cipher) {
 		cipherMapper.update(cipher);
-		EncryptCipher encryptCipher = CopyUtil.copyWithSet(cipher, new EncryptCipher());
-		if (Objects.nonNull(cipher.getPassword())) {
-			encryptCipher.setPassword(EncryptUtil.encryptPassword(cipher.getPassword(), cipher.getSalt()));
-		}
+		Cipher retCipher = cipherMapper.select(cipher.getId());
+		EncryptCipher encryptCipher = CopyUtil.copyWithSet(retCipher, new EncryptCipher());
+		encryptCipher.setPassword(EncryptUtil.encryptPassword(retCipher.getPassword(), retCipher.getSalt()));
 		return Result.success(encryptCipher);
 	}
 
