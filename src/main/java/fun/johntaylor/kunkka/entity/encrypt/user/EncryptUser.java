@@ -1,9 +1,7 @@
 package fun.johntaylor.kunkka.entity.encrypt.user;
 
+import fun.johntaylor.kunkka.utils.encrypt.EncryptUtil;
 import lombok.Data;
-
-import java.util.Optional;
-import java.util.stream.IntStream;
 
 /**
  * @Author John
@@ -35,21 +33,10 @@ public class EncryptUser {
 	public static final Integer S_NORMAL = 1;
 
 	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = Optional
-				.ofNullable(phoneNumber)
-				.map(p -> String.format("%s****%s", p.substring(0, 3), p.substring(6)))
-				.orElse(null);
+		this.phoneNumber = EncryptUtil.encryptPhoneNumber(phoneNumber);
 	}
 
 	public void setEmail(String email) {
-		if (Optional.ofNullable(email).isPresent()) {
-			int idx = email.indexOf("@");
-			String ev = email.substring(0, idx);
-			int encryptLength = ev.length() / 2;
-			StringBuilder sb = new StringBuilder();
-			IntStream.range(0, encryptLength).forEach(v -> sb.append("*"));
-			idx = encryptLength / 2 + sb.toString().length();
-			this.email = String.format("%s%s%s", email.substring(0, encryptLength / 2), sb.toString(), email.substring(idx));
-		}
+		this.email = EncryptUtil.encryptEmail(email);
 	}
 }

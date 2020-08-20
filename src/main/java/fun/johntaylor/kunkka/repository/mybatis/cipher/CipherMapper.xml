@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="fun.johntaylor.kunkka.repository.mybatis.cipher.CipherMapper">
+	<update id="update" parameterType="fun.johntaylor.kunkka.entity.cipher.Cipher">
+		update t_cipher
+		<set>
+			<if test="uid!=null">uid = #{uid},</if>
+			<if test="name!=null">name = #{name},</if>
+			<if test="userName!=null">user_name = #{userName},</if>
+			<if test="password!=null">password = #{password},</if>
+			<if test="salt!=null">salt = #{salt},</if>
+			<if test="email!=null">email = #{email},</if>
+			<if test="phoneNumber!=null">phone_number = #{phoneNumber},</if>
+			<if test="link!=null">link = #{link},</if>
+			<if test="createTime!=null">create_time = #{createTime},</if>
+			<if test="updateTime!=null">update_time = #{updateTime},</if>
+			<if test="status!=null">status = #{status},</if>
+		</set>
+		where id=#{id}
+	</update>
+
+	<update id="updateIdempotent" parameterType="Map">
+		update t_cipher
+		<set>
+			<if test="new.uid!=null">uid = #{new.uid},</if>
+			<if test="new.name!=null">name = #{new.name},</if>
+			<if test="new.userName!=null">user_name = #{new.userName},</if>
+			<if test="new.password!=null">password = #{new.password},</if>
+			<if test="new.salt!=null">salt = #{new.salt},</if>
+			<if test="new.email!=null">email = #{new.email},</if>
+			<if test="new.phoneNumber!=null">phone_number = #{new.phoneNumber},</if>
+			<if test="new.link!=null">link = #{new.link},</if>
+			<if test="new.createTime!=null">create_time = #{new.createTime},</if>
+			<if test="new.updateTime!=null">update_time = #{new.updateTime},</if>
+			<if test="new.status!=null">status = #{new.status},</if>
+		</set>
+		<where>
+			where id=#{old.id}
+			<if test="new.uid!=null and old.uid!=null">and uid = #{old.uid}</if>
+			<if test="new.name!=null and old.name!=null">and name = #{old.name}</if>
+			<if test="new.userName!=null and old.userName!=null">and user_name = #{old.userName}</if>
+			<if test="new.password!=null and old.password!=null">and password = #{old.password}</if>
+			<if test="new.salt!=null and old.salt!=null">and salt = #{old.salt}</if>
+			<if test="new.email!=null and old.email!=null">and email = #{old.email}</if>
+			<if test="new.phoneNumber!=null and old.phoneNumber!=null">and phone_number = #{old.phoneNumber}</if>
+			<if test="new.link!=null and old.link!=null">and link = #{old.link}</if>
+			<if test="new.createTime!=null and old.createTime!=null">and create_time = #{old.createTime}</if>
+			<if test="new.updateTime!=null and old.updateTime!=null">and update_time = #{old.updateTime}</if>
+			<if test="new.status!=null and old.status!=null">and status = #{old.status}</if>
+		</where>
+	</update>
+</mapper>

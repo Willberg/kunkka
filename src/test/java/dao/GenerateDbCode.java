@@ -1,5 +1,6 @@
 package dao;
 
+import fun.johntaylor.kunkka.entity.cipher.Cipher;
 import fun.johntaylor.kunkka.entity.timer.Timer;
 
 import java.lang.reflect.Field;
@@ -208,6 +209,6 @@ public class GenerateDbCode {
 	}
 
 	public static void main(String[] args) {
-		printSql(Timer.class, "id");
+		printSql(Cipher.class, "id");
 	}
 }

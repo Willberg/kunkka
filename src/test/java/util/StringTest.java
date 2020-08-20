@@ -1,15 +1,16 @@
 package util;
 
-import fun.johntaylor.kunkka.constant.cache.CacheDomain;
 import fun.johntaylor.kunkka.entity.encrypt.user.EncryptUser;
 import fun.johntaylor.kunkka.entity.user.User;
-import fun.johntaylor.kunkka.utils.cache.BaseCache;
 import fun.johntaylor.kunkka.utils.cache.impl.SessionCache;
 import fun.johntaylor.kunkka.utils.cache.impl.UserCache;
+import fun.johntaylor.kunkka.utils.encrypt.EncryptUtil;
 import fun.johntaylor.kunkka.utils.general.CopyUtil;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.DigestUtils;
 
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
@@ -74,7 +75,7 @@ public class StringTest {
 		Thread.sleep(35000);
 		System.out.println(SessionCache.get("test", Long.class));
 
-		SessionCache.set("test",12L);
+		SessionCache.set("test", 12L);
 		Thread.sleep(25000);
 		System.out.println(SessionCache.get("test", Long.class));
 		SessionCache.set("test", 12L);
@@ -85,6 +86,32 @@ public class StringTest {
 	@Test
 	public void testUUID() {
 		System.out.println(UUID.randomUUID().toString());
+	}
+
+	@Test
+	public void testMd5() {
+		System.out.println(DigestUtils.md5DigestAsHex(UUID.randomUUID().toString().getBytes()));
+	}
+
+	@Test
+	public void printCharacters() {
+		StringBuilder upper = new StringBuilder();
+		StringBuilder lower = new StringBuilder();
+		IntStream.range(0, 26).forEach(i -> {
+			System.out.print((new Random()).nextInt(26) + " ");
+			char c = 'A';
+			c += i;
+			upper.append(String.format("'%s',", c));
+			c = 'a';
+			c += i;
+			lower.append(String.format("'%s',", c));
+		});
+		System.out.println();
+		System.out.println(upper.substring(0, upper.length() - 1));
+		System.out.println(lower.substring(0, lower.length() - 1));
+
+		System.out.println(EncryptUtil.generateRandomString(true));
+		System.out.println(EncryptUtil.generateRandomString(false));
 	}
 
 }
