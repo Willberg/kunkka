@@ -123,6 +123,13 @@ public class TimerController {
 					long start = 0;
 					String lastDateStr = "";
 					int days = startLocalDate.plus(1, ChronoUnit.MONTHS).getDayOfYear() - startLocalDate.getDayOfYear();
+					// 如果selectedMonth是当月，只需要计算到当前日即可
+					LocalDate now = LocalDate.now();
+					String nowYearMonth = TimeUtil.getDateStrByLocalDate(now, "yyyy-MM");
+					if (nowYearMonth.equals(selectedMonth)) {
+						days = now.getDayOfYear() - startLocalDate.getDayOfYear() + 1;
+					}
+
 					Map<String, Map<Integer, Long>> map = new HashMap<>(days);
 					for (Timer t : timerList) {
 						String dateStr = TimeUtil.getDateStrByTimestamp(t.getCreateTime(), "yyyy-MM-dd");
