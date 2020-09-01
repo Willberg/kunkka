@@ -78,6 +78,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public Result<EncryptUser> changePassword(Long uid, String oldPassword, String newPassword) {
 		User old = userCache.get(uid, User.class);
+		oldPassword = encrypt.md5WithSalt(oldPassword);
 		if (!old.getPassword().equals(oldPassword)) {
 			return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "密码错误");
 		}

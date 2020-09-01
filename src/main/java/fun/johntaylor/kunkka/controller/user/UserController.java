@@ -149,6 +149,11 @@ public class UserController {
 			@Valid @RequestBody UpdatePassword req) {
 		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
-				.map(v -> userService.changePassword(v.getId(), req.getOldPassword(), req.getNewPassword()).toString());
+				.map(v -> {
+					if (req.getNewPassword().equals(req.getOldPassword())) {
+						return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "新密码不能与旧密码相同").toString();
+					}
+					return userService.changePassword(v.getId(), req.getOldPassword(), req.getNewPassword()).toString();
+				});
 	}
 }
