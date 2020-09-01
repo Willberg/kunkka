@@ -30,4 +30,13 @@ public interface UserService {
 	 * @return Result<EncryptUser>
 	 */
 	Result<EncryptUser> getProfile(User user);
+
+	/**
+	 * 修改密码
+	 * @param uid
+	 * @param oldPassword
+	 * @param newPassword
+	 * @return Result<EncryptUser>
+	 */
+	Result<EncryptUser> changePassword(Long uid, String oldPassword, String newPassword);
 }

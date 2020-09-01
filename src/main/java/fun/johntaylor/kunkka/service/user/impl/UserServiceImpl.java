@@ -74,4 +74,21 @@ public class UserServiceImpl implements UserService {
 		EncryptUser encryptUser = CopyUtil.copyWithSet(u, new EncryptUser());
 		return Result.success(encryptUser);
 	}
+
+	@Override
+	public Result<EncryptUser> changePassword(Long uid, String oldPassword, String newPassword) {
+		User old = userCache.get(uid, User.class);
+		if (!old.getPassword().equals(oldPassword)) {
+			return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "密码错误");
+		}
+
+		String password = encrypt.md5WithSalt(newPassword);
+		User user = CopyUtil.copyWithSet(old, new User());
+		user.setPassword(password);
+		user.setUpdateTime(System.currentTimeMillis());
+		userMapper.update(user);
+		userCache.set(uid, user);
+		EncryptUser u = CopyUtil.copyWithSet(user, new EncryptUser());
+		return Result.success(u);
+	}
 }

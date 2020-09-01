@@ -6,6 +6,7 @@ import fun.johntaylor.kunkka.component.thread.pool.DbThreadPool;
 import fun.johntaylor.kunkka.entity.encrypt.user.EncryptUser;
 import fun.johntaylor.kunkka.entity.todo.TodoGroup;
 import fun.johntaylor.kunkka.entity.user.User;
+import fun.johntaylor.kunkka.entity.user.request.UpdatePassword;
 import fun.johntaylor.kunkka.repository.mybatis.todo.TodoGroupMapper;
 import fun.johntaylor.kunkka.service.user.UserService;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
@@ -134,12 +135,20 @@ public class UserController {
 	 * @Author John
 	 * @Description 登录
 	 * @Date 2020/6/22 9:47 PM
-	 * @Param
-	 * @return
+	 * @Param request
+	 * @return Mono<String>
 	 **/
 	@GetMapping(value = "/api/user/profile")
 	public Mono<String> getUser(ServerHttpRequest request) {
 		return Mono.just(session.getUser(request))
 				.map(v -> userService.getProfile(v).toString());
+	}
+
+	@PostMapping(value = "/api/user/password/change")
+	public Mono<String> changePassword(ServerHttpRequest request,
+			@Valid @RequestBody UpdatePassword req) {
+		return Mono.just(session.getUser(request))
+				.publishOn(dbThreadPool.daoInstance())
+				.map(v -> userService.changePassword(v.getId(), req.getOldPassword(), req.getNewPassword()).toString());
 	}
 }
