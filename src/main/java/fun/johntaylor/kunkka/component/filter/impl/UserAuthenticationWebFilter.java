@@ -1,11 +1,12 @@
 package fun.johntaylor.kunkka.component.filter.impl;
 
 import fun.johntaylor.kunkka.component.filter.BaseFilter;
+import fun.johntaylor.kunkka.component.redis.cache.SessionCache;
+import fun.johntaylor.kunkka.component.redis.cache.UserCache;
+import fun.johntaylor.kunkka.component.redis.session.Session;
 import fun.johntaylor.kunkka.entity.user.User;
-import fun.johntaylor.kunkka.utils.cache.impl.SessionCache;
-import fun.johntaylor.kunkka.utils.cache.impl.UserCache;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
-import fun.johntaylor.kunkka.utils.session.SessionUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpCookie;
@@ -19,7 +20,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
-import static fun.johntaylor.kunkka.utils.session.SessionUtil.SESSION_ID;
+import static fun.johntaylor.kunkka.component.redis.session.Session.SESSION_ID;
+
 
 /**
  * @Author John
@@ -36,6 +38,15 @@ public class UserAuthenticationWebFilter extends BaseFilter implements WebFilter
 	@Value("${authentication.whitelist.urls}")
 	private String authenticationWhiteListUrls;
 
+	@Autowired
+	private SessionCache sessionCache;
+
+	@Autowired
+	private Session session;
+
+	@Autowired
+	private UserCache userCache;
+
 	@Override
 	public Mono<Void> filter(ServerWebExchange serverWebExchange, WebFilterChain webFilterChain) {
 		ServerHttpRequest request = serverWebExchange.getRequest();
@@ -50,14 +61,14 @@ public class UserAuthenticationWebFilter extends BaseFilter implements WebFilter
 			return setErrorResponse(response, ErrorCode.USER_AUTHENTICATION_ERROR);
 		}
 		String cookieValue = cookie.getValue();
-		Long uid = SessionCache.get(cookieValue, Long.class);
-		User user = UserCache.get(uid, User.class);
+		Long uid = sessionCache.get(cookieValue, Long.class);
+		User user = userCache.get(uid, User.class);
 		if (Objects.isNull(user)) {
 			return setErrorResponse(response, ErrorCode.USER_AUTHENTICATION_ERROR);
 		}
 
 		// 刷新session
-		SessionUtil.refreshCookie(env, response, cookieValue, uid);
+		session.refreshCookie(env, response, cookieValue, uid);
 
 		// 权限校验
 

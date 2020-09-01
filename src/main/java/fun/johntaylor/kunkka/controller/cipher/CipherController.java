@@ -1,5 +1,6 @@
 package fun.johntaylor.kunkka.controller.cipher;
 
+import fun.johntaylor.kunkka.component.redis.session.Session;
 import fun.johntaylor.kunkka.component.thread.pool.DbThreadPool;
 import fun.johntaylor.kunkka.entity.cipher.Cipher;
 import fun.johntaylor.kunkka.entity.encrypt.cipher.EncryptCipher;
@@ -9,7 +10,6 @@ import fun.johntaylor.kunkka.service.cipher.CipherService;
 import fun.johntaylor.kunkka.utils.encrypt.EncryptUtil;
 import fun.johntaylor.kunkka.utils.general.CopyUtil;
 import fun.johntaylor.kunkka.utils.result.Result;
-import fun.johntaylor.kunkka.utils.session.SessionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.validation.annotation.Validated;
@@ -34,10 +34,13 @@ public class CipherController {
 	@Autowired
 	private CipherService cipherService;
 
+	@Autowired
+	private Session session;
+
 	@PostMapping(value = "/api/cipher/add")
 	public Mono<String> add(ServerHttpRequest request,
 			@Validated(value = {Insert.class}) @RequestBody Cipher reqCipher) {
-		return Mono.just(SessionUtil.getUser(request))
+		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					Cipher cipher = new Cipher();
@@ -59,7 +62,7 @@ public class CipherController {
 	@PostMapping(value = "/api/cipher/update")
 	public Mono<String> update(ServerHttpRequest request,
 			@Validated(value = {Update.class}) @RequestBody Cipher reqCipher) {
-		return Mono.just(SessionUtil.getUser(request))
+		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					Cipher cipher = new Cipher();
@@ -83,7 +86,7 @@ public class CipherController {
 	@GetMapping(value = "/api/cipher/search")
 	public Mono<String> search(ServerHttpRequest request,
 			@RequestParam(value = "name") String name) {
-		return Mono.just(SessionUtil.getUser(request))
+		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					List<Cipher> cipherList = cipherService.list(v.getId());

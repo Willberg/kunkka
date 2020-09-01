@@ -1,18 +1,16 @@
 package fun.johntaylor.kunkka.controller.user;
 
 import fun.johntaylor.kunkka.component.encryption.Jwt;
+import fun.johntaylor.kunkka.component.redis.session.Session;
 import fun.johntaylor.kunkka.component.thread.pool.DbThreadPool;
 import fun.johntaylor.kunkka.entity.encrypt.user.EncryptUser;
 import fun.johntaylor.kunkka.entity.todo.TodoGroup;
 import fun.johntaylor.kunkka.entity.user.User;
 import fun.johntaylor.kunkka.repository.mybatis.todo.TodoGroupMapper;
 import fun.johntaylor.kunkka.service.user.UserService;
-import fun.johntaylor.kunkka.utils.cache.impl.UserCache;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
-import fun.johntaylor.kunkka.utils.general.CopyUtil;
 import fun.johntaylor.kunkka.utils.json.JsonUtil;
 import fun.johntaylor.kunkka.utils.result.Result;
-import fun.johntaylor.kunkka.utils.session.SessionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +45,9 @@ public class UserController {
 	@Autowired
 	private TodoGroupMapper todoGroupMapper;
 
+	@Autowired
+	private Session session;
+
 	/**
 	 * @Author John
 	 * @Description 注册
@@ -64,7 +65,7 @@ public class UserController {
 						return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "注册信息不全").toString();
 					}
 					Result<EncryptUser> result = userService.register(v);
-					SessionUtil.setCookie(env, response, result);
+					session.setCookie(env, response, result);
 					return result.toString();
 				});
 	}
@@ -85,7 +86,7 @@ public class UserController {
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					Result<EncryptUser> result = userService.login(v);
-					SessionUtil.setCookie(env, response, result);
+					session.setCookie(env, response, result);
 					return result.toString();
 				});
 	}
@@ -101,7 +102,7 @@ public class UserController {
 	public Mono<String> logout(ServerHttpRequest request) {
 		return Mono.just(Result.success())
 				.map(result -> {
-					SessionUtil.clearSession(request);
+					session.clearSession(request);
 					return result.toString();
 				});
 	}
@@ -118,7 +119,7 @@ public class UserController {
 	public Mono<String> createUrl(ServerHttpRequest request,
 			@RequestParam(value = "url") String url,
 			@RequestParam(value = "groupId") Long groupId) {
-		return Mono.just(SessionUtil.getUser(request))
+		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					TodoGroup todoGroup = todoGroupMapper.select(groupId);
@@ -138,11 +139,7 @@ public class UserController {
 	 **/
 	@GetMapping(value = "/api/user/profile")
 	public Mono<String> getUser(ServerHttpRequest request) {
-		return Mono.just(SessionUtil.getUser(request))
-				.map(v -> {
-					User u = UserCache.get(v.getId(), User.class);
-					EncryptUser encryptUser = CopyUtil.copyWithSet(u, new EncryptUser());
-					return Result.success(encryptUser).toString();
-				});
+		return Mono.just(session.getUser(request))
+				.map(v -> userService.getProfile(v).toString());
 	}
 }

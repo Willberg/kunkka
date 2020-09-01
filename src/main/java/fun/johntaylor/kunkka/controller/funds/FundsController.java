@@ -1,6 +1,7 @@
 package fun.johntaylor.kunkka.controller.funds;
 
 import com.google.gson.reflect.TypeToken;
+import fun.johntaylor.kunkka.component.redis.session.Session;
 import fun.johntaylor.kunkka.component.thread.pool.DbThreadPool;
 import fun.johntaylor.kunkka.entity.funds.Funds;
 import fun.johntaylor.kunkka.entity.validation.Insert;
@@ -9,7 +10,6 @@ import fun.johntaylor.kunkka.service.funds.FundsService;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
 import fun.johntaylor.kunkka.utils.general.CopyUtil;
 import fun.johntaylor.kunkka.utils.result.Result;
-import fun.johntaylor.kunkka.utils.session.SessionUtil;
 import fun.johntaylor.kunkka.utils.time.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +34,9 @@ public class FundsController {
 	@Autowired
 	private FundsService fundsService;
 
+	@Autowired
+	private Session session;
+
 	/**
 	 * 添加资金记录
 	 * @param request
@@ -42,7 +45,7 @@ public class FundsController {
 	@PostMapping(value = "/api/funds/add")
 	public Mono<String> add(ServerHttpRequest request,
 			@Validated(value = {Insert.class}) @RequestBody Funds reqFunds) {
-		return Mono.just(SessionUtil.getUser(request))
+		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					if (reqFunds.getAmount() <= 0) {
@@ -68,7 +71,7 @@ public class FundsController {
 	@PostMapping(value = "/api/funds/update")
 	public Mono<String> update(ServerHttpRequest request,
 			@Validated(value = {Update.class}) @RequestBody Funds reqFunds) {
-		return Mono.just(SessionUtil.getUser(request))
+		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					if (Optional.ofNullable(reqFunds.getAmount()).orElse(0D) <= 0) {
@@ -95,7 +98,7 @@ public class FundsController {
 	@GetMapping(value = "/api/funds/disbursement/list")
 	public Mono<String> listDisbursement(ServerHttpRequest request,
 			@RequestParam(value = "selectedMonth") String selectedMonth) {
-		return Mono.just(SessionUtil.getUser(request))
+		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					Long[] timestamps = TimeUtil.getStartEndTimestamp(1, selectedMonth, "yyyy-MM");
@@ -127,7 +130,7 @@ public class FundsController {
 	@GetMapping(value = "/api/funds/list")
 	public Mono<String> list(ServerHttpRequest request,
 			@RequestParam(value = "selectedMonth") String selectedMonth) {
-		return Mono.just(SessionUtil.getUser(request))
+		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					Long[] timestamps = TimeUtil.getStartEndTimestamp(1, selectedMonth, "yyyy-MM");
@@ -170,7 +173,7 @@ public class FundsController {
 	@GetMapping(value = "/api/funds/select")
 	public Mono<String> select(ServerHttpRequest request,
 			@RequestParam(value = "id") Long id) {
-		return Mono.just(SessionUtil.getUser(request))
+		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					Funds funds = fundsService.search(id);

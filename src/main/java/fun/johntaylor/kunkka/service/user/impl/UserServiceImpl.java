@@ -1,11 +1,11 @@
 package fun.johntaylor.kunkka.service.user.impl;
 
 import fun.johntaylor.kunkka.component.encryption.Encrypt;
+import fun.johntaylor.kunkka.component.redis.cache.UserCache;
 import fun.johntaylor.kunkka.entity.encrypt.user.EncryptUser;
 import fun.johntaylor.kunkka.entity.user.User;
 import fun.johntaylor.kunkka.repository.mybatis.user.UserMapper;
 import fun.johntaylor.kunkka.service.user.UserService;
-import fun.johntaylor.kunkka.utils.cache.impl.UserCache;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
 import fun.johntaylor.kunkka.utils.general.CopyUtil;
 import fun.johntaylor.kunkka.utils.result.Result;
@@ -27,6 +27,9 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private Encrypt encrypt;
 
+	@Autowired
+	private UserCache userCache;
+
 	@Override
 	public Result<EncryptUser> register(User user) {
 		User oldUser = userMapper.selectByUser(user);
@@ -44,7 +47,7 @@ public class UserServiceImpl implements UserService {
 		user.setRoleId(User.R_USER);
 		user.setStatus(User.S_NORMAL);
 		userMapper.insert(user);
-		UserCache.set(user.getId(), user);
+		userCache.set(user.getId(), user);
 		EncryptUser u = CopyUtil.copyWithSet(user, new EncryptUser());
 		return Result.success(u);
 	}
@@ -60,13 +63,15 @@ public class UserServiceImpl implements UserService {
 		if (!sUser.getPassword().equals(password)) {
 			return Result.fail(ErrorCode.USER_AUTHENTICATION_ERROR);
 		}
-		UserCache.set(sUser.getId(), sUser);
+		userCache.set(sUser.getId(), sUser);
 		EncryptUser u = CopyUtil.copyWithSet(sUser, new EncryptUser());
 		return Result.success(u);
 	}
 
 	@Override
-	public Result logout(User user) {
-		return null;
+	public Result<EncryptUser> getProfile(User user) {
+		User u = userCache.get(user.getId(), User.class);
+		EncryptUser encryptUser = CopyUtil.copyWithSet(u, new EncryptUser());
+		return Result.success(encryptUser);
 	}
 }

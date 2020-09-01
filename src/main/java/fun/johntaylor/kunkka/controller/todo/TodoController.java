@@ -1,5 +1,6 @@
 package fun.johntaylor.kunkka.controller.todo;
 
+import fun.johntaylor.kunkka.component.redis.session.Session;
 import fun.johntaylor.kunkka.component.thread.pool.DbThreadPool;
 import fun.johntaylor.kunkka.entity.todo.Todo;
 import fun.johntaylor.kunkka.entity.todo.TodoGroup;
@@ -11,7 +12,6 @@ import fun.johntaylor.kunkka.repository.mybatis.todo.TodoGroupMapper;
 import fun.johntaylor.kunkka.service.todo.TodoService;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
 import fun.johntaylor.kunkka.utils.result.Result;
-import fun.johntaylor.kunkka.utils.session.SessionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -40,6 +40,9 @@ public class TodoController {
 	@Autowired
 	private TodoGroupMapper todoGroupMapper;
 
+	@Autowired
+	private Session session;
+
 	/**
 	 * 添加任务，没有任务组，自动创建任务组
 	 * @param request
@@ -55,7 +58,7 @@ public class TodoController {
 					if (v.getTodoList().size() == 0) {
 						return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "必须指定一个或多个任务").toString();
 					}
-					User user = SessionUtil.getUser(request);
+					User user = session.getUser(request);
 					// 初始化TodoList
 					List<Todo> todoList = v.getTodoList();
 					TodoGroup todoGroup = new TodoGroup();
@@ -88,7 +91,7 @@ public class TodoController {
 			@RequestParam(value = "count", defaultValue = "10") Integer count,
 			@RequestParam(value = "timeMillis", defaultValue = "0") Long timeMillis,
 			@RequestParam(value = "sort", defaultValue = "desc") String sort) {
-		return Mono.just(SessionUtil.getUser(request))
+		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> todoService.searchTodoGroupList(v.getId(), offset, count, timeMillis, sort).toString());
 	}
@@ -102,7 +105,7 @@ public class TodoController {
 	@GetMapping(value = "/api/todo/list")
 	public Mono<String> todoList(ServerHttpRequest request,
 			@RequestParam(value = "groupId") Long groupId) {
-		return Mono.just(SessionUtil.getUser(request))
+		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> todoService.searchTodoListByUidGroupId(v.getId(), groupId).toString());
 	}
@@ -152,7 +155,7 @@ public class TodoController {
 	 */
 	@GetMapping(value = "/api/todo/group/total")
 	public Mono<String> countTodoGroup(ServerHttpRequest request) {
-		return Mono.just(SessionUtil.getUser(request))
+		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> Result.success(todoGroupMapper.selectCountByUid(v.getId())).toString());
 	}

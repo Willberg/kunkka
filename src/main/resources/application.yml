@@ -45,3 +45,8 @@ csrf.whitelist.urls: '^http://localhost.*$|^https://localhost.*$'
 
 authentication.whitelist.urls: '^.*/api/user/login.*$|^.*/api/public/.*$|^.*/api/user/register.*$|^.*/api/open.*$'
 
+redis:
+  host: localhost
+  port: 6379
+  password: test123
+

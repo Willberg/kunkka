@@ -13,21 +13,21 @@ public interface UserService {
 	/**
 	 * 注册
 	 * @param user
-	 * @return
+	 * @return Result<EncryptUser>
 	 */
 	Result<EncryptUser> register(User user);
 
 	/**
 	 * 登录
 	 * @param user
-	 * @return
+	 * @return Result<EncryptUser>
 	 */
 	Result<EncryptUser> login(User user);
 
 	/**
-	 * 退出
+	 * 获取用户身份
 	 * @param user
-	 * @return
+	 * @return Result<EncryptUser>
 	 */
-	Result logout(User user);
+	Result<EncryptUser> getProfile(User user);
 }

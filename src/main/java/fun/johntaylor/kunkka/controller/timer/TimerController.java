@@ -1,5 +1,6 @@
 package fun.johntaylor.kunkka.controller.timer;
 
+import fun.johntaylor.kunkka.component.redis.session.Session;
 import fun.johntaylor.kunkka.component.thread.pool.DbThreadPool;
 import fun.johntaylor.kunkka.entity.timer.Timer;
 import fun.johntaylor.kunkka.entity.validation.Insert;
@@ -7,7 +8,6 @@ import fun.johntaylor.kunkka.entity.validation.Update;
 import fun.johntaylor.kunkka.service.timer.TimerService;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
 import fun.johntaylor.kunkka.utils.result.Result;
-import fun.johntaylor.kunkka.utils.session.SessionUtil;
 import fun.johntaylor.kunkka.utils.time.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +34,9 @@ public class TimerController {
 	@Autowired
 	private TimerService timerService;
 
+	@Autowired
+	private Session session;
+
 	/**
 	 * 添加计时
 	 * @param request
@@ -42,7 +45,7 @@ public class TimerController {
 	@PostMapping(value = "/api/timer/add")
 	public Mono<String> add(ServerHttpRequest request,
 			@Validated(value = {Insert.class}) @RequestBody Timer reqTimer) {
-		return Mono.just(SessionUtil.getUser(request))
+		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					Timer t = new Timer();
@@ -63,7 +66,7 @@ public class TimerController {
 	@PostMapping(value = "/api/timer/update")
 	public Mono<String> update(ServerHttpRequest request,
 			@Validated(value = {Update.class}) @RequestBody Timer reqTimer) {
-		return Mono.just(SessionUtil.getUser(request))
+		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					Timer t = new Timer();
@@ -85,7 +88,7 @@ public class TimerController {
 	@GetMapping(value = "/api/timer/list")
 	public Mono<String> select(ServerHttpRequest request,
 			@RequestParam(value = "selectedMonth") String selectedMonth) {
-		return Mono.just(SessionUtil.getUser(request))
+		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					LocalDate startLocalDate = TimeUtil.getLocalDate(selectedMonth, "yyyy-MM");
@@ -277,7 +280,7 @@ public class TimerController {
 	 */
 	@GetMapping(value = "/api/timer/last/one")
 	public Mono<String> selectLastOne(ServerHttpRequest request) {
-		return Mono.just(SessionUtil.getUser(request))
+		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> timerService.searchLastOne(v.getId()).toString());
 	}
@@ -290,7 +293,7 @@ public class TimerController {
 	@GetMapping(value = "/api/timer/select")
 	public Mono<String> select(ServerHttpRequest request,
 			@RequestParam(value = "id") Long id) {
-		return Mono.just(SessionUtil.getUser(request))
+		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
 				.map(v -> {
 					Timer t = timerService.selectById(id);
