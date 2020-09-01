@@ -18,13 +18,13 @@ import java.time.Duration;
  **/
 @Configuration
 public class RedisConnectionConfig {
-	@Value("redis.host")
+	@Value("${redis.host}")
 	private String redisHost;
 
-	@Value("redis.port")
+	@Value("${redis.port}")
 	private Integer redisPort;
 
-	@Value("redis.password")
+	@Value("${redis.password}")
 	private String redisPassword;
 
 	@Bean(name = "redisConnectionFactory")
