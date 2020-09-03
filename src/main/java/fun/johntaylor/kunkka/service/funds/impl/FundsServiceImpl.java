@@ -3,6 +3,7 @@ package fun.johntaylor.kunkka.service.funds.impl;
 import fun.johntaylor.kunkka.entity.funds.Funds;
 import fun.johntaylor.kunkka.repository.mybatis.funds.FundsMapper;
 import fun.johntaylor.kunkka.service.funds.FundsService;
+import fun.johntaylor.kunkka.utils.general.CopyUtil;
 import fun.johntaylor.kunkka.utils.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,8 @@ public class FundsServiceImpl implements FundsService {
 			return Result.failWithCustomMessage("无权操作");
 		}
 		fundsMapper.update(funds);
-		return Result.success(funds);
+		Funds retFund = CopyUtil.copyWithSet(funds, old);
+		return Result.success(retFund);
 	}
 
 	@Override

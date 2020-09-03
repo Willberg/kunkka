@@ -165,7 +165,6 @@ public class FundsController {
 				});
 	}
 
-
 	/**
 	 * 查询资金记录
 	 * @param request
