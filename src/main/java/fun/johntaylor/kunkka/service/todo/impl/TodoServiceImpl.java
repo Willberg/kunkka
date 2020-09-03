@@ -290,7 +290,8 @@ public class TodoServiceImpl implements TodoService {
 			int oldFinishedValue = Optional.ofNullable(oldTodoGroup.getFinishValue()).orElse(0);
 			oldTodoGroup.setFinishValue(oldFinishedValue + finishedValue);
 			int totalTime = Todo.S_FINISHED.equals(todo.getStatus()) ? todo.getRealityTime() : 0;
-			oldTodoGroup.setTotalTime(oldTodoGroup.getTotalTime() + totalTime - oldTodo.getEstimateTime());
+			int esTime = Optional.ofNullable(oldTodo.getEstimateTime()).orElse(0);
+			oldTodoGroup.setTotalTime(oldTodoGroup.getTotalTime() + totalTime - esTime);
 			todoGroupMapper.update(oldTodoGroup);
 		}
 
