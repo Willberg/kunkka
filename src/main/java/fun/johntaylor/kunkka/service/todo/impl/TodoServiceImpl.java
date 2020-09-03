@@ -263,14 +263,12 @@ public class TodoServiceImpl implements TodoService {
 		if (Todo.S_FINISHED.equals(todo.getStatus()) || Todo.S_DEL.equals(todo.getStatus())) {
 			boolean isChangeStatus = true;
 			boolean isFinished = false;
-			int finishedValue = 0;
 			List<Todo> todoList = todoMapper.selectTodoList(oldTodoGroup.getId());
 			for (Todo t : todoList) {
 				if (!Todo.S_DEL.equals(t.getStatus()) && !Todo.S_FINISHED.equals(t.getStatus())) {
 					isChangeStatus = false;
 				} else {
 					if (Todo.S_FINISHED.equals(t.getStatus())) {
-						finishedValue += t.getValue();
 						isFinished = true;
 					}
 				}
@@ -288,7 +286,10 @@ public class TodoServiceImpl implements TodoService {
 				oldTodoGroup.setValue(oldTodoGroup.getValue() - oldTodo.getValue());
 			}
 			oldTodoGroup.setUpdateTime(System.currentTimeMillis());
-			oldTodoGroup.setFinishValue(finishedValue);
+			int finishedValue = Todo.S_FINISHED.equals(todo.getStatus()) ? todo.getValue() : 0;
+			oldTodoGroup.setFinishValue(oldTodoGroup.getFinishValue() + finishedValue);
+			int totalTime = Todo.S_FINISHED.equals(todo.getStatus()) ? todo.getRealityTime() : 0;
+			oldTodoGroup.setTotalTime(oldTodoGroup.getTotalTime() + totalTime);
 			todoGroupMapper.update(oldTodoGroup);
 		}
 
