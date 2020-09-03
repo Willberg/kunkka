@@ -81,6 +81,7 @@ public class FundsController {
 					funds.setId(reqFunds.getId());
 					funds.setUid(v.getId());
 					funds.setAmount(reqFunds.getAmount());
+					funds.setCreateTime(reqFunds.getCreateTime());
 					funds.setUpdateTime(System.currentTimeMillis());
 					funds.setCategory(reqFunds.getCategory());
 					funds.setType(reqFunds.getType());
@@ -181,6 +182,18 @@ public class FundsController {
 						return Result.failWithCustomMessage("无权操作").toString();
 					}
 					return Result.success(funds).toString();
+				});
+	}
+
+	@GetMapping(value = "/api/funds/search")
+	public Mono<String> listFunds(ServerHttpRequest request,
+			@RequestParam(value = "startTime") Long startTime,
+			@RequestParam(value = "endTime") Long endTime) {
+		return Mono.just(session.getUser(request))
+				.publishOn(dbThreadPool.daoInstance())
+				.map(v -> {
+					List<Funds> fundsList = fundsService.list(v.getId(), startTime, endTime);
+					return Result.success(fundsList).toString();
 				});
 	}
 }
