@@ -54,7 +54,8 @@ public class FundsController {
 					Funds funds = new Funds();
 					funds.setUid(v.getId());
 					funds.setAmount(reqFunds.getAmount());
-					funds.setCreateTime(System.currentTimeMillis());
+					Long createTime = Optional.ofNullable(reqFunds.getCreateTime()).orElse(System.currentTimeMillis());
+					funds.setCreateTime(createTime);
 					funds.setUpdateTime(System.currentTimeMillis());
 					funds.setCategory(reqFunds.getCategory());
 					funds.setType(reqFunds.getType());
