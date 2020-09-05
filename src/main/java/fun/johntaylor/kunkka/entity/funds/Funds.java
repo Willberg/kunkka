@@ -4,6 +4,7 @@ import fun.johntaylor.kunkka.entity.validation.Insert;
 import fun.johntaylor.kunkka.entity.validation.Update;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -29,6 +30,12 @@ public class Funds {
 	 */
 	@NotNull(message = "请设置金额", groups = {Insert.class})
 	private Double amount;
+
+	/**
+	 * 备注
+	 */
+	@NotEmpty(message = "请设置备注", groups = {Insert.class})
+	private String memo;
 
 	/**
 	 * 创建时间

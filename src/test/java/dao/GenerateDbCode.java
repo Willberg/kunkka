@@ -1,7 +1,6 @@
 package dao;
 
-import fun.johntaylor.kunkka.entity.cipher.Cipher;
-import fun.johntaylor.kunkka.entity.timer.Timer;
+import fun.johntaylor.kunkka.entity.funds.Funds;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -77,9 +76,9 @@ public class GenerateDbCode {
 				keyMap.put(field.getName(), camelNameToUnderString(field.getName()));
 				typeMap.put(field.getName(), field.getType().getSimpleName());
 			} else {
-				update.append(String.format("\t\t<if test=\"%s!=null\">%s = #{%s},</if>\n", field.getName(), camelNameToUnderString(field.getName()), field.getName()));
-				updateIdempotentKey.append(String.format("\t\t<if test=\"new.%s!=null\">%s = #{new.%s},</if>\n", field.getName(), camelNameToUnderString(field.getName()), field.getName()));
-				updateIdempotentWhere.append(String.format("\t\t<if test=\"new.%s!=null and old.%s!=null\">and %s = #{old.%s}</if>\n", field.getName(), field.getName(), camelNameToUnderString(field.getName()), field.getName()));
+				update.append(String.format("\t\t\t<if test=\"%s!=null\">%s = #{%s},</if>\n", field.getName(), camelNameToUnderString(field.getName()), field.getName()));
+				updateIdempotentKey.append(String.format("\t\t\t<if test=\"new.%s!=null\">%s = #{new.%s},</if>\n", field.getName(), camelNameToUnderString(field.getName()), field.getName()));
+				updateIdempotentWhere.append(String.format("\t\t\t<if test=\"new.%s!=null and old.%s!=null\">and %s = #{old.%s}</if>\n", field.getName(), field.getName(), camelNameToUnderString(field.getName()), field.getName()));
 			}
 
 			i++;
@@ -153,33 +152,37 @@ public class GenerateDbCode {
 		sql.delete(0, sql.length());
 		System.out.println();
 
-		sql.append(String.format("<update id=\"update\" parameterType=\"%s\">\n", clz.getName()));
-		sql.append(String.format("\tupdate %s\n", tableName));
+		sql.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
+		sql.append("<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\" >\n");
+		sql.append(String.format("<mapper namespace=\"fun.johntaylor.kunkka.repository.mybatis.%s.%sMapper\">\n", clz.getSimpleName().toLowerCase(), clz.getSimpleName()));
+		sql.append(String.format("\t<update id=\"update\" parameterType=\"%s\">\n", clz.getName()));
+		sql.append(String.format("\t\tupdate %s\n", tableName));
 		if (update.length() > 0) {
-			sql.append("\t<set>\n");
+			sql.append("\t\t<set>\n");
 			sql.append(update);
-			sql.append("\t</set>\n");
+			sql.append("\t\t</set>\n");
 		}
-		sql.append(String.format("\twhere %s\n", selectWhere));
-		sql.append("</update>");
+		sql.append(String.format("\t\twhere %s\n", selectWhere));
+		sql.append("\t</update>");
 		System.out.println(sql.toString());
 		sql.delete(0, sql.length());
 		System.out.println();
 
-		sql.append("<update id=\"updateIdempotent\" parameterType=\"Map\">\n");
-		sql.append(String.format("\tupdate %s\n", tableName));
+		sql.append("\t<update id=\"updateIdempotent\" parameterType=\"Map\">\n");
+		sql.append(String.format("\t\tupdate %s\n", tableName));
 		if (updateIdempotentKey.length() > 0) {
-			sql.append("\t<set>\n");
+			sql.append("\t\t<set>\n");
 			sql.append(updateIdempotentKey);
-			sql.append("\t</set>\n");
+			sql.append("\t\t</set>\n");
 		}
 		if (updateIdempotentWhere.length() > 0) {
-			sql.append("\t<where>\n");
-			sql.append(String.format("\t\twhere %s\n", keyPairsNew.toString()));
+			sql.append("\t\t<where>\n");
+			sql.append(String.format("\t\t\t%s\n", keyPairsNew.toString()));
 			sql.append(updateIdempotentWhere);
-			sql.append("\t</where>\n");
+			sql.append("\t\t</where>\n");
 		}
-		sql.append("</update>");
+		sql.append("\t</update>\n");
+		sql.append("</mapper>");
 		System.out.println(sql.toString());
 		sql.delete(0, sql.length());
 		System.out.println();
@@ -209,6 +212,6 @@ public class GenerateDbCode {
 	}
 
 	public static void main(String[] args) {
-		printSql(Cipher.class, "id");
+		printSql(Funds.class, "id");
 	}
 }

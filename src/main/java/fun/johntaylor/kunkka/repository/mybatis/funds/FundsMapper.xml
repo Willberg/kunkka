@@ -6,6 +6,7 @@
 		<set>
 			<if test="uid!=null">uid = #{uid},</if>
 			<if test="amount!=null">amount = #{amount},</if>
+			<if test="memo!=null">memo = #{memo},</if>
 			<if test="createTime!=null">create_time = #{createTime},</if>
 			<if test="updateTime!=null">update_time = #{updateTime},</if>
 			<if test="category!=null">category = #{category},</if>
@@ -20,6 +21,7 @@
 		<set>
 			<if test="new.uid!=null">uid = #{new.uid},</if>
 			<if test="new.amount!=null">amount = #{new.amount},</if>
+			<if test="new.memo!=null">memo = #{new.memo},</if>
 			<if test="new.createTime!=null">create_time = #{new.createTime},</if>
 			<if test="new.updateTime!=null">update_time = #{new.updateTime},</if>
 			<if test="new.category!=null">category = #{new.category},</if>
@@ -27,9 +29,10 @@
 			<if test="new.status!=null">status = #{new.status},</if>
 		</set>
 		<where>
-			where id=#{old.id}
+			id=#{old.id}
 			<if test="new.uid!=null and old.uid!=null">and uid = #{old.uid}</if>
 			<if test="new.amount!=null and old.amount!=null">and amount = #{old.amount}</if>
+			<if test="new.memo!=null and old.memo!=null">and memo = #{old.memo}</if>
 			<if test="new.createTime!=null and old.createTime!=null">and create_time = #{old.createTime}</if>
 			<if test="new.updateTime!=null and old.updateTime!=null">and update_time = #{old.updateTime}</if>
 			<if test="new.category!=null and old.category!=null">and category = #{old.category}</if>
