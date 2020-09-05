@@ -35,7 +35,7 @@
 			<if test="new.status!=null">status = #{new.status},</if>
 		</set>
 		<where>
-			where id=#{old.id}
+			id=#{old.id}
 			<if test="new.uid!=null and old.uid!=null">and uid = #{old.uid}</if>
 			<if test="new.name!=null and old.name!=null">and name = #{old.name}</if>
 			<if test="new.userName!=null and old.userName!=null">and user_name = #{old.userName}</if>

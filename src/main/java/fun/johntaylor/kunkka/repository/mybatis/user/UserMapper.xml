@@ -29,7 +29,7 @@
 			<if test="new.status!=null">status = #{new.status},</if>
 		</set>
 		<where>
-			where id=#{old.id}
+			id=#{old.id}
 			<if test="new.userName!=null and old.userName!=null">and user_name = #{old.userName}</if>
 			<if test="new.password!=null and old.password!=null">and password = #{old.password}</if>
 			<if test="new.phoneNumber!=null and old.phoneNumber!=null">and phone_number = #{old.phoneNumber}</if>

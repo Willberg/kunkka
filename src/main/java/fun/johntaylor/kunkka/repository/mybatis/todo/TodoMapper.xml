@@ -31,7 +31,7 @@
             <if test="new.status!=null">status = #{new.status},</if>
         </set>
         <where>
-            where id=#{old.id}
+            id=#{old.id}
             <if test="new.task!=null and old.task!=null">and task = #{old.task}</if>
             <if test="new.value!=null and old.value!=null">and value = #{old.value}</if>
             <if test="new.estimateTime!=null and old.estimateTime!=null">and estimate_time = #{old.estimateTime}</if>
