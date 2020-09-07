@@ -162,10 +162,14 @@ public class TodoController {
 	@GetMapping(value = "/api/todo/group/total")
 	public Mono<String> countTodoGroup(ServerHttpRequest request,
 			@RequestParam(value = "startTime", defaultValue = "0") Long startTime,
-			@RequestParam(value = "endTime") Long endTime,
-			@RequestParam(value = "status") Integer status) {
+			@RequestParam(value = "endTime", defaultValue = "0") Long endTime,
+			@RequestParam(value = "status", defaultValue = "0") Integer status) {
 		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
-				.map(v -> Result.success(todoGroupMapper.selectCountByUid(v.getId(), status, startTime, endTime)).toString());
+				.map(v -> {
+					Long endTimeVal = endTime == 0 ? System.currentTimeMillis() + 24 * 3600 : endTime;
+					Integer statusVal = status == 0 ? null : status;
+					return Result.success(todoGroupMapper.selectCountByUid(v.getId(), status, startTime, endTime)).toString();
+				});
 	}
 }
