@@ -169,7 +169,7 @@ public class TodoController {
 				.map(v -> {
 					Long endTimeVal = endTime == 0 ? System.currentTimeMillis() + 24 * 3600 : endTime;
 					Integer statusVal = status == 0 ? null : status;
-					return Result.success(todoGroupMapper.selectCountByUid(v.getId(), status, startTime, endTime)).toString();
+					return Result.success(todoGroupMapper.selectCountByUid(v.getId(), statusVal, startTime, endTimeVal)).toString();
 				});
 	}
 }
