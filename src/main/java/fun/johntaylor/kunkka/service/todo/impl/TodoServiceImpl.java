@@ -356,8 +356,8 @@ public class TodoServiceImpl implements TodoService {
 
 
 	@Override
-	public Result<List<TodoGroup>> searchTodoGroupList(Long uid, Integer offset, Integer count, Long timeMillis, String sort) {
-		List<TodoGroup> todoGroupList = todoGroupMapper.selectList(uid, offset, count, timeMillis, sort);
+	public Result<List<TodoGroup>> searchTodoGroupList(Long uid, Integer offset, Integer count, Integer status, Long startTime, Long endTime, String sort) {
+		List<TodoGroup> todoGroupList = todoGroupMapper.selectList(uid, offset, count, status, startTime, endTime, sort);
 		return Result.success(todoGroupList);
 	}
 

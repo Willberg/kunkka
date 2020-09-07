@@ -33,9 +33,7 @@ public interface TodoGroupMapper {
 	@Delete("delete from TodoGroup where id=#{id}")
 	int delete(Long id);
 
-	@Select("select " + COLUMNS + " from t_todo_group where uid=#{uid} and create_time>#{timeMillis} order by create_time ${sort} limit #{offset}, #{count}")
-	List<TodoGroup> selectList(Long uid, Integer offset, Integer count, Long timeMillis, String sort);
+	List<TodoGroup> selectList(Long uid, Integer offset, Integer count, Integer status, Long startTime, Long endTime, String sort);
 
-	@Select("select count(1) from t_todo_group where uid=#{uid}")
-	int selectCountByUid(Long uid);
+	int selectCountByUid(Long uid, Integer status, Long startTime, Long endTime);
 }

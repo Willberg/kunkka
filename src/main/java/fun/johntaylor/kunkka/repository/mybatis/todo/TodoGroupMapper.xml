@@ -1,49 +1,72 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="fun.johntaylor.kunkka.repository.mybatis.todo.TodoGroupMapper">
-    <update id="update" parameterType="fun.johntaylor.kunkka.entity.todo.TodoGroup">
-        update t_todo_group
-        <set>
-            <if test="uid!=null">uid = #{uid},</if>
-            <if test="value!=null">value = #{value},</if>
-            <if test="finishValue!=null">finish_value = #{finishValue},</if>
-            <if test="totalTime!=null">total_time = #{totalTime},</if>
-            <if test="maxTime!=null">max_time = #{maxTime},</if>
-            <if test="minPriority!=null">min_priority = #{minPriority},</if>
-            <if test="createTime!=null">create_time = #{createTime},</if>
-            <if test="updateTime!=null">update_time = #{updateTime},</if>
-            <if test="isPrivate!=null">is_private = #{isPrivate},</if>
-            <if test="status!=null">status = #{status},</if>
-        </set>
-        where id=#{id}
-    </update>
+	<update id="update" parameterType="fun.johntaylor.kunkka.entity.todo.TodoGroup">
+		update t_todo_group
+		<set>
+			<if test="uid!=null">uid = #{uid},</if>
+			<if test="value!=null">value = #{value},</if>
+			<if test="finishValue!=null">finish_value = #{finishValue},</if>
+			<if test="totalTime!=null">total_time = #{totalTime},</if>
+			<if test="maxTime!=null">max_time = #{maxTime},</if>
+			<if test="minPriority!=null">min_priority = #{minPriority},</if>
+			<if test="createTime!=null">create_time = #{createTime},</if>
+			<if test="updateTime!=null">update_time = #{updateTime},</if>
+			<if test="isPrivate!=null">is_private = #{isPrivate},</if>
+			<if test="status!=null">status = #{status},</if>
+		</set>
+		where id=#{id}
+	</update>
 
-    <update id="updateIdempotent" parameterType="Map">
-        update t_todo_group
-        <set>
-            <if test="new.uid!=null">uid = #{new.uid},</if>
-            <if test="new.value!=null">value = #{new.value},</if>
-            <if test="new.finishValue!=null">finish_value = #{new.finishValue},</if>
-            <if test="new.totalTime!=null">total_time = #{new.totalTime},</if>
-            <if test="new.maxTime!=null">max_time = #{new.maxTime},</if>
-            <if test="new.minPriority!=null">min_priority = #{new.minPriority},</if>
-            <if test="new.createTime!=null">create_time = #{new.createTime},</if>
-            <if test="new.updateTime!=null">update_time = #{new.updateTime},</if>
-            <if test="new.isPrivate!=null">is_private = #{new.isPrivate},</if>
-            <if test="new.status!=null">status = #{new.status},</if>
-        </set>
-        <where>
-            id=#{old.id}
-            <if test="new.uid!=null and old.uid!=null">and uid = #{old.uid}</if>
-            <if test="new.value!=null and old.value!=null">and value = #{old.value}</if>
-            <if test="new.finishValue!=null and old.finishValue!=null">and finish_value = #{old.finishValue}</if>
-            <if test="new.totalTime!=null and old.totalTime!=null">and total_time = #{old.totalTime}</if>
-            <if test="new.maxTime!=null and old.maxTime!=null">and max_time = #{old.maxTime}</if>
-            <if test="new.minPriority!=null and old.minPriority!=null">and min_priority = #{old.minPriority}</if>
-            <if test="new.createTime!=null and old.createTime!=null">and create_time = #{old.createTime}</if>
-            <if test="new.updateTime!=null and old.updateTime!=null">and update_time = #{old.updateTime}</if>
-            <if test="new.isPrivate!=null and old.isPrivate!=null">and is_private = #{old.isPrivate}</if>
-            <if test="new.status!=null and old.status!=null">and status = #{old.status}</if>
-        </where>
-    </update>
+	<update id="updateIdempotent" parameterType="Map">
+		update t_todo_group
+		<set>
+			<if test="new.uid!=null">uid = #{new.uid},</if>
+			<if test="new.value!=null">value = #{new.value},</if>
+			<if test="new.finishValue!=null">finish_value = #{new.finishValue},</if>
+			<if test="new.totalTime!=null">total_time = #{new.totalTime},</if>
+			<if test="new.maxTime!=null">max_time = #{new.maxTime},</if>
+			<if test="new.minPriority!=null">min_priority = #{new.minPriority},</if>
+			<if test="new.createTime!=null">create_time = #{new.createTime},</if>
+			<if test="new.updateTime!=null">update_time = #{new.updateTime},</if>
+			<if test="new.isPrivate!=null">is_private = #{new.isPrivate},</if>
+			<if test="new.status!=null">status = #{new.status},</if>
+		</set>
+		<where>
+			id=#{old.id}
+			<if test="new.uid!=null and old.uid!=null">and uid = #{old.uid}</if>
+			<if test="new.value!=null and old.value!=null">and value = #{old.value}</if>
+			<if test="new.finishValue!=null and old.finishValue!=null">and finish_value = #{old.finishValue}</if>
+			<if test="new.totalTime!=null and old.totalTime!=null">and total_time = #{old.totalTime}</if>
+			<if test="new.maxTime!=null and old.maxTime!=null">and max_time = #{old.maxTime}</if>
+			<if test="new.minPriority!=null and old.minPriority!=null">and min_priority = #{old.minPriority}</if>
+			<if test="new.createTime!=null and old.createTime!=null">and create_time = #{old.createTime}</if>
+			<if test="new.updateTime!=null and old.updateTime!=null">and update_time = #{old.updateTime}</if>
+			<if test="new.isPrivate!=null and old.isPrivate!=null">and is_private = #{old.isPrivate}</if>
+			<if test="new.status!=null and old.status!=null">and status = #{old.status}</if>
+		</where>
+	</update>
+
+	<select id="selectList" resultType="fun.johntaylor.kunkka.entity.todo.TodoGroup">
+		select id, uid, value, finish_value as finishValue, total_time as totalTime, max_time as maxTime, min_priority
+		as minPriority, create_time as createTime, update_time as updateTime, is_private as isPrivate, status
+		from t_todo_group
+		<where>
+			uid=#{uid} and create_time>=#{startTime}
+			<if test="endTime!=null">create_time <![CDATA[ <= ]]> #{endTime},</if>
+			<if test="status!=null">status = #{status}</if>
+		</where>
+		order by create_time ${sort}
+		limit #{offset}, #{count}
+	</select>
+
+	<select id="selectCountByUid" resultType="Integer">
+		select count(1)
+		from t_todo_group
+		<where>
+			uid=#{uid} and create_time>=#{startTime}
+			<if test="endTime!=null">create_time <![CDATA[ <= ]]> #{endTime},</if>
+			<if test="status!=null">status = #{status}</if>
+		</where>
+	</select>
 </mapper>

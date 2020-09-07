@@ -81,7 +81,7 @@ public class TodoController {
 	 * @param request
 	 * @param offset
 	 * @param count
-	 * @param timeMillis
+	 * @param startTime
 	 * @param sort
 	 * @return 任务组列表
 	 */
@@ -89,11 +89,13 @@ public class TodoController {
 	public Mono<String> search(ServerHttpRequest request,
 			@RequestParam(value = "offset", defaultValue = "0") Integer offset,
 			@RequestParam(value = "count", defaultValue = "10") Integer count,
-			@RequestParam(value = "timeMillis", defaultValue = "0") Long timeMillis,
-			@RequestParam(value = "sort", defaultValue = "desc") String sort) {
+			@RequestParam(value = "startTime", defaultValue = "0") Long startTime,
+			@RequestParam(value = "endTime") Long endTime,
+			@RequestParam(value = "sort", defaultValue = "desc") String sort,
+			@RequestParam(value = "status") Integer status) {
 		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
-				.map(v -> todoService.searchTodoGroupList(v.getId(), offset, count, timeMillis, sort).toString());
+				.map(v -> todoService.searchTodoGroupList(v.getId(), offset, count, status, startTime, endTime, sort).toString());
 	}
 
 	/**
@@ -154,9 +156,12 @@ public class TodoController {
 	 * @return 任务组数量
 	 */
 	@GetMapping(value = "/api/todo/group/total")
-	public Mono<String> countTodoGroup(ServerHttpRequest request) {
+	public Mono<String> countTodoGroup(ServerHttpRequest request,
+			@RequestParam(value = "startTime", defaultValue = "0") Long startTime,
+			@RequestParam(value = "endTime") Long endTime,
+			@RequestParam(value = "status") Integer status) {
 		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
-				.map(v -> Result.success(todoGroupMapper.selectCountByUid(v.getId())).toString());
+				.map(v -> Result.success(todoGroupMapper.selectCountByUid(v.getId(), status, startTime, endTime)).toString());
 	}
 }

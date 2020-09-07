@@ -33,13 +33,17 @@ public interface TodoService {
 
 
 	/**
-	 * @Author John
-	 * @Description 查询timeMillis以来的todoGroup
-	 * @Date 2020/7/7 8:41 PM
-	 * @Param
-	 * @return
-	 **/
-	Result<List<TodoGroup>> searchTodoGroupList(Long uid, Integer offset, Integer count, Long timeMillis, String sort);
+	 * 查询timeMillis以来的todoGroup
+	 * @param uid
+	 * @param offset
+	 * @param count
+	 * @param status
+	 * @param startTime
+	 * @param endTime
+	 * @param sort
+	 * @return Result
+	 */
+	Result<List<TodoGroup>> searchTodoGroupList(Long uid, Integer offset, Integer count, Integer status, Long startTime, Long endTime, String sort);
 
 	/**
 	 * @Author John
