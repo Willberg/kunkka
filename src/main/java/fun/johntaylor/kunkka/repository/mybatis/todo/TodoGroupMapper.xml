@@ -53,8 +53,8 @@
 		from t_todo_group
 		<where>
 			uid=#{uid} and create_time>=#{startTime}
-			<if test="endTime!=null">create_time <![CDATA[ <= ]]> #{endTime},</if>
-			<if test="status!=null">status = #{status}</if>
+			<if test="endTime!=null">and create_time <![CDATA[ <= ]]> #{endTime}</if>
+			<if test="status!=null">and status = #{status}</if>
 		</where>
 		order by create_time ${sort}
 		limit #{offset}, #{count}
@@ -65,8 +65,8 @@
 		from t_todo_group
 		<where>
 			uid=#{uid} and create_time>=#{startTime}
-			<if test="endTime!=null">create_time <![CDATA[ <= ]]> #{endTime},</if>
-			<if test="status!=null">status = #{status}</if>
+			<if test="endTime!=null">and create_time <![CDATA[ <= ]]> #{endTime}</if>
+			<if test="status!=null">and status = #{status}</if>
 		</where>
 	</select>
 </mapper>

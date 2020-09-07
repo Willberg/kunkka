@@ -90,12 +90,16 @@ public class TodoController {
 			@RequestParam(value = "offset", defaultValue = "0") Integer offset,
 			@RequestParam(value = "count", defaultValue = "10") Integer count,
 			@RequestParam(value = "startTime", defaultValue = "0") Long startTime,
-			@RequestParam(value = "endTime") Long endTime,
+			@RequestParam(value = "endTime", defaultValue = "0") Long endTime,
 			@RequestParam(value = "sort", defaultValue = "desc") String sort,
-			@RequestParam(value = "status") Integer status) {
+			@RequestParam(value = "status", defaultValue = "0") Integer status) {
 		return Mono.just(session.getUser(request))
 				.publishOn(dbThreadPool.daoInstance())
-				.map(v -> todoService.searchTodoGroupList(v.getId(), offset, count, status, startTime, endTime, sort).toString());
+				.map(v -> {
+					Long endTimeVal = endTime == 0 ? System.currentTimeMillis() + 24 * 3600 : endTime;
+					Integer statusVal = status == 0 ? null : status;
+					return todoService.searchTodoGroupList(v.getId(), offset, count, statusVal, startTime, endTimeVal, sort).toString();
+				});
 	}
 
 	/**
