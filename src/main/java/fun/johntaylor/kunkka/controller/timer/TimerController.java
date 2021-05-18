@@ -262,7 +262,11 @@ public class TimerController {
 				useTime += dv;
 			}
 
+			log.info("date:" + k);
+			log.info("useTime:" + useTime);
+			log.info("TOTAL_TIME:" + TOTAL_TIME);
 			long restTime = TOTAL_TIME - useTime;
+			log.info("restTime:" + restTime);
 			detail.put(Timer.T_UNKNOWN, restTime);
 		});
 	}
