@@ -7,7 +7,6 @@ import fun.johntaylor.kunkka.entity.validation.Insert;
 import fun.johntaylor.kunkka.entity.validation.Update;
 import fun.johntaylor.kunkka.service.timer.TimerService;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
-import fun.johntaylor.kunkka.utils.json.JsonUtil;
 import fun.johntaylor.kunkka.utils.result.Result;
 import fun.johntaylor.kunkka.utils.time.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -191,7 +190,6 @@ public class TimerController {
 						}
 						retMap.put(dateStr, detail);
 					}
-					log.info("result:" + JsonUtil.toJson(retMap));
 					return Result.success(retMap).toString();
 				});
 	}
@@ -260,15 +258,13 @@ public class TimerController {
 			Map<Integer, Long> detail = map.get(k);
 
 			long useTime = 0;
+			// 将未知时间归零
+			detail.put(Timer.T_UNKNOWN, 0L);
 			for (Long dv : detail.values()) {
 				useTime += dv;
 			}
 
-			log.info("date:" + k);
-			log.info("useTime:" + useTime);
-			log.info("TOTAL_TIME:" + TOTAL_TIME);
 			long restTime = TOTAL_TIME - useTime;
-			log.info("restTime:" + restTime);
 			detail.put(Timer.T_UNKNOWN, restTime);
 		});
 	}
