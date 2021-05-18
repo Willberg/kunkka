@@ -7,6 +7,7 @@ import fun.johntaylor.kunkka.entity.validation.Insert;
 import fun.johntaylor.kunkka.entity.validation.Update;
 import fun.johntaylor.kunkka.service.timer.TimerService;
 import fun.johntaylor.kunkka.utils.error.ErrorCode;
+import fun.johntaylor.kunkka.utils.json.JsonUtil;
 import fun.johntaylor.kunkka.utils.result.Result;
 import fun.johntaylor.kunkka.utils.time.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -190,6 +191,7 @@ public class TimerController {
 						}
 						retMap.put(dateStr, detail);
 					}
+					log.info("result:" + JsonUtil.toJson(retMap));
 					return Result.success(retMap).toString();
 				});
 	}
