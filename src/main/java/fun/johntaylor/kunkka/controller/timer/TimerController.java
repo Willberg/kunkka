@@ -28,6 +28,11 @@ import java.util.*;
 @RestController
 @Slf4j
 public class TimerController {
+	/**
+	 * 每天总时长
+	 */
+	private static final long TOTAL_TIME = 24 * 60 * 60;
+
 	@Autowired
 	private DbThreadPool dbThreadPool;
 
@@ -173,10 +178,7 @@ public class TimerController {
 					}
 
 					// 将剩余时间进行分配
-					long total = 24 * 60 * 60;
-					long defaultSleepTime = 75 * 6 * 60;
-					long defaultEatTime = 25 * 6 * 60;
-					calMapRestTime(total, defaultSleepTime, defaultEatTime, map);
+					calMapRestTime(map);
 
 					// 构建返回值
 					Map<String, Map<Integer, Long>> retMap = new LinkedHashMap<>(days);
@@ -184,13 +186,7 @@ public class TimerController {
 						String dateStr = TimeUtil.getDateStrByLocalDate(startLocalDate.plusDays(day), "yyyy-MM-dd");
 						Map<Integer, Long> detail = map.get(dateStr);
 						if (Objects.isNull(detail)) {
-							detail = new HashMap<>(6);
-							detail.put(Timer.T_WORK, 0L);
-							detail.put(Timer.T_EAT, defaultEatTime);
-							detail.put(Timer.T_ENTERTAINMENT, 0L);
-							detail.put(Timer.T_SLEEP, defaultSleepTime);
-							detail.put(Timer.T_STUDY, 0L);
-							detail.put(Timer.T_UNKNOWN, total - (defaultEatTime + defaultSleepTime));
+							detail = initDetailMap();
 						}
 						retMap.put(dateStr, detail);
 					}
@@ -254,6 +250,24 @@ public class TimerController {
 	}
 
 	/**
+	 * 将剩余时间进行分配
+	 * @param map
+	 */
+	private void calMapRestTime(Map<String, Map<Integer, Long>> map) {
+		map.keySet().forEach(k -> {
+			Map<Integer, Long> detail = map.get(k);
+
+			long useTime = 0;
+			for (Long dv : detail.values()) {
+				useTime += dv;
+			}
+
+			long restTime = TOTAL_TIME - useTime;
+			detail.put(Timer.T_UNKNOWN, restTime);
+		});
+	}
+
+	/**
 	 * 初始化detailMap
 	 * @param dateStr
 	 * @param map
@@ -262,14 +276,27 @@ public class TimerController {
 	private Map<Integer, Long> initDetailMap(String dateStr, Map<String, Map<Integer, Long>> map) {
 		Map<Integer, Long> detail = map.get(dateStr);
 		if (Objects.isNull(detail)) {
-			detail = new HashMap<>(6);
-			detail.put(Timer.T_WORK, 0L);
-			detail.put(Timer.T_EAT, 0L);
-			detail.put(Timer.T_ENTERTAINMENT, 0L);
-			detail.put(Timer.T_SLEEP, 0L);
-			detail.put(Timer.T_STUDY, 0L);
+			detail = initDetailMap();
 			map.put(dateStr, detail);
 		}
+		return detail;
+	}
+
+	/**
+	 * 初始化detailMap
+	 * @return detailMap
+	 */
+	private Map<Integer, Long> initDetailMap() {
+		Map<Integer, Long> detail = new HashMap<>(9);
+		detail.put(Timer.T_WORK, 0L);
+		detail.put(Timer.T_EAT, 0L);
+		detail.put(Timer.T_ENTERTAINMENT, 0L);
+		detail.put(Timer.T_SLEEP, 0L);
+		detail.put(Timer.T_STUDY, 0L);
+		detail.put(Timer.T_READ, 0L);
+		detail.put(Timer.T_LEISURE, 0L);
+		detail.put(Timer.T_PROJECT, 0L);
+		detail.put(Timer.T_UNKNOWN, TOTAL_TIME);
 		return detail;
 	}
 

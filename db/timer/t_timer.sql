@@ -4,9 +4,9 @@ create table `t_timer` (
 	`uid` bigint(20) default null comment 'uid',
 	`create_time` bigint(20) default null comment '创建时间',
 	`update_time` bigint(20) default null comment '更新时间',
-	`type` bigint(20) default null comment '类别， 1-- 工作， 2--吃饭， 3--休闲娱乐， 4--睡觉, 5--学习, 6--未知',
+	`type` bigint(20) default null comment '类别， 1-- 工作， 2--吃饭， 3--休闲娱乐， 4--睡觉, 5--学习, 6--阅读, 7--休闲, 8--项目, 9999--未知',
 	`related_id` bigint(20) default null comment '关联ID',
-	`status` bigint(20) default null comment '状态， 1-- 开始， 2--结束',
+	`status` bigint(20) default null comment '状态, 1-- 开始, 2--结束',
 	primary key(`id`),
 	key(`uid`),
 	key(`related_id`)
