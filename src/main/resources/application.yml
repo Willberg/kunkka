@@ -11,11 +11,11 @@ spring:
     username: root
     password: 123456
     hikari:
-      minimum-idle: 5
+      minimum-idle: 10
       # 空闲连接存活最大时间，默认600000（10分钟）
       idle-timeout: 180000
       # 连接池最大连接数，默认是20
-      maximum-pool-size: 20
+      maximum-pool-size: 100
       # 此属性控制从池返回的连接的默认自动提交行为,默认值：true
       auto-commit: true
       # 连接池名称
@@ -37,7 +37,7 @@ jwt:
 salt:
   password: IDJIFJio329&*&*ejenfi323hdhhdh
 
-limit.max: 5
+limit.max: 1500
 
 csrf.whitelist.urls: '^http://localhost.*$|^https://localhost.*$'
 # 测试
