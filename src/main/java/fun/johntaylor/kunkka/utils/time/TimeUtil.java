@@ -22,6 +22,8 @@ import java.util.TimeZone;
  **/
 @Slf4j
 public final class TimeUtil {
+	public static int DECEMBER = 12;
+
 	private TimeUtil() {
 
 	}

@@ -130,7 +130,12 @@ public class TimerController {
 					// 统计各种计时器的时间
 					long start = 0;
 					String lastDateStr = "";
-					int days = startLocalDate.plus(1, ChronoUnit.MONTHS).getDayOfYear() - startLocalDate.getDayOfYear();
+					int days;
+					if (startLocalDate.getMonthValue() == TimeUtil.DECEMBER) {
+						days = 31;
+					} else {
+						days = startLocalDate.plus(1, ChronoUnit.MONTHS).getDayOfYear() - startLocalDate.getDayOfYear();
+					}
 					// 如果selectedMonth是当月，只需要计算到当前日即可
 					LocalDate now = LocalDate.now();
 					String nowYearMonth = TimeUtil.getDateStrByLocalDate(now, "yyyy-MM");
