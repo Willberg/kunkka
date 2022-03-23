@@ -35,7 +35,7 @@ public class Timer {
 	private Long updateTime;
 
 	/**
-	 * 类别， 1-- 工作， 2--吃饭， 3--休闲娱乐， 4--睡觉, 5--学习, 6--阅读, 7--休闲, 8--项目, 9999--未知
+	 * 类别， 1-- 工作， 2--吃饭， 3--休闲娱乐， 4--睡觉, 5--学习, 6--阅读, 7--例行事务, 8--项目, 9999--未知
 	 */
 	@NotNull(message = "请选择类别", groups = {Insert.class})
 	private Integer type;
@@ -56,7 +56,7 @@ public class Timer {
 	public static final Integer T_SLEEP = 4;
 	public static final Integer T_STUDY = 5;
 	public static final Integer T_READ = 6;
-	public static final Integer T_LEISURE = 7;
+	public static final Integer T_CHORE = 7;
 	public static final Integer T_PROJECT = 8;
 	public static final Integer T_UNKNOWN = 9999;
 

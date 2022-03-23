@@ -301,7 +301,7 @@ public class TimerController {
 		detail.put(Timer.T_SLEEP, 0L);
 		detail.put(Timer.T_STUDY, 0L);
 		detail.put(Timer.T_READ, 0L);
-		detail.put(Timer.T_LEISURE, 0L);
+		detail.put(Timer.T_CHORE, 0L);
 		detail.put(Timer.T_PROJECT, 0L);
 		detail.put(Timer.T_UNKNOWN, TOTAL_TIME);
 		return detail;
