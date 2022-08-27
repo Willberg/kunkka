@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="fun.johntaylor.kunkka.repository.mybatis.oj.OjMapper">
+    <update id="update" parameterType="fun.johntaylor.kunkka.entity.oj.Oj">
+        update t_oj
+        <set>
+            <if test="pid!=null">pid = #{pid},</if>
+            <if test="uid!=null">uid = #{uid},</if>
+            <if test="name!=null">name = #{name},</if>
+            <if test="difficulty!=null">difficulty = #{difficulty},</if>
+            <if test="ojType!=null">oj_type = #{ojType},</if>
+            <if test="type!=null">type = #{type},</if>
+            <if test="preTime!=null">pre_time = #{preTime},</if>
+            <if test="useTime!=null">use_time = #{useTime},</if>
+            <if test="standalone!=null">standalone = #{standalone},</if>
+            <if test="study!=null">study = #{study},</if>
+            <if test="link!=null">link = #{link},</if>
+            <if test="createTime!=null">create_time = #{createTime},</if>
+            <if test="updateTime!=null">update_time = #{updateTime},</if>
+            <if test="status!=null">status = #{status},</if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <update id="updateIdempotent" parameterType="Map">
+        update t_oj
+        <set>
+            <if test="new.pid!=null">pid = #{new.pid},</if>
+            <if test="new.uid!=null">uid = #{new.uid},</if>
+            <if test="new.name!=null">name = #{new.name},</if>
+            <if test="new.difficulty!=null">difficulty = #{new.difficulty},</if>
+            <if test="new.ojType!=null">oj_type = #{new.ojType},</if>
+            <if test="new.type!=null">type = #{new.type},</if>
+            <if test="new.preTime!=null">pre_time = #{new.preTime},</if>
+            <if test="new.useTime!=null">use_time = #{new.useTime},</if>
+            <if test="new.standalone!=null">standalone = #{new.standalone},</if>
+            <if test="new.study!=null">study = #{new.study},</if>
+            <if test="new.link!=null">link = #{new.link},</if>
+            <if test="new.createTime!=null">create_time = #{new.createTime},</if>
+            <if test="new.updateTime!=null">update_time = #{new.updateTime},</if>
+            <if test="new.status!=null">status = #{new.status},</if>
+        </set>
+        <where>
+            id=#{old.id}
+            <if test="new.pid!=null and old.pid!=null">and pid = #{old.pid}</if>
+            <if test="new.uid!=null and old.uid!=null">and uid = #{old.uid}</if>
+            <if test="new.name!=null and old.name!=null">and name = #{old.name}</if>
+            <if test="new.difficulty!=null and old.difficulty!=null">and difficulty = #{old.difficulty}</if>
+            <if test="new.ojType!=null and old.ojType!=null">and oj_type = #{old.ojType}</if>
+            <if test="new.type!=null and old.type!=null">and type = #{old.type}</if>
+            <if test="new.preTime!=null and old.preTime!=null">and pre_time = #{old.preTime}</if>
+            <if test="new.useTime!=null and old.useTime!=null">and use_time = #{old.useTime}</if>
+            <if test="new.standalone!=null and old.standalone!=null">and standalone = #{old.standalone}</if>
+            <if test="new.study!=null and old.study!=null">and study = #{old.study}</if>
+            <if test="new.link!=null and old.link!=null">and link = #{old.link}</if>
+            <if test="new.createTime!=null and old.createTime!=null">and create_time = #{old.createTime}</if>
+            <if test="new.updateTime!=null and old.updateTime!=null">and update_time = #{old.updateTime}</if>
+            <if test="new.status!=null and old.status!=null">and status = #{old.status}</if>
+        </where>
+    </update>
+
+    <select id="searchListByUidTime" resultType="fun.johntaylor.kunkka.entity.oj.Oj">
+        select id, pid, uid, name, difficulty, oj_type as ojType, type, pre_time as preTime, use_time as useTime,
+        standalone, study, link, create_time as createTime, update_time as updateTime, status
+        from t_oj
+        <where>
+            uid=#{uid} and status != 4
+            <if test="begin!=null">and create_time <![CDATA[ >= ]]> #{begin}</if>
+            <if test="end!=null">and create_time <![CDATA[ <= ]]> #{end}</if>
+        </where>
+        limit #{offset}, #{count}
+    </select>
+
+    <select id="countByUidTime" resultType="Integer">
+        select count(1)
+        from t_oj
+        <where>
+            uid=#{uid} and status != 4
+            <if test="begin!=null">and create_time <![CDATA[ >= ]]> #{begin}</if>
+            <if test="end!=null">and create_time <![CDATA[ <= ]]> #{end}</if>
+        </where>
+    </select>
+</mapper>
