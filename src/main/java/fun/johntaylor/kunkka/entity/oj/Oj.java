@@ -72,7 +72,7 @@ public class Oj {
     private Long useTime;
 
     /**
-     * 是否独立完成 1--是， 2--否
+     * 是否参考题解 1--是， 2--否
      */
     private Integer standalone;
 

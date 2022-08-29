@@ -10,7 +10,7 @@ create table `t_oj`
     `type`        int          not null comment '题目类别',
     `pre_time`    bigint(20) not null comment '开始或上一次暂停的时刻 毫秒',
     `use_time`    bigint(20) default '0' comment '时长 秒',
-    `standalone`  tinyint default null comment '是否独立完成 1--是， 2--否',
+    `standalone`  tinyint default null comment '是否参考题解 1--是， 2--否',
     `study`       tinyint default null comment '是否学习了题解 1--是， 2--否',
     `link`        varchar(50)  not null comment '题目链接',
     `create_time` bigint(20) not null comment '创建时间',
