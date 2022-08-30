@@ -27,6 +27,10 @@ public class OjServiceImpl implements OjService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Result<Oj> add(Oj oj) {
+        int sum = ojMapper.countBegin(oj.getUid(), Oj.S_BEGIN);
+        if (sum > 0) {
+            return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "请先暂停或完成已经开始的题目");
+        }
         List<Oj> lists = ojMapper.searchListByUidPidOjTye(oj.getUid(), oj.getPid(), oj.getOjType());
         for (Oj old : lists) {
             if (!Oj.S_DEL.equals(old.getStatus())) {
