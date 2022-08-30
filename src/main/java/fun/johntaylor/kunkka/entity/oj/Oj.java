@@ -40,11 +40,7 @@ public class Oj {
      * 难度 1-- 简单, 2-- 中等, 3-- 困难
      */
     @NotNull(message = "请设置题目难度", groups = {Insert.class})
-    private Integer difficulty;
-
-    public static final Integer D_EASY = 1;
-    public static final Integer D_MEDIUM = 2;
-    public static final Integer D_HARD = 3;
+    private String difficulty;
 
     /**
      * 题库 1-- leetcode
@@ -52,13 +48,11 @@ public class Oj {
     @NotNull(message = "请设置题库", groups = {Insert.class})
     private Integer ojType;
 
-    public static final Integer OT_LEETCODE = 1;
-
     /**
      * 题目类型
      */
     @NotNull(message = "请设置题目类型", groups = {Insert.class})
-    private Integer type;
+    private String type;
 
     /**
      * 开始或上一次操作的时刻
@@ -74,18 +68,12 @@ public class Oj {
     /**
      * 是否参考题解 1--是， 2--否
      */
-    private Integer standalone;
-
-    public static final Integer SE_YES = 1;
-    public static final Integer SE_NO = 2;
+    private String standalone;
 
     /**
      * 是否学习了题解 1--是， 2--否
      */
-    private Integer study;
-
-    public static final Integer ST_YES = 1;
-    public static final Integer ST_NO = 2;
+    private String study;
 
     /**
      * 题目链接

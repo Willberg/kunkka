@@ -35,8 +35,8 @@ public class OjController {
     public Mono<String> add(ServerHttpRequest request, @Validated(value = {Insert.class}) @RequestBody Oj oj) {
         return Mono.just(session.getUser(request)).publishOn(dbThreadPool.daoInstance()).map(v -> {
             oj.setUid(v.getId());
-            oj.setStandalone(Oj.SE_NO);
-            oj.setStudy(Oj.ST_NO);
+            oj.setStandalone("否");
+            oj.setStudy("否");
             oj.setUseTime(0L);
             oj.setCreateTime(oj.getPreTime());
             oj.setUpdateTime(oj.getPreTime());

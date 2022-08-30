@@ -15,12 +15,14 @@ public class KunkkaApplicationTests {
     @Test
     public void testTransaction() {
         Oj oj = new Oj();
-        oj.setPid(1L);
+        oj.setPid(11L);
         oj.setUid(1L);
         oj.setName("test");
-        oj.setDifficulty(1);
+        oj.setDifficulty("困难");
         oj.setOjType(1);
-        oj.setType(1);
+        oj.setStandalone("是");
+        oj.setStudy("是");
+        oj.setType("二分搜索");
         oj.setPreTime(System.currentTimeMillis());
         oj.setLink("test/");
         oj.setCreateTime(System.currentTimeMillis());
