@@ -45,10 +45,6 @@ public class OjServiceImpl implements OjService {
     @Transactional(rollbackFor = Exception.class)
     public Result<Oj> update(Oj oj) {
         Oj old = ojMapper.select(oj.getId());
-        if (old.getStatus().equals(oj.getStatus()) || Oj.S_END.equals(old.getStatus())
-            || Oj.S_DEL.equals(old.getStatus())) {
-            return Result.success(old);
-        }
         if (Oj.S_BEGIN.equals(old.getStatus()) && !Oj.S_DEL.equals(oj.getStatus())) {
             oj.setUseTime(old.getUseTime() + (oj.getPreTime() - old.getPreTime()) / 1000);
         }
