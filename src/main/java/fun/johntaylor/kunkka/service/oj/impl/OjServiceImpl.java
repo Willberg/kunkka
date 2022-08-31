@@ -1,6 +1,7 @@
 package fun.johntaylor.kunkka.service.oj.impl;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,18 @@ public class OjServiceImpl implements OjService {
     @Transactional(rollbackFor = Exception.class)
     public Result<Oj> update(Oj oj) {
         Oj old = ojMapper.select(oj.getId());
+        if (Objects.isNull(old)) {
+            return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "记录不存在");
+        }
+        if (!old.getUid().equals(oj.getUid())) {
+            return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "你无权操作");
+        }
+        if (!Oj.S_BEGIN.equals(old.getStatus()) && Oj.S_BEGIN.equals(oj.getStatus())) {
+            int sum = ojMapper.countBegin(oj.getUid(), Oj.S_BEGIN);
+            if (sum > 0) {
+                return Result.failWithMessage(ErrorCode.SYS_PARAMETER_ERROR, "请先暂停或完成已经开始的题目");
+            }
+        }
         if (Oj.S_BEGIN.equals(old.getStatus()) && !Oj.S_DEL.equals(oj.getStatus())) {
             oj.setUseTime(old.getUseTime() + (oj.getPreTime() - old.getPreTime()) / 1000);
         }

@@ -48,6 +48,7 @@ public class OjController {
     @PostMapping(value = "/api/oj/update")
     public Mono<String> update(ServerHttpRequest request, @Validated(value = {Update.class}) @RequestBody Oj oj) {
         return Mono.just(session.getUser(request)).publishOn(dbThreadPool.daoInstance()).map(v -> {
+            oj.setUid(v.getId());
             oj.setUpdateTime(System.currentTimeMillis());
             return ojService.update(oj).toString();
         });
