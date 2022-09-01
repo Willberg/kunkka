@@ -12,7 +12,7 @@ create table `t_oj`
     `use_time`    bigint(20) default '0' comment '时长 秒',
     `standalone`  varchar(2) default null comment '是否参考题解',
     `study`       varchar(2) default null comment '是否学习了题解',
-    `link`        varchar(50)  not null comment '题目链接',
+    `link`        varchar(1000)  not null comment '题目链接',
     `create_time` bigint(20) not null comment '创建时间',
     `update_time` bigint(20) default null comment '更新时间',
     `status`      tinyint      not null comment '状态， 1-- 开始, 2-- 暂停, 3-- 结束, 4-- 删除',
