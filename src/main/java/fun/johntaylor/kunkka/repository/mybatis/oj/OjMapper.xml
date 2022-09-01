@@ -64,7 +64,7 @@
 
     <select id="searchListByUidTime" resultType="fun.johntaylor.kunkka.entity.oj.Oj">
         select id, pid, uid, name, difficulty, oj_type as ojType, type, pre_time as preTime, use_time as useTime,
-        standalone, study, link, create_time as createTime, update_time as updateTime, status
+        standalone, study, link, importance, create_time as createTime, update_time as updateTime, status
         from t_oj
         <where>
             uid=#{uid} and status != 4
