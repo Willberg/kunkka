@@ -82,6 +82,12 @@ public class Oj {
     private String link;
 
     /**
+     * 重要程度
+     */
+    @NotNull(message = "请设置题目重要程度", groups = {Insert.class})
+    private Integer importance;
+
+    /**
      * 创建时间
      */
     private Long createTime;
