@@ -15,6 +15,7 @@
             <if test="standalone!=null">standalone = #{standalone},</if>
             <if test="study!=null">study = #{study},</if>
             <if test="link!=null">link = #{link},</if>
+            <if test="ansLink!=null">ans_link = #{ansLink},</if>
             <if test="importance!=null">importance = #{importance},</if>
             <if test="createTime!=null">create_time = #{createTime},</if>
             <if test="updateTime!=null">update_time = #{updateTime},</if>
@@ -37,6 +38,7 @@
             <if test="new.standalone!=null">standalone = #{new.standalone},</if>
             <if test="new.study!=null">study = #{new.study},</if>
             <if test="new.link!=null">link = #{new.link},</if>
+            <if test="new.ansLink!=null">ans_link = #{new.ansLink},</if>
             <if test="new.importance!=null">importance = #{new.importance},</if>
             <if test="new.createTime!=null">create_time = #{new.createTime},</if>
             <if test="new.updateTime!=null">update_time = #{new.updateTime},</if>
@@ -55,6 +57,7 @@
             <if test="new.standalone!=null and old.standalone!=null">and standalone = #{old.standalone}</if>
             <if test="new.study!=null and old.study!=null">and study = #{old.study}</if>
             <if test="new.link!=null and old.link!=null">and link = #{old.link}</if>
+            <if test="new.ansLink!=null and old.ansLink!=null">and ans_link = #{old.ansLink}</if>
             <if test="new.importance!=null and old.importance!=null">and importance = #{old.importance}</if>
             <if test="new.createTime!=null and old.createTime!=null">and create_time = #{old.createTime}</if>
             <if test="new.updateTime!=null and old.updateTime!=null">and update_time = #{old.updateTime}</if>
@@ -64,7 +67,8 @@
 
     <select id="searchListByUidTime" resultType="fun.johntaylor.kunkka.entity.oj.Oj">
         select id, pid, uid, name, difficulty, oj_type as ojType, type, pre_time as preTime, use_time as useTime,
-        standalone, study, link, importance, create_time as createTime, update_time as updateTime, status
+        standalone, study, link, ans_link as ansLink, importance, create_time as createTime, update_time as updateTime,
+        status
         from t_oj
         <where>
             uid=#{uid} and status != 4

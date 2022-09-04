@@ -82,6 +82,11 @@ public class Oj {
     private String link;
 
     /**
+     * 题解链接
+     */
+    private String ansLink;
+
+    /**
      * 重要程度
      */
     @NotNull(message = "请设置题目重要程度", groups = {Insert.class})
