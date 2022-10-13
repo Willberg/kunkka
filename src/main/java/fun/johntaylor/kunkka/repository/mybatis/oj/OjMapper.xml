@@ -72,6 +72,7 @@
         from t_oj
         <where>
             uid=#{uid} and status != 4
+            <if test="pid!=null">and pid = #{pid}</if>
             <if test="begin!=null">and create_time <![CDATA[ >= ]]> #{begin}</if>
             <if test="end!=null">and create_time <![CDATA[ <= ]]> #{end}</if>
         </where>
@@ -84,6 +85,7 @@
         from t_oj
         <where>
             uid=#{uid} and status != 4
+            <if test="pid!=null">and pid = #{pid}</if>
             <if test="begin!=null">and create_time <![CDATA[ >= ]]> #{begin}</if>
             <if test="end!=null">and create_time <![CDATA[ <= ]]> #{end}</if>
         </where>

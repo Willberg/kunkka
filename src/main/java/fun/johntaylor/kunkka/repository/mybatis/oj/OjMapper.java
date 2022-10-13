@@ -35,16 +35,13 @@ public interface OjMapper {
     @Delete("delete from Oj where id=#{id}")
     int delete(Long id);
 
-    List<Oj> searchListByUidTime(Long uid, Integer offset, Integer count, Long begin, Long end);
+    List<Oj> searchListByUidTime(Long pid, Long uid, Integer offset, Integer count, Long begin, Long end);
 
-    int countByUidTime(Long uid, Long begin, Long end);
+    int countByUidTime(Long pid, Long uid, Long begin, Long end);
 
     @Select("select " + COLUMNS + " from t_oj where uid=#{uid} and pid = #{pid} and oj_type = #{ojType}")
     List<Oj> searchListByUidPidOjTye(Long uid, Long pid, Integer ojType);
 
     @Select("select count(1) from t_oj where uid=#{uid} and status = #{status}")
     int countBegin(Long uid, Integer status);
-
-    @Select("select " + COLUMNS + " from t_oj where pid=#{pid} and uid=#{uid}")
-    Oj searchByPidUid(Long pid, Long uid);
 }

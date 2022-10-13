@@ -55,25 +55,20 @@ public class OjController {
     }
 
     @GetMapping(value = "/api/oj/list")
-    public Mono<String> list(ServerHttpRequest request,
+    public Mono<String> list(ServerHttpRequest request, @RequestParam(value = "pid", required = false) Long pid,
         @RequestParam(value = "offset", defaultValue = "0") Integer offset,
         @RequestParam(value = "count", defaultValue = "10") Integer count,
         @RequestParam(value = "begin", required = false) Long begin,
         @RequestParam(value = "end", required = false) Long end) {
         return Mono.just(session.getUser(request)).publishOn(dbThreadPool.daoInstance())
-            .map(v -> ojService.searchListByUidTime(v.getId(), offset, count, begin, end).toString());
+            .map(v -> ojService.searchListByUidTime(pid, v.getId(), offset, count, begin, end).toString());
     }
 
     @GetMapping(value = "/api/oj/count")
-    public Mono<String> count(ServerHttpRequest request, @RequestParam(value = "begin", required = false) Long begin,
+    public Mono<String> count(ServerHttpRequest request, @RequestParam(value = "pid", required = false) Long pid,
+        @RequestParam(value = "begin", required = false) Long begin,
         @RequestParam(value = "end", required = false) Long end) {
         return Mono.just(session.getUser(request)).publishOn(dbThreadPool.daoInstance())
-            .map(v -> ojService.countByUidTime(v.getId(), begin, end).toString());
-    }
-
-    @GetMapping(value = "/api/oj/search")
-    public Mono<String> search(ServerHttpRequest request, @RequestParam(value = "pid") Long pid) {
-        return Mono.just(session.getUser(request)).publishOn(dbThreadPool.daoInstance())
-            .map(v -> ojService.searchByPidUid(pid, v.getId()).toString());
+            .map(v -> ojService.countByUidTime(pid, v.getId(), begin, end).toString());
     }
 }

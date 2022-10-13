@@ -66,17 +66,13 @@ public class OjServiceImpl implements OjService {
     }
 
     @Override
-    public Result<List<Oj>> searchListByUidTime(Long uid, Integer offset, Integer count, Long begin, Long end) {
-        return Result.success(ojMapper.searchListByUidTime(uid, offset, count, begin, end));
+    public Result<List<Oj>> searchListByUidTime(Long pid, Long uid, Integer offset, Integer count, Long begin,
+        Long end) {
+        return Result.success(ojMapper.searchListByUidTime(pid, uid, offset, count, begin, end));
     }
 
     @Override
-    public Result<Integer> countByUidTime(Long uid, Long begin, Long end) {
-        return Result.success(ojMapper.countByUidTime(uid, begin, end));
-    }
-
-    @Override
-    public Result<Oj> searchByPidUid(Long pid, Long uid) {
-        return Result.success(ojMapper.searchByPidUid(pid, uid));
+    public Result<Integer> countByUidTime(Long pid, Long uid, Long begin, Long end) {
+        return Result.success(ojMapper.countByUidTime(pid, uid, begin, end));
     }
 }

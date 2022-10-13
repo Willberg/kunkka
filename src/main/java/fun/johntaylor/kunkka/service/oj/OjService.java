@@ -31,6 +31,7 @@ public interface OjService {
     /**
      * 根据uid和创建时间获取题目列表
      * 
+     * @param pid
      * @param uid
      * @param offset
      * @param count
@@ -38,24 +39,16 @@ public interface OjService {
      * @param end
      * @return Result
      */
-    Result<List<Oj>> searchListByUidTime(Long uid, Integer offset, Integer count, Long begin, Long end);
+    Result<List<Oj>> searchListByUidTime(Long pid, Long uid, Integer offset, Integer count, Long begin, Long end);
 
     /**
      * 根据uid和创建时间获取题目总数
-     * 
+     *
+     * @param pid
      * @param uid
      * @param begin
      * @param end
      * @return
      */
-    Result<Integer> countByUidTime(Long uid, Long begin, Long end);
-
-    /**
-     * 根据uid和pid获取题目
-     *
-     * @param pid
-     * @param uid
-     * @return Result
-     */
-    Result<Oj> searchByPidUid(Long pid, Long uid);
+    Result<Integer> countByUidTime(Long pid, Long uid, Long begin, Long end);
 }
