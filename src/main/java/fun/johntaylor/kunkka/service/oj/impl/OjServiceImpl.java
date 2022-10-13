@@ -74,4 +74,9 @@ public class OjServiceImpl implements OjService {
     public Result<Integer> countByUidTime(Long uid, Long begin, Long end) {
         return Result.success(ojMapper.countByUidTime(uid, begin, end));
     }
+
+    @Override
+    public Result<Oj> searchByPidUid(Long pid, Long uid) {
+        return Result.success(ojMapper.searchByPidUid(pid, uid));
+    }
 }

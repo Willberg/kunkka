@@ -44,4 +44,7 @@ public interface OjMapper {
 
     @Select("select count(1) from t_oj where uid=#{uid} and status = #{status}")
     int countBegin(Long uid, Integer status);
+
+    @Select("select " + COLUMNS + " from t_oj where pid=#{pid} and uid=#{uid}")
+    Oj searchByPidUid(Long pid, Long uid);
 }

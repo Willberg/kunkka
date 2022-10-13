@@ -70,4 +70,10 @@ public class OjController {
         return Mono.just(session.getUser(request)).publishOn(dbThreadPool.daoInstance())
             .map(v -> ojService.countByUidTime(v.getId(), begin, end).toString());
     }
+
+    @GetMapping(value = "/api/oj/search")
+    public Mono<String> search(ServerHttpRequest request, @RequestParam(value = "pid") Long pid) {
+        return Mono.just(session.getUser(request)).publishOn(dbThreadPool.daoInstance())
+            .map(v -> ojService.searchByPidUid(pid, v.getId()).toString());
+    }
 }

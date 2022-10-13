@@ -49,4 +49,13 @@ public interface OjService {
      * @return
      */
     Result<Integer> countByUidTime(Long uid, Long begin, Long end);
+
+    /**
+     * 根据uid和pid获取题目
+     *
+     * @param pid
+     * @param uid
+     * @return Result
+     */
+    Result<Oj> searchByPidUid(Long pid, Long uid);
 }
