@@ -12,6 +12,7 @@ import fun.johntaylor.kunkka.utils.general.CopyUtil;
 import fun.johntaylor.kunkka.utils.result.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -91,7 +92,12 @@ public class CipherController {
 				.map(v -> {
 					List<Cipher> cipherList = cipherService.list(v.getId());
 					List<EncryptCipher> encryptCipherList = cipherList.stream()
-							.filter(c -> c.getName().contains(name))
+							.filter(c -> {
+								if (StringUtils.isEmpty(name)) {
+									return true;
+								}
+								return c.getName().contains(name);
+							})
 							.map(c -> {
 								EncryptCipher encryptCipher = CopyUtil.copyWithSet(c, new EncryptCipher());
 								encryptCipher.setPassword(EncryptUtil.encryptPassword(c.getPassword(), c.getSalt()));
