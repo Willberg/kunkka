@@ -31,7 +31,7 @@ public class TimerController {
 	/**
 	 * 每天总时长
 	 */
-	private static final long TOTAL_TIME = 24 * 60 * 60;
+	private static final long TOTAL_TIME = 24 * 60 * 60L;
 
 	@Autowired
 	private DbThreadPool dbThreadPool;
@@ -303,6 +303,7 @@ public class TimerController {
 		detail.put(Timer.T_READ, 0L);
 		detail.put(Timer.T_CHORE, 0L);
 		detail.put(Timer.T_PROJECT, 0L);
+		detail.put(Timer.T_SPORT, 0L);
 		detail.put(Timer.T_UNKNOWN, TOTAL_TIME);
 		return detail;
 	}
